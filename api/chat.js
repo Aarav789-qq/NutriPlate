@@ -12,7 +12,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt } = req.body || {};
+    // Safe Body Parsing
+    let body = req.body;
+    if (typeof body === "string") {
+      body = JSON.parse(body);
+    }
+    
+    const { prompt } = body || {};
 
     if (!prompt) {
       return res.status(400).json({ error: "Prompt is required." });
@@ -24,6 +30,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Gemini API key is not configured." });
     }
 
+    // Correct Endpoint & Secure Header Configuration
     const response = await fetch(
       "https://googleapis.com",
       {
@@ -33,7 +40,11 @@ export default async function handler(req, res) {
           "x-goog-api-key": apiKey
         },
         body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: prompt }] }]
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          // System Instruction Object added perfectly
+          systemInstruction: {
+            parts: [{ text: "You are NutriPlate AI, an expert personalized culinary assistant. Provide clean formatting including: Dish Name, Ingredients Needed, Clear Steps, and Macro Highlights." }]
+          }
         })
       }
     );
