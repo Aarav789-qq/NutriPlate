@@ -1,932 +1,2385 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>NutriPlate | What should we eat tomorrow?</title>
+<title>NutriPlate — What should we eat?</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<style>
 
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f7f8f4;
-      color: #26352d;
-      line-height: 1.6;
-    }
+:root {
+    --bg: #f6f8f4;
+    --card: #ffffff;
+    --text: #1e2b24;
+    --muted: #68736c;
+    --primary: #5f8f58;
+    --primary-dark: #355c39;
+    --soft: #e7f0e3;
+    --border: #dfe6dc;
+    --nav: rgba(255,255,255,0.92);
+}
 
-    header {
-      background: white;
-      padding: 20px 7%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #e5e8e2;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    .logo {
-      font-size: 25px;
-      font-weight: 800;
-      letter-spacing: 1px;
-    }
+html {
+    scroll-behavior: smooth;
+}
 
-    .logo span {
-      color: #6c9b64;
-    }
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: 0.3s;
+}
 
-    nav a {
-      text-decoration: none;
-      color: #39473f;
-      margin-left: 25px;
-      font-size: 14px;
-      font-weight: 600;
-    }
+button,
+input,
+select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--nav);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+}
+
+.navbar {
+    max-width: 1200px;
+    margin: auto;
+    padding: 17px 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.logo span {
+    color: var(--primary);
+}
+
+.nav-links {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+}
+
+.nav-links button {
+    background: none;
+    border: none;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.settings-btn {
+    background: var(--soft) !important;
+    padding: 9px 12px;
+    border-radius: 10px;
+}
+
+.hero {
+    min-height: 78vh;
+    padding: 80px 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
+    background:
+        radial-gradient(circle at 80% 20%, #e3f0dc, transparent 30%),
+        linear-gradient(135deg, #f2f7ef, #fafaf6);
+}
+
+.hero-content {
+    max-width: 680px;
+}
+
+.badge {
+    display: inline-block;
+    background: var(--soft);
+    color: var(--primary-dark);
+    padding: 8px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.hero h1 {
+    font-size: clamp(44px, 7vw, 78px);
+    line-height: 1;
+    letter-spacing: -4px;
+    margin-bottom: 24px;
+}
+
+.hero h1 span {
+    color: var(--primary);
+}
+
+.hero p {
+    color: var(--muted);
+    font-size: 19px;
+    max-width: 600px;
+    margin-bottom: 30px;
+}
+
+.hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.primary-btn,
+.secondary-btn {
+    border-radius: 13px;
+    padding: 14px 21px;
+    border: none;
+    font-weight: 800;
+    transition: 0.2s;
+}
+
+.primary-btn {
+    background: var(--text);
+    color: white;
+}
+
+.secondary-btn {
+    background: white;
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.primary-btn:hover,
+.secondary-btn:hover {
+    transform: translateY(-2px);
+}
+
+.hero-card {
+    width: 360px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 25px;
+    padding: 28px;
+    box-shadow: 0 20px 55px rgba(0,0,0,0.08);
+}
+
+.food-emoji {
+    font-size: 65px;
+    margin-bottom: 10px;
+}
+
+.hero-card h3 {
+    margin-bottom: 5px;
+}
+
+.hero-card p {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+.nutrition-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+
+section {
+    padding: 85px 7%;
+}
+
+.section-title {
+    max-width: 750px;
+    text-align: center;
+    margin: auto auto 45px;
+}
+
+.section-title h2 {
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+.section-title p {
+    color: var(--muted);
+}
+
+.grid-3 {
+    max-width: 1100px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 25px;
+}
+
+.card-icon {
+    font-size: 35px;
+    margin-bottom: 12px;
+}
+
+.card h3 {
+    margin-bottom: 8px;
+}
+
+.card p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+#planner {
+    background: var(--soft);
+}
+
+.planner-container {
+    max-width: 950px;
+    margin: auto;
+    background: var(--card);
+    border-radius: 24px;
+    padding: 35px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+}
+
+.mode-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.mode-tab {
+    padding: 12px 18px;
+    border-radius: 11px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    font-weight: 700;
+}
+
+.mode-tab.active {
+    background: var(--text);
+    color: white;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 800;
+    margin-bottom: 9px;
+}
+
+input,
+select {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 13px;
+    outline: none;
+}
+
+input:focus,
+select:focus {
+    border-color: var(--primary);
+}
+
+.options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.option {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.option.selected {
+    background: var(--soft);
+    border-color: var(--primary);
+    font-weight: 800;
+}
+
+.voice-box {
+    border: 2px dashed #b8c8b2;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.voice-box p {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 7px 0 15px;
+}
+
+.voice-btn {
+    border: none;
+    background: var(--primary);
+    color: white;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-weight: 800;
+}
+
+.family-mode {
+    display: none;
+}
+
+.member {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 17px;
+    border-radius: 13px;
+    margin-bottom: 12px;
+}
+
+.member h4 {
+    margin-bottom: 12px;
+}
+
+.member-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.results {
+    display: none;
+    margin-top: 40px;
+}
+
+.results.show {
+    display: block;
+}
+
+.results h2 {
+    margin-bottom: 20px;
+}
+
+.meal-grid {
+    display: grid;
+    gap: 17px;
+}
+
+.meal-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    padding: 22px;
+}
+
+.meal-card h3 {
+    margin-bottom: 7px;
+}
+
+.meal-card > p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 15px 0;
+}
+
+.chip {
+    background: var(--soft);
+    padding: 7px 9px;
+    border-radius: 8px;
+    font-size: 11px;
+}
+
+.why {
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    font-size: 13px;
+}
+
+.recipe-link {
+    display: inline-block;
+    margin-top: 13px;
+    color: var(--primary-dark);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+#cuisines {
+    background: var(--card);
+}
+
+.cuisine-grid {
+    max-width: 1050px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.cuisine {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+    text-align: center;
+    background: var(--bg);
+    transition: 0.2s;
+}
+
+.cuisine:hover {
+    transform: translateY(-4px);
+}
+
+.cuisine-icon {
+    font-size: 35px;
+    margin-bottom: 8px;
+}
+
+#facts {
+    background: var(--bg);
+}
+
+.fact-table {
+    max-width: 1000px;
+    margin: auto;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+th,
+td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-size: 13px;
+}
+
+th {
+    background: var(--soft);
+}
+
+#plus {
+    background: var(--text);
+    color: white;
+}
+
+#plus .section-title p {
+    color: #cbd6cf;
+}
+
+.plus-card {
+    max-width: 850px;
+    margin: auto;
+    background: #304239;
+    border: 1px solid #4b5d51;
+    border-radius: 25px;
+    padding: 35px;
+}
+
+.price {
+    font-size: 48px;
+    font-weight: 900;
+    margin: 10px 0 20px;
+}
+
+.plus-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.plus-feature {
+    padding: 13px;
+    border: 1px solid #506258;
+    border-radius: 10px;
+}
+
+.settings-panel,
+.checkout-panel {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal {
+    width: 100%;
+    max-width: 550px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--card);
+    color: var(--text);
+    border-radius: 20px;
+    padding: 28px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.close {
+    border: none;
+    background: var(--bg);
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+}
+
+.theme-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.theme-option {
+    padding: 15px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg);
+    text-align: left;
+}
+
+.payment-options {
+    display: grid;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.payment {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    padding: 14px;
+    border-radius: 11px;
+    text-align: left;
+    font-weight: 700;
+}
+
+.demo-note {
+    background: #fff4d6;
+    color: #6d5724;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-bottom: 20px;
+}
+
+footer {
+    background: #152019;
+    color: #bdc9c0;
+    text-align: center;
+    padding: 25px;
+    font-size: 13px;
+}
+
+.disclaimer {
+    max-width: 850px;
+    margin: 25px auto 0;
+    color: var(--muted);
+    font-size: 11px;
+    text-align: center;
+}
+
+@media(max-width: 850px) {
 
     .hero {
-      min-height: 78vh;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 50px;
-      padding: 70px 8%;
-      background: linear-gradient(135deg, #eef5e9, #faf9f3);
-    }
-
-    .hero-text {
-      max-width: 620px;
-    }
-
-    .tag {
-      display: inline-block;
-      background: #e1eddc;
-      color: #52764d;
-      padding: 8px 14px;
-      border-radius: 30px;
-      font-size: 13px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      font-size: clamp(42px, 7vw, 76px);
-      line-height: 1.02;
-      margin-bottom: 20px;
-      letter-spacing: -3px;
-    }
-
-    h1 span {
-      color: #6c9b64;
-    }
-
-    .hero p {
-      font-size: 19px;
-      color: #59655d;
-      max-width: 570px;
-      margin-bottom: 30px;
-    }
-
-    .button {
-      display: inline-block;
-      border: none;
-      background: #26352d;
-      color: white;
-      padding: 15px 25px;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .button:hover {
-      transform: translateY(-2px);
-      opacity: 0.9;
+        flex-direction: column;
+        text-align: center;
     }
 
     .hero-card {
-      background: white;
-      border-radius: 25px;
-      padding: 30px;
-      width: 340px;
-      box-shadow: 0 15px 45px rgba(0,0,0,0.08);
-    }
-
-    .meal-icon {
-      font-size: 60px;
-      margin-bottom: 10px;
-    }
-
-    .hero-card h3 {
-      margin-bottom: 5px;
-    }
-
-    .hero-card p {
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-
-    .nutrition-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid #eeeeea;
-      font-size: 14px;
-    }
-
-    section {
-      padding: 80px 8%;
-    }
-
-    .section-title {
-      text-align: center;
-      max-width: 700px;
-      margin: auto auto 45px;
-    }
-
-    .section-title h2 {
-      font-size: 38px;
-      margin-bottom: 12px;
-    }
-
-    .section-title p {
-      color: #667069;
-    }
-
-    .problem-grid,
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 22px;
-    }
-
-    .info-card {
-      background: white;
-      border: 1px solid #e5e8e2;
-      border-radius: 18px;
-      padding: 27px;
-    }
-
-    .info-card .emoji {
-      font-size: 32px;
-      margin-bottom: 15px;
-    }
-
-    .info-card h3 {
-      margin-bottom: 8px;
-    }
-
-    .info-card p {
-      color: #667069;
-      font-size: 15px;
-    }
-
-    #planner {
-      background: #eef5e9;
-    }
-
-    .planner-box {
-      max-width: 850px;
-      margin: auto;
-      background: white;
-      padding: 35px;
-      border-radius: 22px;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.06);
-    }
-
-    .form-group {
-      margin-bottom: 25px;
-    }
-
-    .form-group label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-
-    input,
-    select {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid #d8ddd5;
-      border-radius: 10px;
-      font-size: 15px;
-      background: white;
-    }
-
-    .options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .option {
-      border: 1px solid #d8ddd5;
-      background: #fafbf8;
-      padding: 11px 15px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: 0.2s;
-    }
-
-    .option:hover {
-      border-color: #6c9b64;
-    }
-
-    .option.selected {
-      background: #e1eddc;
-      border-color: #6c9b64;
-      font-weight: bold;
-    }
-
-    .recommendations {
-      display: none;
-      margin-top: 35px;
-    }
-
-    .recommendations.show {
-      display: block;
-    }
-
-    .recommendations h2 {
-      margin-bottom: 20px;
-    }
-
-    .meal-results {
-      display: grid;
-      gap: 18px;
-    }
-
-    .meal {
-      border: 1px solid #e2e6df;
-      border-radius: 16px;
-      padding: 22px;
-      background: #fbfcf9;
-    }
-
-    .meal h3 {
-      margin-bottom: 8px;
-    }
-
-    .meal p {
-      color: #606b63;
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-
-    .meal-tags span {
-      display: inline-block;
-      background: #e8efe5;
-      padding: 5px 9px;
-      border-radius: 20px;
-      margin: 3px;
-      font-size: 12px;
-    }
-
-    .why {
-      margin-top: 12px;
-      font-size: 13px;
-      color: #46564b;
-    }
-
-    .family {
-      background: white;
-    }
-
-    .family-box {
-      max-width: 900px;
-      margin: auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 30px;
-      align-items: center;
-    }
-
-    .family-list {
-      background: #f2f6ef;
-      padding: 25px;
-      border-radius: 18px;
-    }
-
-    .family-list div {
-      padding: 12px;
-      border-bottom: 1px solid #dce5d8;
-    }
-
-    .future {
-      background: #26352d;
-      color: white;
-      text-align: center;
-    }
-
-    .future p {
-      color: #d8e1da;
-      max-width: 700px;
-      margin: 15px auto 30px;
-    }
-
-    .future-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .future-item {
-      padding: 20px;
-      border: 1px solid #526258;
-      border-radius: 14px;
-    }
-
-    footer {
-      background: #18231e;
-      color: #cfd8d2;
-      text-align: center;
-      padding: 25px;
-      font-size: 13px;
-    }
-
-    .disclaimer {
-      max-width: 850px;
-      margin: 25px auto 0;
-      font-size: 12px;
-      color: #78837b;
-      text-align: center;
-    }
-
-    @media (max-width: 800px) {
-      .hero {
-        flex-direction: column;
-        text-align: center;
-      }
-
-      .hero-card {
         width: 100%;
         max-width: 400px;
-      }
+    }
 
-      .problem-grid,
-      .feature-grid {
+    .grid-3 {
         grid-template-columns: 1fr;
-      }
+    }
 
-      .family-box {
-        grid-template-columns: 1fr;
-      }
-
-      .future-grid {
+    .cuisine-grid {
         grid-template-columns: 1fr 1fr;
-      }
+    }
 
-      nav {
+    .nav-links {
         display: none;
-      }
+    }
+}
+
+@media(max-width: 550px) {
+
+    section {
+        padding: 60px 5%;
     }
 
-    @media (max-width: 500px) {
-      .future-grid {
-        grid-template-columns: 1fr;
-      }
-
-      section {
-        padding: 60px 6%;
-      }
-
-      .planner-box {
+    .planner-container {
         padding: 22px;
-      }
     }
-  </style>
+
+    .member-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .plus-features {
+        grid-template-columns: 1fr;
+    }
+
+    .cuisine-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero h1 {
+        letter-spacing: -2px;
+    }
+}
+
+</style>
 </head>
+
 
 <body>
 
-<header>
-  <div class="logo">MEAL<span>MATE</span></div>
 
-  <nav>
-    <a href="#problem">Problem</a>
-    <a href="#planner">Planner</a>
-    <a href="#family">Family Mode</a>
-  </nav>
+<header>
+
+<div class="navbar">
+
+    <div class="logo">
+        NUTRI<span>PLATE</span>
+    </div>
+
+    <div class="nav-links">
+
+        <button onclick="goTo('planner')">
+            Plan
+        </button>
+
+        <button onclick="goTo('cuisines')">
+            Cuisines
+        </button>
+
+        <button onclick="goTo('facts')">
+            NutriFacts
+        </button>
+
+        <button onclick="goTo('plus')">
+            Plus
+        </button>
+
+        <button class="settings-btn" onclick="openSettings()">
+            ⚙️
+        </button>
+
+    </div>
+
+</div>
+
 </header>
 
-<section class="hero">
-  <div class="hero-text">
 
-    <div class="tag">PERSONALIZED MEAL PLANNING</div>
+
+<!-- HERO -->
+
+<section class="hero">
+
+<div class="hero-content">
+
+    <div class="badge">
+        PERSONALIZED MEAL DECISION PLATFORM
+    </div>
 
     <h1>
-      What should we eat <span>tomorrow?</span>
+        What should we eat <span>today?</span>
     </h1>
 
     <p>
-      MEALMATE helps households make everyday meal decisions
-      using dietary preferences, available ingredients,
-      cooking time and nutritional priorities.
+        NutriPlate helps you decide what to cook using
+        the ingredients you already have, your available
+        time, preferences and nutritional needs.
     </p>
 
-    <button class="button" onclick="scrollToPlanner()">
-      Plan My Meal →
-    </button>
+    <div class="hero-buttons">
 
-  </div>
+        <button class="primary-btn"
+                onclick="goTo('planner')">
+            ⚡ Plan My Meal
+        </button>
 
-  <div class="hero-card">
+        <button class="secondary-btn"
+                onclick="openQuickDemo()">
+            🤷 Surprise Me
+        </button>
 
-    <div class="meal-icon">🍛</div>
-
-    <h3>Dal & Vegetable Bowl</h3>
-
-    <p>A simple balanced meal suggestion.</p>
-
-    <div class="nutrition-row">
-      <span>🫘 Protein source</span>
-      <strong>Dal</strong>
     </div>
 
-    <div class="nutrition-row">
-      <span>🥬 Fibre</span>
-      <strong>Vegetables</strong>
+</div>
+
+
+<div class="hero-card">
+
+    <div class="food-emoji">
+        🍛
     </div>
 
-    <div class="nutrition-row">
-      <span>🥛 Calcium source</span>
-      <strong>Curd</strong>
-    </div>
-
-  </div>
-</section>
-
-
-<section id="problem">
-
-  <div class="section-title">
-
-    <h2>A simple question. A daily problem.</h2>
+    <h3>
+        Your meal, explained.
+    </h3>
 
     <p>
-      Deciding what to eat can become surprisingly difficult
-      when families have different preferences, ingredients,
-      schedules and nutritional priorities.
+        NutriPlate doesn't just recommend a dish.
+        It explains why the meal fits.
     </p>
 
-  </div>
-
-  <div class="problem-grid">
-
-    <div class="info-card">
-      <div class="emoji">🤔</div>
-      <h3>Too many choices</h3>
-      <p>
-        Families often struggle to decide what to cook every day.
-      </p>
+    <div class="nutrition-line">
+        <span>🫘 Protein</span>
+        <strong>Dal / Paneer</strong>
     </div>
 
-    <div class="info-card">
-      <div class="emoji">🔁</div>
-      <h3>Meal repetition</h3>
-      <p>
-        Without planning, households can fall into the same
-        meals again and again.
-      </p>
+    <div class="nutrition-line">
+        <span>🧲 Iron</span>
+        <strong>Pulses / Greens</strong>
     </div>
 
-    <div class="info-card">
-      <div class="emoji">⏰</div>
-      <h3>Limited time</h3>
-      <p>
-        A good meal also needs to fit the family's schedule
-        and cooking time.
-      </p>
+    <div class="nutrition-line">
+        <span>🥛 Calcium</span>
+        <strong>Curd / Paneer</strong>
     </div>
 
-  </div>
+    <div class="nutrition-line">
+        <span>🧬 Zinc</span>
+        <strong>Pulses / Seeds</strong>
+    </div>
+
+    <div class="nutrition-line">
+        <span>🥬 Fibre</span>
+        <strong>Vegetables</strong>
+    </div>
+
+</div>
 
 </section>
 
+
+
+<!-- PROBLEM -->
+
+<section>
+
+<div class="section-title">
+
+    <h2>
+        A tiny question that happens every day.
+    </h2>
+
+    <p>
+        "What should we cook tomorrow?"
+        NutriPlate turns that decision into a quick,
+        personalized experience.
+    </p>
+
+</div>
+
+
+<div class="grid-3">
+
+    <div class="card">
+
+        <div class="card-icon">🤔</div>
+
+        <h3>
+            Decision fatigue
+        </h3>
+
+        <p>
+            Families repeatedly spend time deciding
+            what to cook.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-icon">🧺</div>
+
+        <h3>
+            Ingredients already at home
+        </h3>
+
+        <p>
+            NutriPlate can prioritize meals that use
+            what you already have.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-icon">🥗</div>
+
+        <h3>
+            Nutrition matters
+        </h3>
+
+        <p>
+            Users can see the major nutritional
+            contributions of suggested meals.
+        </p>
+
+    </div>
+
+</div>
+
+</section>
+
+
+
+<!-- PLANNER -->
 
 <section id="planner">
 
-  <div class="section-title">
+<div class="section-title">
 
-    <h2>Try the MEALMATE prototype</h2>
+    <h2>
+        Let's decide your meal.
+    </h2>
 
     <p>
-      Tell us about your situation and we'll suggest meal ideas.
+        Choose Quick Pick if you don't want a long form,
+        or Family Mode for deeper personalization.
     </p>
 
-  </div>
-
-  <div class="planner-box">
-
-    <div class="form-group">
-
-      <label>Who are you planning for?</label>
-
-      <div class="options">
-
-        <div class="option selected" data-group="person">
-          Myself
-        </div>
-
-        <div class="option" data-group="person">
-          My family
-        </div>
-
-        <div class="option" data-group="person">
-          Multiple people
-        </div>
-
-      </div>
-
-    </div>
+</div>
 
 
-    <div class="form-group">
-
-      <label>Age group</label>
-
-      <select id="age">
-        <option value="child">Child</option>
-        <option value="teen">Teen</option>
-        <option value="adult">Adult</option>
-        <option value="older">Older adult</option>
-      </select>
-
-    </div>
+<div class="planner-container">
 
 
-    <div class="form-group">
+<div class="mode-tabs">
 
-      <label>Dietary pattern</label>
-
-      <div class="options">
-
-        <div class="option selected" data-group="diet">
-          Vegetarian
-        </div>
-
-        <div class="option" data-group="diet">
-          Vegan
-        </div>
-
-        <div class="option" data-group="diet">
-          Vegetarian + Eggs
-        </div>
-
-        <div class="option" data-group="diet">
-          Non-vegetarian
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label>What ingredients do you have?</label>
-
-      <input
-        id="ingredients"
-        type="text"
-        placeholder="Example: rice, dal, potato, curd, vegetables"
-      >
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label>Available cooking time</label>
-
-      <div class="options">
-
-        <div class="option" data-group="time">
-          15 min
-        </div>
-
-        <div class="option selected" data-group="time">
-          30 min
-        </div>
-
-        <div class="option" data-group="time">
-          45 min
-        </div>
-
-        <div class="option" data-group="time">
-          60+ min
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label>What's your priority?</label>
-
-      <div class="options">
-
-        <div class="option selected" data-group="priority">
-          Balanced meal
-        </div>
-
-        <div class="option" data-group="priority">
-          Higher protein
-        </div>
-
-        <div class="option" data-group="priority">
-          More variety
-        </div>
-
-        <div class="option" data-group="priority">
-          Budget-friendly
-        </div>
-
-        <div class="option" data-group="priority">
-          Quick meal
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <button class="button" onclick="generateMeals()">
-      Find My Meals →
+    <button class="mode-tab active"
+            onclick="switchMode('quick', this)">
+        ⚡ Quick Pick
     </button>
 
+    <button class="mode-tab"
+            onclick="switchMode('family', this)">
+        👨‍👩‍👧 Family Mode
+    </button>
 
-    <div id="recommendations" class="recommendations">
+</div>
 
-      <h2>Your MEALMATE suggestions 🍽️</h2>
 
-      <div id="mealResults" class="meal-results"></div>
+
+<!-- QUICK MODE -->
+
+<div id="quickMode">
+
+    <div class="voice-box">
+
+        <div style="font-size:35px;">
+            🎤
+        </div>
+
+        <strong>
+            Just tell NutriPlate what you have.
+        </strong>
+
+        <p>
+            Voice input is available where your browser
+            supports speech recognition.
+        </p>
+
+        <button class="voice-btn"
+                onclick="startVoice()">
+            🎙️ Speak Ingredients
+        </button>
+
+        <p id="voiceStatus"></p>
 
     </div>
 
-  </div>
 
-  <div class="disclaimer">
-    MEALMATE is a prototype for general meal-planning and nutrition
-    education. It does not diagnose, prevent or treat medical conditions.
-  </div>
+    <div class="form-group">
+
+        <label>
+            Ingredients
+        </label>
+
+        <input
+            id="ingredients"
+            type="text"
+            placeholder="Example: rice, dal, paneer, tomato"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Cooking time
+        </label>
+
+        <div class="options">
+
+            <button class="option selected"
+                    data-group="time">
+                15 min
+            </button>
+
+            <button class="option"
+                    data-group="time">
+                30 min
+            </button>
+
+            <button class="option"
+                    data-group="time">
+                45 min
+            </button>
+
+            <button class="option"
+                    data-group="time">
+                60+ min
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Cuisine
+        </label>
+
+        <select id="cuisine">
+
+            <option value="Any">
+                🌎 Any cuisine
+            </option>
+
+            <option>
+                🇮🇳 Indian
+            </option>
+
+            <option>
+                🇰🇷 Korean
+            </option>
+
+            <option>
+                🇮🇹 Italian
+            </option>
+
+            <option>
+                🇯🇵 Japanese
+            </option>
+
+            <option>
+                🇲🇽 Mexican
+            </option>
+
+            <option>
+                🇨🇳 Chinese
+            </option>
+
+            <option>
+                🇹🇭 Thai
+            </option>
+
+            <option>
+                🥙 Mediterranean
+            </option>
+
+            <option>
+                🌎 Fusion
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            What matters most?
+        </label>
+
+        <div class="options">
+
+            <button class="option selected"
+                    data-group="priority">
+                ⚖️ Balanced
+            </button>
+
+            <button class="option"
+                    data-group="priority">
+                🫘 Protein
+            </button>
+
+            <button class="option"
+                    data-group="priority">
+                💰 Budget
+            </button>
+
+            <button class="option"
+                    data-group="priority">
+                ⚡ Quick
+            </button>
+
+            <button class="option"
+                    data-group="priority">
+                🎨 Variety
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <button class="primary-btn"
+            onclick="generateMeals()">
+        Find My Meals →
+    </button>
+
+</div>
+
+
+
+<!-- FAMILY MODE -->
+
+<div id="familyMode" class="family-mode">
+
+    <div class="form-group">
+
+        <label>
+            How many people are eating?
+        </label>
+
+        <select id="familyCount"
+                onchange="createFamilyMembers()">
+
+            <option value="2">2 people</option>
+            <option value="3">3 people</option>
+            <option value="4">4 people</option>
+            <option value="5">5 people</option>
+            <option value="6">6 people</option>
+
+        </select>
+
+    </div>
+
+
+    <div id="familyMembers"></div>
+
+
+    <div class="form-group">
+
+        <label>
+            Ingredients available
+        </label>
+
+        <input
+            id="familyIngredients"
+            type="text"
+            placeholder="Example: rice, potatoes, paneer"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Cooking time
+        </label>
+
+        <div class="options">
+
+            <button class="option selected"
+                    data-group="familyTime">
+                30 min
+            </button>
+
+            <button class="option"
+                    data-group="familyTime">
+                45 min
+            </button>
+
+            <button class="option"
+                    data-group="familyTime">
+                60+ min
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <button class="primary-btn"
+            onclick="generateFamilyMeals()">
+        Plan For My Family →
+    </button>
+
+</div>
+
+
+
+<!-- RESULTS -->
+
+<div id="results" class="results">
+
+    <h2>
+        Your NutriPlate suggestions 🍽️
+    </h2>
+
+    <div id="mealResults"
+         class="meal-grid">
+    </div>
+
+</div>
+
+
+</div>
 
 </section>
 
 
-<section class="family" id="family">
 
-  <div class="section-title">
+<!-- CUISINES -->
 
-    <h2>One family. Different preferences.</h2>
+<section id="cuisines">
+
+<div class="section-title">
+
+    <h2>
+        Explore the world 🌎
+    </h2>
 
     <p>
-      MEALMATE can help families find a practical base meal
-      while allowing individual variations.
+        NutriPlate isn't limited to one cuisine.
+        Discover popular foods and adaptations using
+        ingredients available locally.
     </p>
 
-  </div>
+</div>
 
-  <div class="family-box">
+
+<div class="cuisine-grid">
+
+    <div class="cuisine">
+        <div class="cuisine-icon">🇮🇳</div>
+        <strong>Indian</strong>
+    </div>
+
+    <div class="cuisine">
+        <div class="cuisine-icon">🇰🇷</div>
+        <strong>Korean</strong>
+    </div>
+
+    <div class="cuisine">
+        <div class="cuisine-icon">🇮🇹</div>
+        <strong>Italian</strong>
+    </div>
+
+    <div class="cuisine">
+        <div class="cuisine-icon">🇯🇵</div>
+        <strong>Japanese</strong>
+    </div>
+
+    <div class="cuisine">
+        <div class="cuisine-icon">🇲🇽</div>
+        <strong>Mexican</strong>
+    </div>
+
+    <div class="cuisine">
+        <div class="cuisine-icon">🇨🇳</div>
+        <strong>Chinese</strong>
+    </div>
+
+    <div class="cuisine">
+        <div class="cuisine-icon">🇹🇭</div>
+        <strong>Thai</strong>
+    </div>
+
+    <div class="cuisine">
+        <div class="cuisine-icon">🥙</div>
+        <strong>Mediterranean</strong>
+    </div>
+
+</div>
+
+</section>
+
+
+
+<!-- NUTRIFACTS -->
+
+<section id="facts">
+
+<div class="section-title">
+
+    <h2>
+        NutriFacts 🧠
+    </h2>
+
+    <p>
+        General nutrition education for different
+        stages of life and everyday situations.
+    </p>
+
+</div>
+
+
+<div class="fact-table">
+
+<table>
+
+<thead>
+
+<tr>
+    <th>Life stage</th>
+    <th>Nutrition focus</th>
+    <th>Examples</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+    <td>🧑‍🎓 Teens</td>
+    <td>Growth, protein, iron, calcium, zinc</td>
+    <td>Dal, dairy, beans, vegetables, fruits, whole grains</td>
+</tr>
+
+<tr>
+    <td>👨 Adults</td>
+    <td>Balanced diet, fibre, protein, variety</td>
+    <td>Pulses, vegetables, fruits, whole grains, nuts</td>
+</tr>
+
+<tr>
+    <td>👵 Older adults</td>
+    <td>Adequate nutrition, protein, hydration</td>
+    <td>Protein foods, vegetables, fruits, whole grains, fluids</td>
+</tr>
+
+<tr>
+    <td>📚 Exam period</td>
+    <td>Regular balanced meals and hydration</td>
+    <td>Balanced meals, fruit, vegetables, protein foods, water</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+
+<div class="disclaimer">
+
+    NutriPlate provides general nutrition education and meal
+    planning. It does not diagnose or treat medical conditions.
+    Health concerns should be discussed with a parent/guardian
+    and an appropriate healthcare professional.
+
+</div>
+
+</section>
+
+
+
+<!-- PLUS -->
+
+<section id="plus">
+
+<div class="section-title">
+
+    <h2>
+        NutriPlate Plus ⭐
+    </h2>
+
+    <p>
+        More personalization, planning and customization.
+    </p>
+
+</div>
+
+
+<div class="plus-card">
 
     <div>
+        <span class="badge">
+            PROPOSED PLAN
+        </span>
+    </div>
 
-      <h2>Family Mode</h2>
+    <div class="price">
+        ₹999 <span style="font-size:18px;">/ year</span>
+    </div>
 
-      <p>
-        Instead of planning completely different meals for
-        everyone, MEALMATE can suggest a shared base meal
-        with optional additions or modifications.
-      </p>
+
+    <div class="plus-features">
+
+        <div class="plus-feature">
+            🌸 Seasonal themes
+        </div>
+
+        <div class="plus-feature">
+            📅 Weekly meal planner
+        </div>
+
+        <div class="plus-feature">
+            🛒 Smart grocery lists
+        </div>
+
+        <div class="plus-feature">
+            👨‍👩‍👧 Saved family profiles
+        </div>
+
+        <div class="plus-feature">
+            ❤️ Saved meals
+        </div>
+
+        <div class="plus-feature">
+            🧠 Advanced personalization
+        </div>
+
+        <div class="plus-feature">
+            📊 Meal history
+        </div>
+
+        <div class="plus-feature">
+            🌎 Expanded discovery
+        </div>
 
     </div>
 
-    <div class="family-list">
 
-      <div>👨 Person 1 — Vegetarian</div>
+    <button class="primary-btn"
+            onclick="openCheckout()">
 
-      <div>🧑 Person 2 — Vegetarian + Eggs</div>
+        ⭐ Upgrade to Plus
 
-      <div>👩 Person 3 — Different preferences</div>
+    </button>
 
-      <div>🍛 One practical base meal</div>
-
-    </div>
-
-  </div>
+</div>
 
 </section>
 
 
-<section class="future">
 
-  <div class="section-title">
+<!-- SETTINGS MODAL -->
 
-    <h2>From prototype to product</h2>
+<div id="settingsPanel"
+     class="settings-panel">
 
-    <p>
-      This website is the first prototype.
-      The next step is a full mobile application.
+<div class="modal">
+
+    <div class="modal-header">
+
+        <h2>
+            ⚙️ Settings
+        </h2>
+
+        <button class="close"
+                onclick="closeSettings()">
+            ✕
+        </button>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Language
+        </label>
+
+        <select id="language">
+
+            <option>English</option>
+            <option>हिन्दी</option>
+            <option>मराठी</option>
+            <option>ગુજરાતી</option>
+            <option>বাংলা</option>
+            <option>தமிழ்</option>
+            <option>తెలుగు</option>
+            <option>ಕನ್ನಡ</option>
+
+        </select>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Appearance
+        </label>
+
+        <div class="theme-options">
+
+            <button class="theme-option"
+                    onclick="setTheme('day')">
+                ☀️ Day Mode
+            </button>
+
+            <button class="theme-option"
+                    onclick="setTheme('night')">
+                🌙 Night Mode
+            </button>
+
+            <button class="theme-option"
+                    onclick="setTheme('season')">
+                🌸 Seasonal
+                <br>
+                <small>Plus feature</small>
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Dietary preference
+        </label>
+
+        <select>
+
+            <option>Vegetarian</option>
+            <option>Vegan</option>
+            <option>Vegetarian + Eggs</option>
+            <option>Non-vegetarian</option>
+
+        </select>
+
+    </div>
+
+
+    <button class="primary-btn"
+            onclick="closeSettings()">
+
+        Save Settings
+
+    </button>
+
+</div>
+
+</div>
+
+
+
+<!-- CHECKOUT -->
+
+<div id="checkoutPanel"
+     class="checkout-panel">
+
+<div class="modal">
+
+    <div class="modal-header">
+
+        <h2>
+            ⭐ NutriPlate Plus
+        </h2>
+
+        <button class="close"
+                onclick="closeCheckout()">
+            ✕
+        </button>
+
+    </div>
+
+
+    <h3>
+        ₹999 / year
+    </h3>
+
+
+    <div class="demo-note">
+
+        ⚠️ <strong>Prototype checkout:</strong>
+        This demonstration screen does not process real
+        payments or collect card/UPI credentials.
+
+    </div>
+
+
+    <label style="font-weight:800;">
+        Choose a payment method
+    </label>
+
+
+    <div class="payment-options">
+
+        <button class="payment"
+                onclick="demoPayment('UPI')">
+            📱 UPI
+        </button>
+
+        <button class="payment"
+                onclick="demoPayment('Card')">
+            💳 Credit / Debit Card
+        </button>
+
+        <button class="payment"
+                onclick="demoPayment('Net Banking')">
+            🏦 Net Banking
+        </button>
+
+        <button class="payment"
+                onclick="demoPayment('Other')">
+            💰 Other supported methods
+        </button>
+
+    </div>
+
+
+    <p id="paymentMessage"
+       style="color:var(--muted);font-size:13px;">
     </p>
 
-  </div>
+</div>
 
-  <div class="future-grid">
+</div>
 
-    <div class="future-item">📱 Mobile App</div>
-
-    <div class="future-item">🛒 Shopping Lists</div>
-
-    <div class="future-item">📅 Weekly Planning</div>
-
-    <div class="future-item">🧠 Smarter Personalization</div>
-
-  </div>
-
-</section>
 
 
 <footer>
 
-  <p>
-    © 2026 MEALMATE — Personalized meal planning prototype
-  </p>
+    © 2026 NutriPlate
+
+    <br><br>
+
+    <span>
+        What should we eat? Let NutriPlate help.
+    </span>
 
 </footer>
 
 
+
 <script>
 
-  const options = document.querySelectorAll(".option");
+/* -----------------------------
+   NAVIGATION
+----------------------------- */
 
-  options.forEach(option => {
-
-    option.addEventListener("click", function() {
-
-      const group = this.dataset.group;
-
-      document
-        .querySelectorAll('.option[data-group="' + group + '"]')
-        .forEach(item => item.classList.remove("selected"));
-
-      this.classList.add("selected");
-
-    });
-
-  });
-
-
-  function scrollToPlanner() {
+function goTo(id) {
 
     document
-      .getElementById("planner")
-      .scrollIntoView({ behavior: "smooth" });
+        .getElementById(id)
+        .scrollIntoView({
+            behavior: "smooth"
+        });
 
-  }
+}
 
 
-  function generateMeals() {
+/* -----------------------------
+   MODE SWITCH
+----------------------------- */
 
-    const age = document.getElementById("age").value;
+function switchMode(mode, button) {
 
-    const ingredients =
-      document.getElementById("ingredients").value.toLowerCase();
+    document
+        .querySelectorAll(".mode-tab")
+        .forEach(tab => {
+            tab.classList.remove("active");
+        });
 
-    const priorityElement =
-      document.querySelector('.option[data-group="priority"].selected');
+    button.classList.add("active");
+
+
+    if (mode === "quick") {
+
+        document.getElementById("quickMode")
+            .style.display = "block";
+
+        document.getElementById("familyMode")
+            .style.display = "none";
+
+    } else {
+
+        document.getElementById("quickMode")
+            .style.display = "none";
+
+        document.getElementById("familyMode")
+            .style.display = "block";
+
+        createFamilyMembers();
+
+    }
+
+}
+
+
+/* -----------------------------
+   OPTION BUTTONS
+----------------------------- */
+
+document.addEventListener("click", function(event) {
+
+    if (!event.target.classList.contains("option")) {
+        return;
+    }
+
+    const group =
+        event.target.dataset.group;
+
+    document
+        .querySelectorAll(
+            '.option[data-group="' + group + '"]'
+        )
+        .forEach(option => {
+            option.classList.remove("selected");
+        });
+
+    event.target.classList.add("selected");
+
+});
+
+
+/* -----------------------------
+   VOICE INPUT
+----------------------------- */
+
+function startVoice() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+
+    if (!SpeechRecognition) {
+
+        document.getElementById("voiceStatus")
+            .textContent =
+            "Voice input is not supported by this browser. You can type instead.";
+
+        return;
+
+    }
+
+
+    const recognition =
+        new SpeechRecognition();
+
+    recognition.lang = "en-IN";
+
+    recognition.interimResults = false;
+
+
+    document.getElementById("voiceStatus")
+        .textContent =
+        "🎙️ Listening...";
+
+
+    recognition.start();
+
+
+    recognition.onresult = function(event) {
+
+        const text =
+            event.results[0][0].transcript;
+
+        document.getElementById("ingredients")
+            .value = text;
+
+
+        document.getElementById("voiceStatus")
+            .textContent =
+            "Got it: " + text;
+
+    };
+
+
+    recognition.onerror = function() {
+
+        document.getElementById("voiceStatus")
+            .textContent =
+            "Couldn't hear that. Please try again.";
+
+    };
+
+}
+
+
+/* -----------------------------
+   MEAL DATABASE
+----------------------------- */
+
+const meals = [
+
+    {
+        name: "Dal + Rice + Vegetable Bowl",
+        cuisines: ["Indian", "Any"],
+        ingredients: ["rice", "dal", "vegetable"],
+        nutrients: [
+            "🫘 Protein",
+            "🧲 Iron",
+            "🥬 Fibre",
+            "🧬 Zinc",
+            "⚡ Energy",
+            "🥗 Micronutrients"
+        ],
+        why:
+            "Uses familiar staple ingredients and combines pulses, grains and vegetables."
+    },
+
+
+    {
+        name: "Paneer Vegetable Wrap",
+        cuisines: ["Indian", "Fusion", "Any"],
+        ingredients: ["paneer", "vegetable"],
+        nutrients: [
+            "🧀 Protein",
+            "🥛 Calcium",
+            "🥬 Fibre",
+            "🧲 Iron",
+            "🧬 Zinc",
+            "⚡ Energy"
+        ],
+        why:
+            "Paneer contributes protein and calcium while vegetables add fibre and variety."
+    },
+
+
+    {
+        name: "Vegetable Khichdi + Curd",
+        cuisines: ["Indian", "Any"],
+        ingredients: ["rice", "dal", "vegetable", "curd"],
+        nutrients: [
+            "🫘 Protein",
+            "🧲 Iron",
+            "🥛 Calcium",
+            "🥬 Fibre",
+            "🧬 Zinc",
+            "💧 Hydration"
+        ],
+        why:
+            "A practical one-pot meal that can be adapted to available vegetables."
+    },
+
+
+    {
+        name: "Korean-Inspired Rice Bowl",
+        cuisines: ["Korean", "Fusion", "Any"],
+        ingredients: ["rice", "vegetable"],
+        nutrients: [
+            "⚡ Energy",
+            "🥬 Fibre",
+            "🫘 Protein",
+            "🧲 Iron",
+            "🧬 Zinc",
+            "🥗 Variety"
+        ],
+        why:
+            "A Korean-inspired adaptation using familiar rice and vegetable ingredients."
+    },
+
+
+    {
+        name: "Vegetable Pasta",
+        cuisines: ["Italian", "Any"],
+        ingredients: ["pasta", "tomato", "vegetable"],
+        nutrients: [
+            "⚡ Energy",
+            "🥬 Fibre",
+            "🧲 Iron",
+            "🧬 Zinc",
+            "🥗 Variety",
+            "🫘 Protein*"
+        ],
+        why:
+            "A flexible pasta meal that can use available vegetables and optional protein foods."
+    },
+
+
+    {
+        name: "Mexican-Style Bean Rice Bowl",
+        cuisines: ["Mexican", "Fusion", "Any"],
+        ingredients: ["rice", "bean", "vegetable"],
+        nutrients: [
+            "🫘 Protein",
+            "🥬 Fibre",
+            "🧲 Iron",
+            "🧬 Zinc",
+            "⚡ Energy",
+            "🥗 Variety"
+        ],
+        why:
+            "Beans contribute plant protein and fibre while rice and vegetables make a flexible base."
+    },
+
+
+    {
+        name: "Japanese-Inspired Vegetable Rice Bowl",
+        cuisines: ["Japanese", "Fusion", "Any"],
+        ingredients: ["rice", "vegetable"],
+        nutrients: [
+            "⚡ Energy",
+            "🥬 Fibre",
+            "🧲 Iron",
+            "🧬 Zinc",
+            "🥗 Variety",
+            "🫘 Protein*"
+        ],
+        why:
+            "A simple rice-based adaptation that can be customized with vegetables and a protein source."
+    },
+
+
+    {
+        name: "Chickpea Mediterranean Bowl",
+        cuisines: ["Mediterranean", "Fusion", "Any"],
+        ingredients: ["chickpea", "vegetable"],
+        nutrients: [
+            "🫘 Protein",
+            "🥬 Fibre",
+            "🧲 Iron",
+            "🧬 Zinc",
+            "🥗 Micronutrients",
+            "⚡ Energy"
+        ],
+        why:
+            "Chickpeas provide plant protein and fibre, while vegetables increase variety."
+    },
+
+
+    {
+        name: "Vegetable Noodles",
+        cuisines: ["Chinese", "Any"],
+        ingredients: ["noodle", "vegetable"],
+        nutrients: [
+            "⚡ Energy",
+            "🥬 Fibre",
+            "🧬 Zinc",
+            "🧲 Iron",
+            "🥗 Variety",
+            "🫘 Protein*"
+        ],
+        why:
+            "A quick customizable meal where vegetables and an optional protein source can be added."
+    },
+
+
+    {
+        name: "Thai-Inspired Vegetable Rice",
+        cuisines: ["Thai", "Fusion", "Any"],
+        ingredients: ["rice", "vegetable"],
+        nutrients: [
+            "⚡ Energy",
+            "🥬 Fibre",
+            "🧲 Iron",
+            "🧬 Zinc",
+            "🥗 Variety",
+            "🫘 Protein*"
+        ],
+        why:
+            "A flexible rice-based fusion option that can incorporate available vegetables."
+    }
+
+];
+
+
+/* -----------------------------
+   GENERATE QUICK MEALS
+----------------------------- */
+
+function generateMeals() {
+
+    const ingredientText =
+        document.getElementById("ingredients")
+            .value
+            .toLowerCase();
+
+
+    const cuisine =
+        document.getElementById("cuisine")
+            .value
+            .replace(/[^\w\s]/gi, "")
+            .trim();
+
 
     const priority =
-      priorityElement
-        ? priorityElement.textContent.trim()
-        : "Balanced meal";
+        document
+            .querySelector(
+                '.option[data-group="priority"].selected'
+            )
+            ?.textContent
+            .toLowerCase() || "balanced";
 
 
-    let meals = [];
+    let scored = meals.map(meal => {
+
+        let score = 0;
 
 
-    if (
-      ingredients.includes("dal") ||
-      ingredients.includes("lentil") ||
-      priority.includes("protein")
-    ) {
-
-      meals.push({
-        name: "Dal + Rice + Vegetable Bowl",
-        description: "A simple family-friendly combination built around dal, grains and vegetables.",
-        tags: ["Protein source", "Vegetables", "Family-friendly"],
-        why: "Dal contributes protein, while vegetables add fibre and a range of micronutrients."
-      });
-
-    }
+        if (
+            meal.cuisines.includes(cuisine) ||
+            cuisine === "Any"
+        ) {
+            score += 5;
+        }
 
 
-    if (
-      ingredients.includes("paneer") ||
-      ingredients.includes("curd") ||
-      priority.includes("protein")
-    ) {
+        meal.ingredients.forEach(item => {
 
-      meals.push({
-        name: "Paneer Vegetable Wrap + Curd",
-        description: "A flexible meal that can be adapted with the vegetables available at home.",
-        tags: ["Protein source", "Calcium source", "Flexible"],
-        why: "Paneer and curd can contribute protein and calcium, while vegetables add fibre and variety."
-      });
+            if (ingredientText.includes(item)) {
+                score += 3;
+            }
 
-    }
+        });
 
 
-    meals.push({
-      name: "Vegetable Khichdi + Curd",
-      description: "A simple one-pot meal that can be adapted using vegetables available at home.",
-      tags: ["Simple", "Vegetables", "Family-friendly"],
-      why: "Combining grains, pulses and vegetables can create a practical and varied everyday meal."
+        if (
+            priority.includes("protein") &&
+            meal.nutrients.some(
+                n => n.includes("Protein")
+            )
+        ) {
+            score += 2;
+        }
+
+
+        return {
+            ...meal,
+            score
+        };
+
     });
 
 
-    if (priority.includes("Quick")) {
-
-      meals.unshift({
-        name: "Quick Vegetable Poha + Curd",
-        description: "A quick option that can be customized with vegetables and toppings.",
-        tags: ["Quick", "Vegetables", "Easy"],
-        why: "Useful when cooking time is limited and you still want to include a varied meal."
-      });
-
-    }
+    scored.sort((a,b) => b.score - a.score);
 
 
-    if (age === "teen") {
+    displayMeals(
+        scored.slice(0, 6)
+    );
 
-      meals.push({
-        name: "Vegetable Roti Wrap + Curd",
-        description: "An easy meal option that can be filled with vegetables and a protein-rich filling.",
-        tags: ["Teen-friendly", "Customizable", "Balanced"],
-        why: "Adolescence is an important period for growth, making overall balanced nutrition especially important."
-      });
-
-    }
+}
 
 
-    meals = meals.slice(0, 3);
+/* -----------------------------
+   DISPLAY MEALS
+----------------------------- */
+
+function displayMeals(list) {
+
+    const container =
+        document.getElementById("mealResults");
 
 
-    const results =
-      document.getElementById("mealResults");
-
-    results.innerHTML = "";
+    container.innerHTML = "";
 
 
-    meals.forEach((meal, index) => {
+    list.forEach((meal, index) => {
 
-      const card =
-        document.createElement("div");
+        const card =
+            document.createElement("div");
 
-      card.className = "meal";
+        card.className = "meal-card";
 
-      card.innerHTML = `
-        <h3>${index + 1}. ${meal.name}</h3>
 
-        <p>${meal.description}</p>
+        card.innerHTML = `
 
-        <div class="meal-tags">
-          ${meal.tags.map(tag => `<span>${tag}</span>`).join("")}
-        </div>
+            <h3>
+                ${index + 1}. ${meal.name}
+            </h3>
 
-        <div class="why">
-          <strong>Why MEALMATE chose it:</strong>
-          ${meal.why}
-        </div>
-      `;
+            <p>
+                ${meal.cuisines.join(" • ")}
+            </p>
 
-      results.appendChild(card);
+            <div class="chips">
+
+                ${meal.nutrients
+                    .map(
+                        nutrient =>
+                        `<span class="chip">
+                            ${nutrient}
+                        </span>`
+                    )
+                    .join("")
+                }
+
+            </div>
+
+            <div class="why">
+
+                <strong>
+                    Why NutriPlate chose it:
+                </strong>
+
+                <br>
+
+                ${meal.why}
+
+            </div>
+
+            <a class="recipe-link"
+               href="https://www.google.com/search?q=${encodeURIComponent(meal.name + " recipe")}"
+               target="_blank">
+
+                🔗 Find recipe sources →
+
+            </a>
+
+        `;
+
+
+        container.appendChild(card);
 
     });
 
 
     document
-      .getElementById("recommendations")
-      .classList.add("show");
+        .getElementById("results")
+        .classList.add("show");
 
 
     document
-      .getElementById("recommendations")
-      .scrollIntoView({ behavior: "smooth" });
+        .getElementById("results")
+        .scrollIntoView({
+            behavior: "smooth"
+        });
 
-  }
+}
+
+
+/* -----------------------------
+   FAMILY MEMBERS
+----------------------------- */
+
+function createFamilyMembers() {
+
+    const count =
+        parseInt(
+            document.getElementById("familyCount")
+                .value
+        );
+
+
+    const container =
+        document.getElementById("familyMembers");
+
+
+    container.innerHTML = "";
+
+
+    for (
+        let i = 1;
+        i <= count;
+        i++
+    ) {
+
+        const member =
+            document.createElement("div");
+
+
+        member.className = "member";
+
+
+        member.innerHTML = `
+
+            <h4>
+                Person ${i}
+            </h4>
+
+            <div class="member-grid">
+
+                <select class="age">
+
+                    <option>Child</option>
+                    <option>Teen</option>
+                    <option>Adult</option>
+                    <option>Older adult</option>
+
+                </select>
+
+
+                <select class="diet">
+
+                    <option>Vegetarian</option>
+                    <option>Vegan</option>
+                    <option>Vegetarian + Eggs</option>
+                    <option>Non-vegetarian</option>
+
+                </select>
+
+            </div>
+
+        `;
+
+
+        container.appendChild(member);
+
+    }
+
+}
+
+
+/* -----------------------------
+   FAMILY MEALS
+----------------------------- */
+
+function generateFamilyMeals() {
+
+    const ingredientText =
+        document.getElementById("familyIngredients")
+            .value
+            .toLowerCase();
+
+
+    let results = meals.map(meal => {
+
+        let score = 0;
+
+
+        meal.ingredients.forEach(item => {
+
+            if (ingredientText.includes(item)) {
+                score += 3;
+            }
+
+        });
+
+
+        if (
+            meal.nutrients.some(
+                n => n.includes("Protein")
+            )
+        ) {
+            score += 1;
+        }
+
+
+        return {
+            ...meal,
+            score
+        };
+
+    });
+
+
+    results.sort(
+        (a,b) => b.score - a.score
+    );
+
+
+    displayMeals(
+        results.slice(0, 6)
+    );
+
+}
+
+
+/* -----------------------------
+   SETTINGS
+----------------------------- */
+
+function openSettings() {
+
+    document.getElementById("settingsPanel")
+        .style.display = "flex";
+
+}
+
+
+function closeSettings() {
+
+    document.getElementById("settingsPanel")
+        .style.display = "none";
+
+}
+
+
+/* -----------------------------
+   THEMES
+----------------------------- */
+
+function setTheme(theme) {
+
+    if (theme === "night") {
+
+        document.documentElement.style.setProperty(
+            "--bg",
+            "#111713"
+        );
+
+        document.documentElement.style.setProperty(
+            "--card",
+            "#1b241e"
+        );
+
+        document.documentElement.style.setProperty(
+            "--text",
+            "#edf4ee"
+        );
+
+        document.documentElement.style.setProperty(
+            "--muted",
+            "#aab6ad"
+        );
+
+        document.documentElement.style.setProperty(
+            "--border",
+            "#334138"
+        );
+
+        document.documentElement.style.setProperty(
+            "--soft",
+            "#26372b"
+        );
+
+    }
+
+
+    else {
+
+        document.documentElement.style.setProperty(
+            "--bg",
+            "#f6f8f4"
+        );
+
+        document.documentElement.style.setProperty(
+            "--card",
+            "#ffffff"
+        );
+
+        document.documentElement.style.setProperty(
+            "--text",
+            "#1e2b24"
+        );
+
+        document.documentElement.style.setProperty(
+            "--muted",
+            "#68736c"
+        );
+
+        document.documentElement.style.setProperty(
+            "--border",
+            "#dfe6dc"
+        );
+
+        document.documentElement.style.setProperty(
+            "--soft",
+            "#e7f0e3"
+        );
+
+    }
+
+}
+
+
+/* -----------------------------
+   CHECKOUT
+----------------------------- */
+
+function openCheckout() {
+
+    document.getElementById("checkoutPanel")
+        .style.display = "flex";
+
+}
+
+
+function closeCheckout() {
+
+    document.getElementById("checkoutPanel")
+        .style.display = "none";
+
+}
+
+
+function demoPayment(method) {
+
+    document.getElementById("paymentMessage")
+        .textContent =
+        method +
+        " selected. This is a competition prototype; no real payment is processed.";
+
+}
+
+
+/* -----------------------------
+   SURPRISE ME
+----------------------------- */
+
+function openQuickDemo() {
+
+    goTo("planner");
+
+    setTimeout(() => {
+
+        document.getElementById("ingredients")
+            .value = "rice, vegetables, paneer";
+
+        generateMeals();
+
+    }, 600);
+
+}
+
+
+/* -----------------------------
+   INITIALIZE
+----------------------------- */
+
+createFamilyMembers();
 
 </script>
 
