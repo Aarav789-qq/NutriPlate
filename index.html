@@ -7,45 +7,55 @@
 
 <style>
 :root{
-  --bg:#f4f8f2;
+  --bg:#f3f8f1;
   --card:#ffffff;
+  --card2:#f8fbf7;
   --text:#17251b;
-  --muted:#66736a;
+  --muted:#68756b;
   --primary:#245c38;
-  --primary2:#34784a;
+  --primary2:#397c4e;
   --accent:#dcebd9;
-  --border:#d7e2d8;
-  --shadow:0 10px 30px rgba(20,50,30,.08);
+  --accent2:#eef6eb;
+  --border:#d6e2d7;
+  --danger:#b84a4a;
+  --warning:#a87820;
+  --shadow:0 12px 35px rgba(24,55,32,.09);
+  --radius:20px;
 }
 
 body.dark{
-  --bg:#101812;
-  --card:#17221a;
-  --text:#f0f6f0;
-  --muted:#b6c4b8;
-  --primary:#74c58b;
-  --primary2:#8bd69d;
-  --accent:#223c29;
-  --border:#304536;
-  --shadow:0 10px 30px rgba(0,0,0,.25);
+  --bg:#0d1510;
+  --card:#17231a;
+  --card2:#1c2a20;
+  --text:#f1f7f1;
+  --muted:#b8c7ba;
+  --primary:#76c88c;
+  --primary2:#94dba5;
+  --accent:#24422c;
+  --accent2:#1b3021;
+  --border:#304738;
+  --danger:#ef8585;
+  --warning:#e0b45f;
+  --shadow:0 12px 35px rgba(0,0,0,.28);
 }
 
 *{
   box-sizing:border-box;
 }
 
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  transition:.25s;
+html{
+  scroll-behavior:smooth;
 }
 
-button,
-input,
-select,
-textarea{
+body{
+  margin:0;
+  font-family:Inter,Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:.25s ease;
+}
+
+button,input,select,textarea{
   font:inherit;
 }
 
@@ -56,25 +66,31 @@ button{
 header{
   position:sticky;
   top:0;
-  z-index:20;
-  background:var(--card);
+  z-index:100;
+  background:rgba(255,255,255,.94);
   border-bottom:1px solid var(--border);
+  backdrop-filter:blur(12px);
+}
+
+body.dark header{
+  background:rgba(23,35,26,.95);
 }
 
 .nav{
-  max-width:1200px;
+  max-width:1280px;
   margin:auto;
-  padding:15px 20px;
+  padding:14px 20px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:20px;
+  gap:18px;
 }
 
 .logo{
-  font-size:25px;
-  font-weight:800;
+  font-size:26px;
+  font-weight:900;
   color:var(--primary);
+  white-space:nowrap;
 }
 
 .logo span{
@@ -84,14 +100,15 @@ header{
 .navlinks{
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
+  justify-content:flex-end;
+  gap:5px;
 }
 
 .navlinks button{
   border:0;
   background:transparent;
   color:var(--text);
-  padding:9px 12px;
+  padding:9px 11px;
   border-radius:10px;
 }
 
@@ -100,40 +117,88 @@ header{
 }
 
 .container{
-  max-width:1200px;
+  max-width:1280px;
   margin:auto;
-  padding:30px 20px 60px;
+  padding:28px 20px 70px;
 }
 
 .hero{
-  padding:35px 0 25px;
+  padding:42px 0 28px;
+  display:grid;
+  grid-template-columns:1.4fr .8fr;
+  gap:25px;
+  align-items:center;
 }
 
 .hero h1{
-  font-size:clamp(35px,6vw,62px);
-  margin:0 0 12px;
-  line-height:1.05;
+  font-size:clamp(40px,6vw,70px);
+  line-height:1;
+  margin:0 0 18px;
+  letter-spacing:-2px;
+}
+
+.hero h1 span{
+  color:var(--primary);
 }
 
 .hero p{
-  max-width:720px;
   color:var(--muted);
   font-size:18px;
-  line-height:1.6;
+  line-height:1.65;
+  max-width:720px;
+}
+
+.hero-box{
+  background:linear-gradient(145deg,var(--primary),var(--primary2));
+  color:white;
+  border-radius:28px;
+  padding:30px;
+  box-shadow:var(--shadow);
+}
+
+.hero-box h3{
+  margin-top:0;
+  font-size:25px;
+}
+
+.hero-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+
+.hero-stat{
+  background:rgba(255,255,255,.15);
+  border-radius:14px;
+  padding:13px;
+  text-align:center;
+}
+
+.hero-stat b{
+  display:block;
+  font-size:20px;
 }
 
 .card{
   background:var(--card);
   border:1px solid var(--border);
-  border-radius:20px;
-  padding:22px;
+  border-radius:var(--radius);
+  padding:23px;
   margin:18px 0;
   box-shadow:var(--shadow);
 }
 
+.card h2{
+  margin-top:0;
+}
+
+.card h3{
+  margin-top:5px;
+}
+
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(245px,1fr));
   gap:16px;
 }
 
@@ -143,9 +208,15 @@ header{
   gap:18px;
 }
 
+.form-row{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:14px;
+}
+
 label{
   display:block;
-  font-weight:700;
+  font-weight:800;
   margin-bottom:7px;
 }
 
@@ -154,15 +225,15 @@ select,
 textarea{
   width:100%;
   padding:13px 14px;
-  border-radius:12px;
   border:1px solid var(--border);
-  background:var(--bg);
+  border-radius:12px;
+  background:var(--card2);
   color:var(--text);
   outline:none;
 }
 
 textarea{
-  min-height:110px;
+  min-height:120px;
   resize:vertical;
 }
 
@@ -178,11 +249,13 @@ textarea:focus{
   padding:12px 17px;
   background:var(--primary);
   color:white;
-  font-weight:700;
+  font-weight:800;
+  transition:.18s;
 }
 
 .btn:hover{
-  opacity:.9;
+  transform:translateY(-1px);
+  opacity:.92;
 }
 
 .btn.secondary{
@@ -196,89 +269,26 @@ textarea:focus{
   border:1px solid var(--primary);
 }
 
-.form-row{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:14px;
+.btn.danger{
+  background:var(--danger);
 }
 
-.ingredients{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:12px;
-}
-
-.ingredient{
-  padding:7px 11px;
-  background:var(--accent);
-  border-radius:999px;
-  font-size:14px;
-}
-
-.recipe{
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:17px;
-  background:var(--card);
-}
-
-.recipe h3{
-  margin-top:0;
-}
-
-.meta{
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
-  margin:10px 0;
-}
-
-.meta span{
-  background:var(--accent);
-  padding:6px 8px;
-  border-radius:999px;
-  font-size:12px;
-}
-
-.nutrition{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:7px;
-  margin-top:12px;
-}
-
-.nutri-box{
-  background:var(--accent);
-  border-radius:10px;
-  padding:9px;
-  text-align:center;
-  font-size:12px;
-}
-
-.nutri-box b{
-  display:block;
-  margin-bottom:4px;
-}
-
-.tabs{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-bottom:15px;
-}
-
-.tab{
-  padding:10px 14px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:var(--card);
-  color:var(--text);
-}
-
-.tab.active{
-  background:var(--primary);
+.btn.gold{
+  background:#a87820;
   color:white;
+}
+
+.action-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:15px;
+}
+
+.small{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.55;
 }
 
 .section{
@@ -289,29 +299,225 @@ textarea:focus{
   display:none!important;
 }
 
-.small{
-  color:var(--muted);
+.ingredients{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+
+.ingredient{
+  background:var(--accent);
+  border-radius:999px;
+  padding:7px 11px;
   font-size:14px;
 }
 
+.ingredient button{
+  border:0;
+  background:none;
+  color:inherit;
+  font-weight:bold;
+  margin-left:4px;
+}
+
+.recipe{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:18px;
+  transition:.2s;
+}
+
+.recipe:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--shadow);
+}
+
+.recipe h3{
+  margin:0 0 8px;
+}
+
+.meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:10px 0;
+}
+
+.meta span{
+  background:var(--accent);
+  border-radius:999px;
+  padding:6px 8px;
+  font-size:12px;
+}
+
+.nutrition{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin-top:13px;
+}
+
+.nutri-box{
+  background:var(--accent2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:9px 5px;
+  text-align:center;
+  font-size:12px;
+}
+
+.nutri-box b{
+  display:block;
+  margin-bottom:4px;
+}
+
+.score{
+  margin-top:10px;
+  font-size:13px;
+  color:var(--primary);
+  font-weight:bold;
+}
+
+.tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:15px 0;
+}
+
+.tab{
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  border-radius:999px;
+  padding:10px 14px;
+}
+
+.tab.active{
+  background:var(--primary);
+  color:white;
+}
+
+.mode-card{
+  min-height:180px;
+}
+
+.mode-icon{
+  font-size:35px;
+}
+
+.fact-card{
+  min-height:190px;
+}
+
+.fact-table-wrap{
+  overflow-x:auto;
+}
+
+.fact-table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:760px;
+}
+
+.fact-table th,
+.fact-table td{
+  border:1px solid var(--border);
+  padding:14px;
+  text-align:left;
+  vertical-align:top;
+}
+
+.fact-table th{
+  background:var(--accent);
+}
+
+.season-card{
+  min-height:170px;
+}
+
+.upgrade{
+  border:2px solid #a87820;
+}
+
+.price{
+  font-size:38px;
+  font-weight:900;
+  color:var(--primary);
+}
+
+.badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  background:var(--accent);
+  font-size:12px;
+  font-weight:800;
+}
+
+.status{
+  margin-top:12px;
+  padding:12px;
+  border-radius:12px;
+  background:var(--accent2);
+  color:var(--text);
+}
+
+.ai-box{
+  min-height:90px;
+  line-height:1.7;
+}
+
+.loading{
+  opacity:.7;
+}
+
+.notice{
+  border-left:4px solid var(--primary);
+  background:var(--accent2);
+  padding:13px 15px;
+  border-radius:10px;
+}
+
 footer{
-  padding:35px 20px;
+  padding:40px 20px;
   text-align:center;
   color:var(--muted);
 }
 
-@media(max-width:700px){
+@media(max-width:850px){
+  .hero{
+    grid-template-columns:1fr;
+  }
+
   .nav{
     align-items:flex-start;
     flex-direction:column;
   }
 
   .navlinks{
-    width:100%;
+    justify-content:flex-start;
+  }
+}
+
+@media(max-width:600px){
+  .container{
+    padding-left:13px;
+    padding-right:13px;
+  }
+
+  .card{
+    padding:17px;
   }
 
   .nutrition{
     grid-template-columns:repeat(2,1fr);
+  }
+
+  .hero h1{
+    letter-spacing:-1px;
   }
 }
 </style>
@@ -327,12 +533,13 @@ footer{
     </div>
 
     <div class="navlinks">
-      <button onclick="showSection('planner')">Quick Meal Planner</button>
-      <button onclick="showSection('recipes')">Recipes</button>
-      <button onclick="showSection('facts')">Nutri Facts</button>
-      <button onclick="showSection('modes')">Smart Modes</button>
-      <button onclick="showSection('ai')">NutriPlate AI</button>
-      <button onclick="showSection('settings')">Settings</button>
+      <button onclick="showSection('planner')" data-i18n="navPlanner">Quick Meal Planner</button>
+      <button onclick="showSection('recipes')" data-i18n="navRecipes">Recipes</button>
+      <button onclick="showSection('facts')" data-i18n="navFacts">Nutri Facts</button>
+      <button onclick="showSection('modes')" data-i18n="navModes">Smart Modes</button>
+      <button onclick="showSection('ai')" data-i18n="navAI">NutriPlate AI</button>
+      <button onclick="showSection('plus')" data-i18n="navPlus">Plus</button>
+      <button onclick="showSection('settings')" data-i18n="navSettings">Settings</button>
     </div>
 
   </div>
@@ -341,360 +548,574 @@ footer{
 
 <main class="container">
 
+<!-- HERO -->
+
 <section class="hero">
-  <h1>What should we eat?</h1>
-  <p>
-    NutriPlate helps you turn the ingredients you already have
-    into practical meal ideas, explore cuisines, understand
-    nutrition, and optionally ask AI for personalised suggestions.
-  </p>
+
+  <div>
+    <div class="badge">🥗 SMART FOOD • SIMPLE DECISIONS</div>
+
+    <h1>
+      <span>What should</span><br>
+      we eat?
+    </h1>
+
+    <p data-i18n="heroText">
+      NutriPlate turns the ingredients you already have into
+      practical meal ideas, explores cuisines from around the
+      world, explains nutrition, and gives you optional AI help.
+    </p>
+
+    <div class="action-row">
+      <button class="btn" onclick="showSection('planner')" data-i18n="startPlanning">
+        Start Planning
+      </button>
+
+      <button class="btn secondary" onclick="showSection('recipes')" data-i18n="exploreRecipes">
+        Explore Recipes
+      </button>
+    </div>
+  </div>
+
+  <div class="hero-box">
+    <h3>🥕 Cook smarter.</h3>
+
+    <p>
+      Use what you already have instead of wasting food.
+      Pick a cuisine, tell us your ingredients and NutriPlate
+      does the matching.
+    </p>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <b id="recipeCount">0+</b>
+        <small>Meals</small>
+      </div>
+
+      <div class="hero-stat">
+        <b>10</b>
+        <small>Cuisines</small>
+      </div>
+
+      <div class="hero-stat">
+        <b>7</b>
+        <small>Languages</small>
+      </div>
+    </div>
+  </div>
+
 </section>
 
 
-<!-- =========================
-     QUICK MEAL PLANNER
-========================= -->
+<!-- QUICK PLANNER -->
 
 <section id="planner" class="section">
 
-  <div class="card">
+<div class="card">
 
-    <h2>🍽️ Quick Meal Planner</h2>
+  <h2>🍽️ <span data-i18n="plannerTitle">Quick Meal Planner</span></h2>
 
-    <p class="small">
-      Tell NutriPlate what you already have at home.
-      Our own recommendation engine will find matching meals.
-    </p>
+  <p class="small" data-i18n="plannerSubtitle">
+    No AI required. NutriPlate's own food engine matches your
+    ingredients with its recipe database.
+  </p>
 
-    <div class="form-row">
+  <div class="form-row">
 
-      <div>
-        <label for="ingredientInput">Ingredients</label>
+    <div>
+      <label data-i18n="ingredientsLabel">Ingredients you have</label>
 
-        <input
-          id="ingredientInput"
-          placeholder="Example: roti, beans, tomato, cucumber"
-          onkeydown="if(event.key==='Enter') addIngredients()"
-        >
-
-      </div>
-
-      <div>
-        <label for="cuisine">Cuisine</label>
-
-        <select id="cuisine">
-          <option>Any</option>
-          <option>Indian</option>
-          <option>Korean</option>
-          <option>Mexican</option>
-          <option>Chinese</option>
-          <option>Italian</option>
-          <option>Japanese</option>
-          <option>Thai</option>
-          <option>American</option>
-          <option>Mediterranean</option>
-        </select>
-      </div>
-
-      <div>
-        <label for="diet">Diet</label>
-
-        <select id="diet">
-          <option>Vegetarian</option>
-          <option>Vegan</option>
-          <option>Egg Vegetarian</option>
-          <option>Non-Vegetarian</option>
-        </select>
-
-      </div>
-
+      <input
+        id="ingredientInput"
+        placeholder="roti, tomato, cucumber, beans..."
+        onkeydown="if(event.key==='Enter') addIngredients()"
+      >
     </div>
 
+    <div>
+      <label data-i18n="cuisineLabel">Cuisine</label>
 
-    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
-
-      <button class="btn" onclick="addIngredients()">
-        + Add Ingredients
-      </button>
-
-      <button class="btn secondary" onclick="findMeals()">
-        Find My Meals
-      </button>
-
-      <button class="btn outline" onclick="clearIngredients()">
-        Clear
-      </button>
-
+      <select id="cuisine">
+        <option value="Any">🌍 Any Cuisine</option>
+        <option value="Indian">🇮🇳 Indian</option>
+        <option value="Korean">🇰🇷 Korean</option>
+        <option value="Mexican">🇲🇽 Mexican</option>
+        <option value="Chinese">🇨🇳 Chinese</option>
+        <option value="Italian">🇮🇹 Italian</option>
+        <option value="Japanese">🇯🇵 Japanese</option>
+        <option value="Thai">🇹🇭 Thai</option>
+        <option value="American">🇺🇸 American</option>
+        <option value="Mediterranean">🌍 Mediterranean</option>
+        <option value="Fusion">✨ Fusion</option>
+      </select>
     </div>
 
+    <div>
+      <label data-i18n="dietLabel">Diet</label>
 
-    <div id="ingredientList" class="ingredients"></div>
+      <select id="diet">
+        <option value="Vegetarian">🥗 Vegetarian</option>
+        <option value="Vegan">🌱 Vegan</option>
+        <option value="Jain">🪷 Jain-friendly</option>
+      </select>
+    </div>
 
   </div>
 
+  <div class="action-row">
 
-  <div id="results"></div>
+    <button class="btn" onclick="addIngredients()">
+      + <span data-i18n="addIngredients">Add Ingredients</span>
+    </button>
+
+    <button class="btn secondary" onclick="findMeals()">
+      🔎 <span data-i18n="findMeals">Find My Meals</span>
+    </button>
+
+    <button class="btn outline" onclick="clearIngredients()">
+      Clear
+    </button>
+
+  </div>
+
+  <div id="ingredientList" class="ingredients"></div>
+
+</div>
+
+
+<!-- FAMILY PLANNER -->
+
+<div class="card">
+
+  <h2>👨‍👩‍👧‍👦 Family Planner</h2>
+
+  <p class="small">
+    Planning for more than one person? NutriPlate can consider
+    the number of people and their broad age groups.
+  </p>
+
+  <div class="form-row">
+
+    <div>
+      <label>Number of people</label>
+      <input id="familyCount" type="number" min="1" max="20" value="1"
+             onchange="renderFamilyMembers()">
+    </div>
+
+    <div>
+      <label>Meal type</label>
+      <select id="familyMeal">
+        <option>Breakfast</option>
+        <option>Lunch</option>
+        <option>Snack</option>
+        <option>Dinner</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Family diet</label>
+      <select id="familyDiet">
+        <option>Vegetarian</option>
+        <option>Vegan</option>
+        <option>Jain-friendly</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div id="familyMembers" class="grid" style="margin-top:15px"></div>
+
+  <button class="btn" onclick="familyPlan()">
+    👨‍👩‍👧‍👦 Create Family Suggestions
+  </button>
+
+  <div id="familyResults"></div>
+
+</div>
+
+
+<div id="results"></div>
 
 </section>
 
 
-
-<!-- =========================
-     RECIPES
-========================= -->
+<!-- RECIPES -->
 
 <section id="recipes" class="section">
 
-  <div class="card">
+<div class="card">
 
-    <h2>📖 Explore Recipes</h2>
+  <h2>📖 Explore the World of Food</h2>
 
-    <p class="small">
-      Explore dishes by cuisine.
-    </p>
+  <p class="small">
+    Choose a cuisine. The explorer shows dishes belonging to
+    that cuisine only.
+  </p>
 
-    <div class="tabs">
+  <div class="tabs">
 
-      <button class="tab active" onclick="showCuisine('Indian',this)">
-        🇮🇳 Indian
-      </button>
-
-      <button class="tab" onclick="showCuisine('Korean',this)">
-        🇰🇷 Korean
-      </button>
-
-      <button class="tab" onclick="showCuisine('Mexican',this)">
-        🇲🇽 Mexican
-      </button>
-
-      <button class="tab" onclick="showCuisine('Chinese',this)">
-        🇨🇳 Chinese
-      </button>
-
-      <button class="tab" onclick="showCuisine('Italian',this)">
-        🇮🇹 Italian
-      </button>
-
-      <button class="tab" onclick="showCuisine('Japanese',this)">
-        🇯🇵 Japanese
-      </button>
-
-      <button class="tab" onclick="showCuisine('Thai',this)">
-        🇹🇭 Thai
-      </button>
-
-      <button class="tab" onclick="showCuisine('American',this)">
-        🇺🇸 American
-      </button>
-
-      <button class="tab" onclick="showCuisine('Mediterranean',this)">
-        🌍 Mediterranean
-      </button>
-
-    </div>
-
-    <div id="cuisineRecipes" class="grid"></div>
+    <button class="tab active" onclick="showCuisine('Indian',this)">🇮🇳 Indian</button>
+    <button class="tab" onclick="showCuisine('Korean',this)">🇰🇷 Korean</button>
+    <button class="tab" onclick="showCuisine('Mexican',this)">🇲🇽 Mexican</button>
+    <button class="tab" onclick="showCuisine('Chinese',this)">🇨🇳 Chinese</button>
+    <button class="tab" onclick="showCuisine('Italian',this)">🇮🇹 Italian</button>
+    <button class="tab" onclick="showCuisine('Japanese',this)">🇯🇵 Japanese</button>
+    <button class="tab" onclick="showCuisine('Thai',this)">🇹🇭 Thai</button>
+    <button class="tab" onclick="showCuisine('American',this)">🇺🇸 American</button>
+    <button class="tab" onclick="showCuisine('Mediterranean',this)">🌍 Mediterranean</button>
+    <button class="tab" onclick="showCuisine('Fusion',this)">✨ Fusion</button>
 
   </div>
+
+  <div id="cuisineRecipes" class="grid"></div>
+
+</div>
 
 </section>
 
 
-
-<!-- =========================
-     NUTRI FACTS
-========================= -->
+<!-- NUTRI FACTS -->
 
 <section id="facts" class="section">
 
-  <div class="card">
+<div class="card">
 
-    <h2>🥗 Nutri Facts</h2>
+  <h2>🥗 Nutri Facts</h2>
 
-    <p>
-      General nutrition information for different stages of life.
-    </p>
+  <p class="small">
+    General educational nutrition information. Individual
+    nutritional needs vary, so this is not medical advice.
+  </p>
 
-    <div class="grid">
+  <div class="fact-table-wrap">
 
-      <div class="card">
-        <h3>👦 Growing Teens</h3>
-        <p>
-          Focus on regular balanced meals containing protein,
-          whole grains, fruits, vegetables, calcium-rich foods,
-          iron and zinc.
-        </p>
-      </div>
+    <table class="fact-table">
 
-      <div class="card">
-        <h3>👧 Growing Girls</h3>
-        <p>
-          A varied diet can provide protein, iron, calcium,
-          vitamin D and other nutrients needed during growth.
-        </p>
-      </div>
+      <thead>
+        <tr>
+          <th>Life stage</th>
+          <th>Focus nutrients</th>
+          <th>Useful food groups</th>
+          <th>Simple reminder</th>
+        </tr>
+      </thead>
 
-      <div class="card">
-        <h3>🧑 Adults</h3>
-        <p>
-          Aim for a balanced plate containing vegetables,
-          fruits, grains, protein foods and healthy fats.
-        </p>
-      </div>
+      <tbody>
 
-      <div class="card">
-        <h3>👴 Older Adults</h3>
-        <p>
-          Adequate protein, calcium, vitamin D, fibre and
-          hydration become especially important with age.
-        </p>
-      </div>
+        <tr>
+          <td>👦 Growing children & teens</td>
+          <td>Protein, iron, calcium, zinc, vitamin D, fibre</td>
+          <td>Dal/beans, dairy or alternatives, vegetables, fruits, grains, nuts/seeds</td>
+          <td>Regular balanced meals matter during growth.</td>
+        </tr>
 
-    </div>
+        <tr>
+          <td>👧 Growing girls</td>
+          <td>Protein, iron, calcium, vitamin D</td>
+          <td>Beans, lentils, leafy vegetables, dairy/fortified alternatives, fruits</td>
+          <td>Iron-rich foods are particularly useful to discuss with a healthcare professional when needed.</td>
+        </tr>
+
+        <tr>
+          <td>🧑 Adults</td>
+          <td>Protein, fibre, vitamins, minerals, healthy fats</td>
+          <td>Vegetables, fruits, whole grains, legumes, nuts/seeds</td>
+          <td>Build variety into the weekly diet.</td>
+        </tr>
+
+        <tr>
+          <td>👴 Older adults</td>
+          <td>Protein, calcium, vitamin D, fibre, hydration</td>
+          <td>Protein-rich foods, vegetables, fruits, whole grains, calcium-rich foods</td>
+          <td>Hydration and adequate protein are important.</td>
+        </tr>
+
+      </tbody>
+
+    </table>
 
   </div>
+
+</div>
+
+
+<div class="grid">
+
+  <div class="card fact-card">
+    <h3>💪 Protein</h3>
+    <p>
+      Helps build and maintain muscles and other tissues.
+      Vegetarian sources include dals, beans, lentils, soy,
+      dairy and nuts.
+    </p>
+  </div>
+
+  <div class="card fact-card">
+    <h3>🩸 Iron</h3>
+    <p>
+      Important for normal blood function. Legumes, leafy
+      vegetables, beans, fortified foods and seeds can contribute.
+    </p>
+  </div>
+
+  <div class="card fact-card">
+    <h3>🦴 Calcium</h3>
+    <p>
+      Important for bones and teeth. Dairy and calcium-fortified
+      alternatives are useful sources.
+    </p>
+  </div>
+
+  <div class="card fact-card">
+    <h3>⚙️ Zinc</h3>
+    <p>
+      Supports normal growth and immune function. Beans,
+      lentils, dairy, nuts and seeds can contribute zinc.
+    </p>
+  </div>
+
+  <div class="card fact-card">
+    <h3>🍊 Vitamin C</h3>
+    <p>
+      Fruits and vegetables such as citrus fruits, guava,
+      tomatoes and peppers can provide vitamin C.
+    </p>
+  </div>
+
+  <div class="card fact-card">
+    <h3>🌾 Fibre</h3>
+    <p>
+      Whole grains, vegetables, fruits, beans and lentils
+      are useful sources of dietary fibre.
+    </p>
+  </div>
+
+</div>
 
 </section>
 
 
-
-<!-- =========================
-     SMART MODES
-========================= -->
+<!-- SMART MODES -->
 
 <section id="modes" class="section">
 
-  <div class="card">
+<div class="card">
 
-    <h2>🧠 Smart Modes</h2>
+  <h2>🧠 Smart Modes</h2>
 
-    <div class="grid">
+  <div class="grid">
 
-      <div class="card">
-        <h3>🤒 I Am Sick</h3>
-        <p>
-          Get simple food and hydration ideas for common
-          situations such as a cold or cough.
-        </p>
-        <p class="small">
-          This feature provides general information and is not
-          a substitute for medical care.
-        </p>
-      </div>
+    <div class="card mode-card">
+      <div class="mode-icon">📚</div>
+      <h3>Exam Mode</h3>
+      <p>
+        Meal and snack ideas for a busy study day, focusing on
+        balanced meals, hydration and regular eating.
+      </p>
+      <button class="btn" onclick="showMode('exam')">Open Exam Mode</button>
+    </div>
 
-      <div class="card">
-        <h3>📚 Exam Mode</h3>
-        <p>
-          Discover balanced snack and meal ideas that can fit
-          into a busy study schedule.
-        </p>
-      </div>
+    <div class="card mode-card">
+      <div class="mode-icon">🤒</div>
+      <h3>I Am Sick</h3>
+      <p>
+        General gentle-food and hydration suggestions for common
+        situations such as coughs, colds or fever.
+      </p>
+      <button class="btn" onclick="showMode('sick')">Open Sick Mode</button>
+    </div>
 
-      <div class="card">
-        <h3>🛡️ Immunity Mode</h3>
-        <p>
-          Explore meals containing a variety of fruits,
-          vegetables, protein foods and other nutrient-rich foods.
-        </p>
-      </div>
+    <div class="card mode-card">
+      <div class="mode-icon">🛡️</div>
+      <h3>Immunity Mode</h3>
+      <p>
+        Build varied meals containing vegetables, fruits,
+        protein foods and other nutrient-rich ingredients.
+      </p>
+      <button class="btn" onclick="showMode('immunity')">Open Immunity</button>
+    </div>
 
-      <div class="card">
-        <h3>☀️ Seasonal Mode</h3>
-        <p>
-          Choose food ideas based on the season and the type
-          of ingredients commonly available.
-        </p>
-      </div>
-
+    <div class="card mode-card">
+      <div class="mode-icon">🌦️</div>
+      <h3>Seasonal Mode</h3>
+      <p>
+        Explore food ideas based on the season.
+      </p>
+      <button class="btn" onclick="showMode('season')">Open Seasons</button>
     </div>
 
   </div>
 
+  <div id="modeOutput"></div>
+
+</div>
+
 </section>
 
 
-
-<!-- =========================
-     NUTRIPLATE AI
-========================= -->
+<!-- AI -->
 
 <section id="ai" class="section">
 
-  <div class="card">
+<div class="card">
 
-    <h2>🤖 NutriPlate AI</h2>
+  <div class="badge">OPTIONAL AI</div>
 
-    <p>
-      AI is optional. Use it when you want a more personalised
-      conversation about food ideas.
-    </p>
+  <h2>🤖 NutriPlate AI</h2>
 
-    <textarea
-      id="aiInput"
-      placeholder="Example: I have roti, beans, cucumber and tomato. Give me a Korean-style vegetarian idea."
-    ></textarea>
+  <p>
+    The AI is a separate feature. Your Quick Meal Planner
+    continues working even if the AI is unavailable.
+  </p>
 
-    <button
-      class="btn"
-      style="margin-top:10px"
-      onclick="askAI()"
-    >
-      Ask NutriPlate AI
+  <textarea
+    id="aiInput"
+    placeholder="Example: I have leftover roti, rice, beans, tomato, cucumber, onion and mayonnaise. I want a Korean-inspired vegetarian meal."
+  ></textarea>
+
+  <div class="action-row">
+
+    <button class="btn" onclick="askAI()">
+      🤖 Ask NutriPlate AI
     </button>
 
-    <div
-      id="aiResponse"
-      class="card"
-      style="margin-top:15px"
-    >
-      AI responses will appear here.
-    </div>
+    <button class="btn outline" onclick="document.getElementById('aiInput').value=''">
+      Clear
+    </button>
 
   </div>
+
+  <div id="aiResponse" class="card ai-box">
+    AI responses will appear here.
+  </div>
+
+</div>
 
 </section>
 
 
+<!-- PLUS -->
 
-<!-- =========================
-     SETTINGS
-========================= -->
+<section id="plus" class="section">
 
-<section id="settings" class="section">
+<div class="card">
 
-  <div class="card">
+  <div class="badge">NUTRIPLATE PLUS</div>
 
-    <h2>⚙️ Settings</h2>
+  <h2>🚀 Upgrade your food experience</h2>
 
-    <div class="form-row">
+  <p>
+    The free version gives you the core NutriPlate engine.
+    Plus can later unlock additional personalization and
+    premium features.
+  </p>
 
-      <div>
-        <label>Appearance</label>
+  <div class="two">
 
-        <select id="appearance" onchange="changeAppearance()">
-          <option value="light">Day Mode ☀️</option>
-          <option value="dark">Night Mode 🌙</option>
-        </select>
-      </div>
+    <div class="card">
 
-      <div>
-        <label>Language</label>
+      <h3>🆓 Free</h3>
 
-        <select id="language" onchange="changeLanguage()">
-          <option value="en">English</option>
-          <option value="hi">हिन्दी</option>
-          <option value="mr">मराठी</option>
-          <option value="ta">தமிழ்</option>
-          <option value="te">తెలుగు</option>
-          <option value="kn">ಕನ್ನಡ</option>
-          <option value="bn">বাংলা</option>
-        </select>
+      <ul>
+        <li>Quick Meal Planner</li>
+        <li>Built-in recipe engine</li>
+        <li>Cuisine filtering</li>
+        <li>Nutri Facts</li>
+        <li>Smart Modes</li>
+        <li>Day/Night appearance</li>
+        <li>Multiple languages</li>
+        <li>Optional AI</li>
+      </ul>
 
-      </div>
+    </div>
+
+    <div class="card upgrade">
+
+      <h3>⭐ NutriPlate Plus</h3>
+
+      <div class="price">₹999</div>
+
+      <p>Planned premium upgrade.</p>
+
+      <ul>
+        <li>Advanced family personalization</li>
+        <li>Seasonal personalization</li>
+        <li>Expanded recipe collections</li>
+        <li>More AI personalization</li>
+        <li>Advanced meal planning</li>
+        <li>Future premium recipe packs</li>
+      </ul>
+
+      <button class="btn gold" onclick="openPaymentDemo()">
+        ⭐ Upgrade for ₹999
+      </button>
+
+      <div id="paymentDemo"></div>
 
     </div>
 
   </div>
+
+</div>
+
+</section>
+
+
+<!-- SETTINGS -->
+
+<section id="settings" class="section">
+
+<div class="card">
+
+  <h2>⚙️ Settings</h2>
+
+  <div class="form-row">
+
+    <div>
+      <label>Appearance</label>
+
+      <select id="appearance" onchange="changeAppearance()">
+        <option value="light">☀️ Day Mode</option>
+        <option value="dark">🌙 Night Mode</option>
+        <option value="seasonal">🌦️ Seasonal</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Language</label>
+
+      <select id="language" onchange="changeLanguage()">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+        <option value="mr">मराठी</option>
+        <option value="ta">தமிழ்</option>
+        <option value="te">తెలుగు</option>
+        <option value="kn">ಕನ್ನಡ</option>
+        <option value="bn">বাংলা</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Season</label>
+
+      <select id="season" onchange="applySeason()">
+        <option value="auto">Automatic</option>
+        <option value="summer">☀️ Summer</option>
+        <option value="monsoon">🌧️ Monsoon</option>
+        <option value="winter">❄️ Winter</option>
+        <option value="spring">🌸 Spring</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div class="status">
+    <b>Privacy reminder:</b>
+    Your Gemini API key should NEVER be placed inside this
+    HTML file. Keep it in your Vercel environment variable.
+  </div>
+
+</div>
 
 </section>
 
@@ -703,49 +1124,578 @@ footer{
 
 <footer>
   <b>NutriPlate</b> — Smart food decisions, made simpler.
+  <br>
+  <span class="small">
+    Educational nutrition information only. Not medical advice.
+  </span>
 </footer>
-
 
 
 <script>
 
-/* =============================
-   GLOBAL DATA
-============================= */
+/* =========================================================
+   NUTRIPLATE
+   CORE APP ENGINE
+========================================================= */
 
-let ingredients=[];
+let ingredients = [];
 
 
-/* =============================
-   INGREDIENT NORMALIZATION
-============================= */
+/* =========================================================
+   RECIPE DATABASE
+   The planner uses THIS database.
+   It does NOT depend on AI.
+========================================================= */
+
+const recipes = [
+
+/* ================= INDIA ================= */
+
+{
+ name:"Rajma Rice Bowl",
+ cuisine:"Indian",
+ needs:["beans","rice"],
+ extra:["tomato","onion"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Dal Rice",
+ cuisine:"Indian",
+ needs:["dal","rice"],
+ extra:["tomato","onion"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Vegetable Roti Wrap",
+ cuisine:"Indian",
+ needs:["roti","tomato","cucumber"],
+ extra:["onion","beans"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"High"
+},
+
+{
+ name:"Aloo Roti",
+ cuisine:"Indian",
+ needs:["roti","potato"],
+ extra:["onion","tomato"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Moderate",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Vegetable Pulao",
+ cuisine:"Indian",
+ needs:["rice","onion"],
+ extra:["tomato","beans","potato"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Chana Masala Rice",
+ cuisine:"Indian",
+ needs:["chickpeas","rice"],
+ extra:["tomato","onion"],
+ tags:["vegetarian"],
+ protein:"High", iron:"High", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Chole Roti",
+ cuisine:"Indian",
+ needs:["chickpeas","roti"],
+ extra:["tomato","onion"],
+ tags:["vegetarian"],
+ protein:"High", iron:"High", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Moong Dal Khichdi",
+ cuisine:"Indian",
+ needs:["dal","rice"],
+ extra:["carrot","peas","tomato"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Vegetable Poha",
+ cuisine:"Indian",
+ needs:["poha","onion"],
+ extra:["tomato","peas","potato"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Moderate",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Besan Chilla",
+ cuisine:"Indian",
+ needs:["besan","onion"],
+ extra:["tomato","cucumber","pepper"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Vegetable Upma",
+ cuisine:"Indian",
+ needs:["rava","onion"],
+ extra:["tomato","carrot","peas"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Moderate", calcium:"Moderate", zinc:"Moderate",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Paneer Roti Roll",
+ cuisine:"Indian",
+ needs:["paneer","roti"],
+ extra:["tomato","onion","cucumber"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"High", zinc:"Good",
+ fibre:"Moderate", vitaminC:"Good"
+},
+
+/* ================= KOREAN ================= */
+
+{
+ name:"Korean Veggie Rice Bowl",
+ cuisine:"Korean",
+ needs:["rice","cucumber"],
+ extra:["beans","onion","carrot"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"High"
+},
+
+{
+ name:"Korean Bean Rice Bowl",
+ cuisine:"Korean",
+ needs:["rice","beans"],
+ extra:["cucumber","onion","tomato"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Korean-Style Roti Wrap",
+ cuisine:"Korean",
+ needs:["roti","cucumber","onion"],
+ extra:["beans","tomato"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Korean Veggie Noodle Bowl",
+ cuisine:"Korean",
+ needs:["noodles","onion"],
+ extra:["carrot","cucumber","beans"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Moderate",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Korean Bibimbap-Style Bowl",
+ cuisine:"Korean",
+ needs:["rice","carrot"],
+ extra:["cucumber","beans","spinach"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Korean Bean Lettuce Bowl",
+ cuisine:"Korean",
+ needs:["beans","lettuce"],
+ extra:["cucumber","tomato","rice"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"Good", zinc:"Good",
+ fibre:"High", vitaminC:"High"
+},
+
+/* ================= MEXICAN ================= */
+
+{
+ name:"Bean Burrito",
+ cuisine:"Mexican",
+ needs:["beans","roti"],
+ extra:["tomato","onion","cucumber","rice"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Mexican Rice Bowl",
+ cuisine:"Mexican",
+ needs:["rice","beans"],
+ extra:["tomato","onion","cucumber","corn"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Bean Quesadilla",
+ cuisine:"Mexican",
+ needs:["beans","tortilla"],
+ extra:["tomato","onion","cheese"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"Good", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Mexican Veggie Wrap",
+ cuisine:"Mexican",
+ needs:["roti","tomato"],
+ extra:["beans","onion","cucumber"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"High"
+},
+
+{
+ name:"Mexican Bean Tacos",
+ cuisine:"Mexican",
+ needs:["tortilla","beans"],
+ extra:["tomato","onion","lettuce"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+/* ================= CHINESE ================= */
+
+{
+ name:"Vegetable Fried Rice",
+ cuisine:"Chinese",
+ needs:["rice","onion"],
+ extra:["carrot","beans","peas"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Moderate",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Chinese Bean Rice Bowl",
+ cuisine:"Chinese",
+ needs:["rice","beans"],
+ extra:["onion","carrot","cucumber"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Vegetable Chow Mein",
+ cuisine:"Chinese",
+ needs:["noodles","onion"],
+ extra:["carrot","cabbage","beans"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Moderate",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Chinese Veggie Stir Fry",
+ cuisine:"Chinese",
+ needs:["onion","carrot"],
+ extra:["beans","cucumber","pepper"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"High"
+},
+
+{
+ name:"Chinese Vegetable Noodles",
+ cuisine:"Chinese",
+ needs:["noodles","carrot"],
+ extra:["onion","cabbage","beans"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"Good"
+},
+
+/* ================= ITALIAN ================= */
+
+{
+ name:"Bean & Tomato Pasta",
+ cuisine:"Italian",
+ needs:["beans","tomato"],
+ extra:["onion","pasta"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"High"
+},
+
+{
+ name:"Tomato Vegetable Pasta",
+ cuisine:"Italian",
+ needs:["pasta","tomato"],
+ extra:["onion","pepper","beans"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Moderate",
+ fibre:"Good", vitaminC:"High"
+},
+
+{
+ name:"Italian Bean Rice Bowl",
+ cuisine:"Italian",
+ needs:["rice","beans"],
+ extra:["tomato","onion"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Tomato Bruschetta",
+ cuisine:"Italian",
+ needs:["bread","tomato"],
+ extra:["onion","cucumber"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Moderate", calcium:"Moderate", zinc:"Moderate",
+ fibre:"Good", vitaminC:"High"
+},
+
+/* ================= JAPANESE ================= */
+
+{
+ name:"Japanese-Inspired Rice Bowl",
+ cuisine:"Japanese",
+ needs:["rice","cucumber"],
+ extra:["beans","carrot","onion"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Moderate", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Japanese Bean Rice Bowl",
+ cuisine:"Japanese",
+ needs:["rice","beans"],
+ extra:["cucumber","onion","carrot"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Japanese Veggie Noodles",
+ cuisine:"Japanese",
+ needs:["noodles","onion"],
+ extra:["cucumber","carrot","beans"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Japanese Vegetable Fried Rice",
+ cuisine:"Japanese",
+ needs:["rice","carrot"],
+ extra:["onion","peas","beans"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"Good"
+},
+
+/* ================= THAI ================= */
+
+{
+ name:"Thai Veggie Rice Bowl",
+ cuisine:"Thai",
+ needs:["rice","onion"],
+ extra:["tomato","cucumber","beans"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Thai Bean Rice Bowl",
+ cuisine:"Thai",
+ needs:["rice","beans"],
+ extra:["tomato","onion","cucumber"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Thai Vegetable Noodles",
+ cuisine:"Thai",
+ needs:["noodles","carrot"],
+ extra:["onion","pepper","beans"],
+ tags:["vegetarian"],
+ protein:"Moderate", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"Good"
+},
+
+/* ================= AMERICAN ================= */
+
+{
+ name:"American Bean Wrap",
+ cuisine:"American",
+ needs:["roti","beans"],
+ extra:["tomato","cucumber","onion","lettuce"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"American Veggie Rice Bowl",
+ cuisine:"American",
+ needs:["rice","beans"],
+ extra:["tomato","onion","cucumber"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Loaded Veggie Toast",
+ cuisine:"American",
+ needs:["bread","tomato"],
+ extra:["beans","cucumber","cheese"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Good", zinc:"Good",
+ fibre:"Good", vitaminC:"Good"
+},
+
+/* ================= MEDITERRANEAN ================= */
+
+{
+ name:"Mediterranean Bean Bowl",
+ cuisine:"Mediterranean",
+ needs:["beans","cucumber"],
+ extra:["tomato","onion","rice"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"High"
+},
+
+{
+ name:"Mediterranean Rice Bowl",
+ cuisine:"Mediterranean",
+ needs:["rice","tomato"],
+ extra:["cucumber","beans","onion"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"High"
+},
+
+{
+ name:"Mediterranean Veggie Wrap",
+ cuisine:"Mediterranean",
+ needs:["roti","cucumber"],
+ extra:["tomato","beans","onion"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"High"
+},
+
+/* ================= FUSION ================= */
+
+{
+ name:"Korean-Mexican Bean Burrito",
+ cuisine:"Fusion",
+ needs:["roti","beans"],
+ extra:["rice","cucumber","tomato","onion"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Indian-Italian Masala Pasta",
+ cuisine:"Fusion",
+ needs:["pasta","tomato"],
+ extra:["onion","beans","pepper"],
+ tags:["vegetarian"],
+ protein:"Good", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"Good", vitaminC:"Good"
+},
+
+{
+ name:"Korean-Indian Rice Bowl",
+ cuisine:"Fusion",
+ needs:["rice","beans"],
+ extra:["cucumber","onion","tomato"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+},
+
+{
+ name:"Mexican-Indian Roti Bowl",
+ cuisine:"Fusion",
+ needs:["roti","beans"],
+ extra:["rice","tomato","onion","cucumber"],
+ tags:["vegetarian"],
+ protein:"High", iron:"Good", calcium:"Moderate", zinc:"Good",
+ fibre:"High", vitaminC:"Good"
+}
+
+];
+
+
+/* =========================================================
+   INGREDIENT ALIASES
+========================================================= */
+
+const aliases = {
+  rajma:"beans",
+  "kidney beans":"beans",
+  "red kidney beans":"beans",
+  chana:"chickpeas",
+  chickpea:"chickpeas",
+  garbanzo:"chickpeas",
+  chapati:"roti",
+  chapatti:"roti",
+  tortilla:"tortilla",
+  "green onion":"onion",
+  "spring onion":"onion",
+  capsicum:"pepper",
+  "bell pepper":"pepper",
+  noodles:"noodles",
+  maggi:"noodles",
+  mayonnaise:"mayonnaise"
+};
 
 function normalizeIngredient(item){
 
-  const aliases={
-    "rajma":"beans",
-    "kidney beans":"beans",
-    "red kidney beans":"beans",
-    "chana":"beans",
-    "chickpeas":"beans",
-    "garbanzo":"beans",
-    "chapati":"roti",
-    "chapatti":"roti",
-    "green onion":"onion",
-    "spring onion":"onion",
-    "capsicum":"pepper",
-    "bell pepper":"pepper"
-  };
-
-  const value=item.trim().toLowerCase();
+  let value=item.trim().toLowerCase();
 
   return aliases[value] || value;
 }
 
 
-/* =============================
-   ADD INGREDIENTS
-============================= */
+/* =========================================================
+   INGREDIENTS
+========================================================= */
 
 function addIngredients(){
 
@@ -755,15 +1705,15 @@ function addIngredients(){
 
   if(!text)return;
 
-  const newItems=text
+  const items=text
     .split(",")
-    .map(x=>normalizeIngredient(x))
+    .map(normalizeIngredient)
     .filter(Boolean);
 
   ingredients=[
     ...new Set([
       ...ingredients,
-      ...newItems
+      ...items
     ])
   ];
 
@@ -773,10 +1723,6 @@ function addIngredients(){
 }
 
 
-/* =============================
-   RENDER INGREDIENTS
-============================= */
-
 function renderIngredients(){
 
   const box=document.getElementById("ingredientList");
@@ -784,29 +1730,16 @@ function renderIngredients(){
   box.innerHTML=ingredients.map((item,index)=>`
 
     <span class="ingredient">
-      ${item}
+      ${escapeHTML(item)}
 
-      <button
-        onclick="removeIngredient(${index})"
-        style="
-          border:0;
-          background:none;
-          cursor:pointer;
-          color:inherit;
-        "
-      >
+      <button onclick="removeIngredient(${index})">
         ×
       </button>
-
     </span>
 
   `).join("");
 }
 
-
-/* =============================
-   REMOVE INGREDIENT
-============================= */
 
 function removeIngredient(index){
 
@@ -816,10 +1749,6 @@ function removeIngredient(index){
 }
 
 
-/* =============================
-   CLEAR
-============================= */
-
 function clearIngredients(){
 
   ingredients=[];
@@ -827,391 +1756,12 @@ function clearIngredients(){
   renderIngredients();
 
   document.getElementById("results").innerHTML="";
-
 }
 
 
-/* ==================================================
-   NUTRIPLATE OWN SMART RECOMMENDER
-
-   IMPORTANT:
-   - This NEVER calls AI.
-   - Cuisine is a HARD FILTER.
-   - Results come from NutriPlate's own database.
-   - Recipes are ranked according to ingredients available.
-================================================== */
-
-const recipes=[
-
-  /* =========================
-     🇮🇳 INDIAN
-  ========================= */
-
-  {
-    name:"Rajma Rice Bowl",
-    cuisine:"Indian",
-    needs:["beans","rice"],
-    extra:["tomato","onion"],
-    protein:"High",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Vegetable Roti Wrap",
-    cuisine:"Indian",
-    needs:["roti","tomato","cucumber"],
-    extra:["onion","beans"],
-    protein:"Moderate",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Dal Rice",
-    cuisine:"Indian",
-    needs:["rice","dal"],
-    extra:["tomato","onion"],
-    protein:"Good",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Aloo Roti",
-    cuisine:"Indian",
-    needs:["roti","potato"],
-    extra:["onion","tomato"],
-    protein:"Moderate",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Moderate"
-  },
-
-  {
-    name:"Vegetable Pulao",
-    cuisine:"Indian",
-    needs:["rice","onion"],
-    extra:["tomato","beans","potato"],
-    protein:"Moderate",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-
-  /* =========================
-     🇰🇷 KOREAN
-  ========================= */
-
-  {
-    name:"Korean Veggie Rice Bowl",
-    cuisine:"Korean",
-    needs:["rice","cucumber"],
-    extra:["beans","onion","tomato"],
-    protein:"Good",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Korean-Style Roti Wrap",
-    cuisine:"Korean",
-    needs:["roti","cucumber","onion"],
-    extra:["beans","tomato"],
-    protein:"Good",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Korean Bean Rice Bowl",
-    cuisine:"Korean",
-    needs:["rice","beans"],
-    extra:["cucumber","onion","tomato"],
-    protein:"High",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Korean Veggie Noodle Bowl",
-    cuisine:"Korean",
-    needs:["noodles","onion"],
-    extra:["cucumber","beans","tomato"],
-    protein:"Moderate",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-
-  /* =========================
-     🇲🇽 MEXICAN
-  ========================= */
-
-  {
-    name:"Bean Burrito",
-    cuisine:"Mexican",
-    needs:["beans","roti"],
-    extra:["tomato","onion","cucumber","rice"],
-    protein:"High",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Mexican Rice Bowl",
-    cuisine:"Mexican",
-    needs:["rice","beans"],
-    extra:["tomato","onion","cucumber"],
-    protein:"High",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Bean Quesadilla",
-    cuisine:"Mexican",
-    needs:["beans","roti"],
-    extra:["tomato","onion"],
-    protein:"High",
-    iron:"Good",
-    calcium:"Good",
-    zinc:"Good"
-  },
-
-  {
-    name:"Mexican Veggie Wrap",
-    cuisine:"Mexican",
-    needs:["roti","tomato"],
-    extra:["beans","onion","cucumber"],
-    protein:"Moderate",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-
-  /* =========================
-     🇨🇳 CHINESE
-  ========================= */
-
-  {
-    name:"Vegetable Fried Rice",
-    cuisine:"Chinese",
-    needs:["rice","onion"],
-    extra:["tomato","beans","cucumber"],
-    protein:"Moderate",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Moderate"
-  },
-
-  {
-    name:"Chinese Bean Rice Bowl",
-    cuisine:"Chinese",
-    needs:["rice","beans"],
-    extra:["onion","cucumber"],
-    protein:"Good",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Vegetable Chow Mein",
-    cuisine:"Chinese",
-    needs:["noodles","onion"],
-    extra:["tomato","beans","cucumber"],
-    protein:"Moderate",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Moderate"
-  },
-
-  {
-    name:"Chinese Veggie Stir Fry",
-    cuisine:"Chinese",
-    needs:["onion","tomato"],
-    extra:["beans","cucumber"],
-    protein:"Moderate",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-
-  /* =========================
-     🇮🇹 ITALIAN
-  ========================= */
-
-  {
-    name:"Bean & Tomato Pasta",
-    cuisine:"Italian",
-    needs:["beans","tomato"],
-    extra:["onion"],
-    protein:"Good",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Tomato Vegetable Pasta",
-    cuisine:"Italian",
-    needs:["tomato","onion"],
-    extra:["beans"],
-    protein:"Moderate",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Moderate"
-  },
-
-  {
-    name:"Italian Bean Rice Bowl",
-    cuisine:"Italian",
-    needs:["rice","beans"],
-    extra:["tomato","onion"],
-    protein:"Good",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-
-  /* =========================
-     🇯🇵 JAPANESE
-  ========================= */
-
-  {
-    name:"Japanese-Inspired Rice Bowl",
-    cuisine:"Japanese",
-    needs:["rice","cucumber"],
-    extra:["beans","onion"],
-    protein:"Good",
-    iron:"Moderate",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Japanese Bean Rice Bowl",
-    cuisine:"Japanese",
-    needs:["rice","beans"],
-    extra:["cucumber","onion"],
-    protein:"Good",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Japanese Veggie Noodles",
-    cuisine:"Japanese",
-    needs:["noodles","onion"],
-    extra:["cucumber","beans"],
-    protein:"Moderate",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-
-  /* =========================
-     🇹🇭 THAI
-  ========================= */
-
-  {
-    name:"Thai Veggie Rice Bowl",
-    cuisine:"Thai",
-    needs:["rice","onion"],
-    extra:["tomato","cucumber","beans"],
-    protein:"Moderate",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Thai Bean Rice Bowl",
-    cuisine:"Thai",
-    needs:["rice","beans"],
-    extra:["tomato","onion","cucumber"],
-    protein:"Good",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-
-  /* =========================
-     🇺🇸 AMERICAN
-  ========================= */
-
-  {
-    name:"American Veggie Rice Bowl",
-    cuisine:"American",
-    needs:["rice","beans"],
-    extra:["tomato","onion","cucumber"],
-    protein:"Good",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"American Bean Wrap",
-    cuisine:"American",
-    needs:["roti","beans"],
-    extra:["tomato","cucumber","onion"],
-    protein:"High",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-
-  /* =========================
-     🌍 MEDITERRANEAN
-  ========================= */
-
-  {
-    name:"Mediterranean Bean Bowl",
-    cuisine:"Mediterranean",
-    needs:["beans","cucumber"],
-    extra:["tomato","onion","rice"],
-    protein:"High",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  },
-
-  {
-    name:"Mediterranean Rice Bowl",
-    cuisine:"Mediterranean",
-    needs:["rice","tomato"],
-    extra:["cucumber","beans","onion"],
-    protein:"Good",
-    iron:"Good",
-    calcium:"Moderate",
-    zinc:"Good"
-  }
-
-];
-
-
-/* =============================
-   FIND MEALS
-============================= */
+/* =========================================================
+   CORE RECOMMENDER
+========================================================= */
 
 function findMeals(){
 
@@ -1219,24 +1769,16 @@ function findMeals(){
 
   const cuisine=document.getElementById("cuisine").value;
 
-  const diet=document.getElementById("diet").value;
-
-
   if(ingredients.length===0){
 
     results.innerHTML=`
-
       <div class="card">
-
         <h3>🥕 Add some ingredients first</h3>
-
         <p>
-          Try:
-          roti, beans, tomato, cucumber and onion.
+          Try something like:
+          <b>roti, beans, tomato, cucumber, rice</b>
         </p>
-
       </div>
-
     `;
 
     return;
@@ -1245,104 +1787,64 @@ function findMeals(){
 
   /*
     HARD CUISINE FILTER
-
-    If Korean is selected,
-    absolutely NO Indian/Mexican/etc.
-    recipes enter the results.
+    Korean means ONLY Korean.
   */
 
-  const selectedRecipes=recipes.filter(recipe=>{
-
-    const cuisineMatch=
-      cuisine==="Any" ||
-      recipe.cuisine===cuisine;
-
-    /*
-      Current recipe database is vegetarian.
-      Therefore vegetarian-compatible options
-      are returned for all current diets.
-    */
-
-    const dietMatch=true;
-
-    return cuisineMatch && dietMatch;
-
-  });
+  let pool=recipes.filter(recipe=>
+    cuisine==="Any" || recipe.cuisine===cuisine
+  );
 
 
   /*
-    SCORE RECIPES
+    Ingredient matching.
+    Missing ingredients reduce the score.
+    This prevents random unrelated dishes
+    from dominating the results.
   */
 
-  const ranked=selectedRecipes
-    .map(recipe=>{
+  const ranked=pool.map(recipe=>{
 
-      const requiredMatches=
-        recipe.needs.filter(
-          item=>ingredients.includes(item)
-        );
+    const matchedRequired=
+      recipe.needs.filter(item=>ingredients.includes(item));
 
-      const optionalMatches=
-        recipe.extra.filter(
-          item=>ingredients.includes(item)
-        );
+    const matchedExtra=
+      recipe.extra.filter(item=>ingredients.includes(item));
 
-      const missing=
-        recipe.needs.filter(
-          item=>!ingredients.includes(item)
-        );
+    const missing=
+      recipe.needs.filter(item=>!ingredients.includes(item));
 
+    const score=
+      matchedRequired.length*10 +
+      matchedExtra.length*3 -
+      missing.length*4;
 
-      const score=
-        (requiredMatches.length*5)+
-        (optionalMatches.length*2)-
-        (missing.length);
+    return{
+      recipe,
+      matchedRequired,
+      matchedExtra,
+      missing,
+      score
+    };
 
-
-      return{
-        recipe,
-        requiredMatches,
-        optionalMatches,
-        missing,
-        score
-      };
-
-    })
-
-    .sort((a,b)=>{
-
-      if(b.score!==a.score){
-
-        return b.score-a.score;
-
-      }
-
-      return a.missing.length-b.missing.length;
-
-    });
+  }).sort((a,b)=>b.score-a.score);
 
 
   /*
-    FIRST TRY STRONG MATCHES
+    Strong matches first.
+    Up to 12 suggestions so the planner
+    feels like an actual recommendation engine.
   */
 
-  const strong=
+  let matches=
     ranked
-      .filter(x=>x.requiredMatches.length>0)
-      .slice(0,8);
+      .filter(x=>x.matchedRequired.length>0)
+      .slice(0,12);
 
 
   /*
-    IF THERE ARE NO STRONG MATCHES,
-    STILL SHOW RECIPES FROM THE SELECTED
-    CUISINE RATHER THAN CALLING AI.
+    If no ingredient matches exist,
+    do NOT pretend the user has the ingredients.
   */
-
-  const matches=
-    strong.length
-      ? strong
-      : ranked.slice(0,8);
-
 
   if(matches.length===0){
 
@@ -1350,11 +1852,17 @@ function findMeals(){
 
       <div class="card">
 
-        <h3>🍽️ No recipes available</h3>
+        <h2>😕 No strong matches yet</h2>
 
         <p>
-          NutriPlate does not currently have
-          recipes stored for this cuisine.
+          NutriPlate couldn't find a recipe in
+          <b>${escapeHTML(cuisine)}</b>
+          using the ingredients you entered.
+        </p>
+
+        <p class="small">
+          Try adding another ingredient, or choose
+          "Any Cuisine" if you want broader ideas.
         </p>
 
       </div>
@@ -1362,7 +1870,6 @@ function findMeals(){
     `;
 
     return;
-
   }
 
 
@@ -1371,212 +1878,149 @@ function findMeals(){
     <div class="card">
 
       <h2>
-        🍽️ ${
-          cuisine==="Any"
-            ? "NutriPlate Meal Matches"
-            : cuisine+" Meal Matches"
-        }
+        🍽️ ${cuisine==="Any"
+          ? "Your NutriPlate Matches"
+          : cuisine+" Meal Matches"}
       </h2>
 
       <p class="small">
-
-        Powered by NutriPlate's own recipe engine.
-        NutriPlate AI is optional.
-
+        ${matches.length} matching options from NutriPlate's
+        own recipe engine. AI is not required.
       </p>
 
       <div class="grid">
 
-        ${
-          matches
-            .map(x=>
-              recipeCard(
-                x.recipe,
-                x.requiredMatches,
-                x.optionalMatches,
-                x.missing
-              )
-            )
-            .join("")
-        }
+        ${matches.map(x=>
+          recipeCard(
+            x.recipe,
+            x.matchedRequired,
+            x.matchedExtra,
+            x.missing,
+            x.score
+          )
+        ).join("")}
 
       </div>
 
     </div>
-
   `;
 
 }
 
 
-/* =============================
+/* =========================================================
    RECIPE CARD
-============================= */
+========================================================= */
 
-function recipeCard(
-  r,
-  matched=[],
-  optionalMatched=[],
-  missing=[]
-){
+function recipeCard(r,matched=[],extra=[],missing=[],score=null){
 
   return`
 
-    <div class="recipe">
+    <article class="recipe">
 
-      <h3>${r.name}</h3>
+      <h3>${escapeHTML(r.name)}</h3>
 
       <div class="meta">
 
-        <span>
-          🌎 ${r.cuisine}
-        </span>
-
-        <span>
-          🥗 ${r.protein} protein
-        </span>
-
-        <span>
-          🩸 ${r.iron} iron
-        </span>
-
-        <span>
-          🦴 ${r.calcium} calcium
-        </span>
-
-        <span>
-          ⚙️ ${r.zinc} zinc
-        </span>
+        <span>🌎 ${escapeHTML(r.cuisine)}</span>
+        <span>🥗 ${r.protein} protein</span>
+        <span>🩸 ${r.iron} iron</span>
+        <span>🦴 ${r.calcium} calcium</span>
+        <span>⚙️ ${r.zinc} zinc</span>
 
       </div>
 
-
       <p>
-
-        <b>Uses from your kitchen:</b>
-
-        ${
-          matched.length
-            ? matched.join(", ")
-            : "No exact required ingredient"
-        }
-
+        <b>🍳 Uses from your kitchen:</b><br>
+        ${matched.length
+          ? matched.map(escapeHTML).join(", ")
+          : "No direct match"}
       </p>
 
-
       ${
-        optionalMatched.length
-
-          ?`
-
-            <p>
-
-              <b>Also available:</b>
-
-              ${optionalMatched.join(", ")}
-
-            </p>
-
-          `
-
-          :""
-
+        extra.length
+        ?`
+          <p>
+            <b>➕ Also available:</b><br>
+            ${extra.map(escapeHTML).join(", ")}
+          </p>
+        `
+        :""
       }
-
 
       ${
         missing.length
-
-          ?`
-
-            <p>
-
-              <b>🛒 You may need:</b>
-
-              ${missing.join(", ")}
-
-            </p>
-
-          `
-
-          :`
-
-            <p>
-              <b>✅ You have all required ingredients!</b>
-            </p>
-
-          `
-
+        ?`
+          <p>
+            <b>🛒 You may need:</b><br>
+            ${missing.map(escapeHTML).join(", ")}
+          </p>
+        `
+        :`
+          <p>
+            <b>✅ You have all core ingredients!</b>
+          </p>
+        `
       }
 
-
       <p>
-
-        <b>Core ingredients:</b>
-
-        ${r.needs.join(", ")}
-
+        <b>Core:</b>
+        ${r.needs.map(escapeHTML).join(", ")}
       </p>
 
-
       <p>
-
         <b>Optional:</b>
-
-        ${r.extra.join(", ")}
-
+        ${r.extra.map(escapeHTML).join(", ")}
       </p>
 
+      ${
+        score!==null
+        ?`<div class="score">NutriPlate match score: ${Math.max(0,score)}</div>`
+        :""
+      }
 
       <div class="nutrition">
 
         <div class="nutri-box">
-
           <b>Protein</b>
-
           ${r.protein}
-
         </div>
 
-
         <div class="nutri-box">
-
           <b>Iron</b>
-
           ${r.iron}
-
         </div>
 
-
         <div class="nutri-box">
-
           <b>Calcium</b>
-
           ${r.calcium}
-
         </div>
 
+        <div class="nutri-box">
+          <b>Zinc</b>
+          ${r.zinc}
+        </div>
 
         <div class="nutri-box">
+          <b>Fibre</b>
+          ${r.fibre}
+        </div>
 
-          <b>Zinc</b>
-
-          ${r.zinc}
-
+        <div class="nutri-box">
+          <b>Vitamin C</b>
+          ${r.vitaminC}
         </div>
 
       </div>
 
-    </div>
-
+    </article>
   `;
-
 }
 
 
-/* =============================
+/* =========================================================
    CUISINE EXPLORER
-============================= */
+========================================================= */
 
 function showCuisine(cuisine,button){
 
@@ -1588,99 +2032,477 @@ function showCuisine(cuisine,button){
     button.classList.add("active");
   }
 
-  const box=
-    document.getElementById("cuisineRecipes");
-
+  const box=document.getElementById("cuisineRecipes");
 
   const list=
-    recipes.filter(
-      recipe=>recipe.cuisine===cuisine
-    );
-
+    recipes.filter(recipe=>recipe.cuisine===cuisine);
 
   box.innerHTML=
-    list.map(recipe=>recipeCard(recipe)).join("");
 
+    list.length
+
+    ?list.map(recipe=>recipeCard(recipe)).join("")
+
+    :`
+      <div class="card">
+        <h3>No recipes added yet.</h3>
+      </div>
+    `;
 }
 
 
-/* =============================
+/* =========================================================
+   FAMILY PLANNER
+========================================================= */
+
+function renderFamilyMembers(){
+
+  const count=
+    Math.min(
+      20,
+      Math.max(
+        1,
+        Number(document.getElementById("familyCount").value)||1
+      )
+    );
+
+  const box=document.getElementById("familyMembers");
+
+  box.innerHTML="";
+
+  for(let i=1;i<=count;i++){
+
+    box.innerHTML+=`
+
+      <div class="card">
+
+        <h3>Person ${i}</h3>
+
+        <label>Age group</label>
+
+        <select id="familyAge${i}">
+          <option>Child</option>
+          <option selected>Teen</option>
+          <option>Adult</option>
+          <option>Senior</option>
+        </select>
+
+      </div>
+
+    `;
+  }
+}
+
+
+function familyPlan(){
+
+  const count=
+    Number(document.getElementById("familyCount").value)||1;
+
+  const ages=[];
+
+  for(let i=1;i<=count;i++){
+
+    const el=document.getElementById("familyAge"+i);
+
+    if(el)ages.push(el.value);
+  }
+
+  const results=document.getElementById("familyResults");
+
+  const counts={};
+
+  ages.forEach(age=>{
+    counts[age]=(counts[age]||0)+1;
+  });
+
+  let advice=[];
+
+  if(counts.Child || counts.Teen){
+    advice.push(
+      "Include regular balanced meals with protein-rich foods, vegetables, fruits and calcium-rich foods."
+    );
+  }
+
+  if(counts.Adult){
+    advice.push(
+      "Aim for variety across vegetables, fruits, grains, protein foods and healthy fats."
+    );
+  }
+
+  if(counts.Senior){
+    advice.push(
+      "Consider adequate protein, calcium, vitamin D, fibre and hydration."
+    );
+  }
+
+  results.innerHTML=`
+
+    <div class="card">
+
+      <h3>👨‍👩‍👧 Family plan created</h3>
+
+      <p>
+        Planning for <b>${count}</b> ${count===1?"person":"people"}.
+      </p>
+
+      <p>
+        ${Object.entries(counts)
+          .map(([age,n])=>`${n} ${age}`)
+          .join(" • ")}
+      </p>
+
+      <div class="notice">
+        ${advice.join("<br><br>")}
+      </div>
+
+      <p class="small">
+        This is a general planning tool. Individual medical or
+        nutritional needs should be discussed with a qualified professional.
+      </p>
+
+    </div>
+  `;
+}
+
+
+/* =========================================================
+   SMART MODES
+========================================================= */
+
+function showMode(mode){
+
+  const box=document.getElementById("modeOutput");
+
+  const data={
+
+    exam:{
+      title:"📚 Exam Mode",
+      text:`
+        <ul>
+          <li>Don't skip meals during long study sessions.</li>
+          <li>Choose a balanced meal with a protein source.</li>
+          <li>Keep fruit or another simple snack available.</li>
+          <li>Drink water regularly.</li>
+          <li>NutriPlate does not promise that any food will "cure anxiety" or instantly increase concentration.</li>
+        </ul>
+      `
+    },
+
+    sick:{
+      title:"🤒 I Am Sick",
+      text:`
+        <ul>
+          <li>Prioritize fluids and rest.</li>
+          <li>Choose foods that feel comfortable and are easy to eat.</li>
+          <li>Simple options can include soups, khichdi, rice, dal or fruit depending on tolerance.</li>
+          <li>For persistent, severe or worrying symptoms, ask a parent/guardian and seek medical advice.</li>
+        </ul>
+      `
+    },
+
+    immunity:{
+      title:"🛡️ Immunity Mode",
+      text:`
+        <ul>
+          <li>Eat a variety of fruits and vegetables.</li>
+          <li>Include protein foods such as beans, dal, lentils, soy or dairy.</li>
+          <li>Include whole grains and fibre-rich foods.</li>
+          <li>Good sleep, hydration and regular activity also matter.</li>
+        </ul>
+      `
+    },
+
+    season:{
+      title:"🌦️ Seasonal Mode",
+      text:`
+        <div class="grid">
+
+          <div class="card season-card">
+            <h3>☀️ Summer</h3>
+            <p>Think hydrating foods, fruits, vegetables and refreshing meals.</p>
+          </div>
+
+          <div class="card season-card">
+            <h3>🌧️ Monsoon</h3>
+            <p>Choose freshly prepared foods and maintain good food hygiene.</p>
+          </div>
+
+          <div class="card season-card">
+            <h3>❄️ Winter</h3>
+            <p>Warm balanced meals with vegetables, grains and protein foods can be comforting.</p>
+          </div>
+
+          <div class="card season-card">
+            <h3>🌸 Spring</h3>
+            <p>Use seasonal fruits and vegetables to increase variety.</p>
+          </div>
+
+        </div>
+      `
+    }
+
+  };
+
+  box.innerHTML=`
+
+    <div class="card">
+
+      <h2>${data[mode].title}</h2>
+
+      ${data[mode].text}
+
+    </div>
+  `;
+}
+
+
+/* =========================================================
    NAVIGATION
-============================= */
+========================================================= */
 
 function showSection(id){
 
-  document
-    .getElementById(id)
-    .scrollIntoView({
-      behavior:"smooth"
+  const el=document.getElementById(id);
+
+  if(el){
+
+    el.scrollIntoView({
+      behavior:"smooth",
+      block:"start"
     });
 
+  }
 }
 
 
-/* =============================
+/* =========================================================
    APPEARANCE
-============================= */
+========================================================= */
 
 function changeAppearance(){
 
   const mode=
     document.getElementById("appearance").value;
 
+  document.body.classList.remove("dark");
+
   if(mode==="dark"){
-
     document.body.classList.add("dark");
-
-  }else{
-
-    document.body.classList.remove("dark");
-
   }
 
+  if(mode==="seasonal"){
+    applySeason();
+  }
 }
 
 
-/* =============================
-   LANGUAGE
-============================= */
+/* =========================================================
+   SEASONAL
+========================================================= */
+
+function applySeason(){
+
+  const season=
+    document.getElementById("season").value;
+
+  /*
+    The app keeps readable text and contrast.
+    Seasonal mode changes the accent, while
+    the normal dark/light variables remain intact.
+  */
+
+  document.body.classList.remove(
+    "season-summer",
+    "season-monsoon",
+    "season-winter",
+    "season-spring"
+  );
+
+  if(season!=="auto"){
+    document.body.classList.add("season-"+season);
+  }
+}
+
+
+/* =========================================================
+   REAL INTERFACE TRANSLATIONS
+========================================================= */
+
+const translations={
+
+en:{
+navPlanner:"Quick Meal Planner",
+navRecipes:"Recipes",
+navFacts:"Nutri Facts",
+navModes:"Smart Modes",
+navAI:"NutriPlate AI",
+navPlus:"Plus",
+navSettings:"Settings",
+heroText:"NutriPlate turns the ingredients you already have into practical meal ideas, explores cuisines from around the world, explains nutrition, and gives you optional AI help.",
+startPlanning:"Start Planning",
+exploreRecipes:"Explore Recipes",
+plannerTitle:"Quick Meal Planner",
+plannerSubtitle:"No AI required. NutriPlate's own food engine matches your ingredients with its recipe database.",
+ingredientsLabel:"Ingredients you have",
+cuisineLabel:"Cuisine",
+dietLabel:"Diet",
+addIngredients:"Add Ingredients",
+findMeals:"Find My Meals"
+},
+
+hi:{
+navPlanner:"त्वरित भोजन योजना",
+navRecipes:"रेसिपी",
+navFacts:"पोषण तथ्य",
+navModes:"स्मार्ट मोड",
+navAI:"न्यूट्रीप्लेट AI",
+navPlus:"प्लस",
+navSettings:"सेटिंग्स",
+heroText:"न्यूट्रीप्लेट आपके पास मौजूद सामग्री से भोजन के सुझाव देता है, अलग-अलग व्यंजनों को खोजने में मदद करता है और पोषण की जानकारी देता है।",
+startPlanning:"योजना शुरू करें",
+exploreRecipes:"रेसिपी देखें",
+plannerTitle:"त्वरित भोजन योजना",
+plannerSubtitle:"AI जरूरी नहीं है। न्यूट्रीप्लेट का अपना इंजन आपकी सामग्री से रेसिपी मिलाता है।",
+ingredientsLabel:"आपके पास सामग्री",
+cuisineLabel:"व्यंजन",
+dietLabel:"आहार",
+addIngredients:"सामग्री जोड़ें",
+findMeals:"मेरे भोजन खोजें"
+},
+
+mr:{
+navPlanner:"झटपट जेवण योजना",
+navRecipes:"पाककृती",
+navFacts:"पोषण तथ्य",
+navModes:"स्मार्ट मोड",
+navAI:"न्यूट्रीप्लेट AI",
+navPlus:"प्लस",
+navSettings:"सेटिंग्ज",
+heroText:"न्यूट्रीप्लेट तुमच्याकडे असलेल्या पदार्थांमधून जेवणाच्या कल्पना सुचवते, विविध पाककृती शोधण्यास मदत करते आणि पोषणाची माहिती देते.",
+startPlanning:"नियोजन सुरू करा",
+exploreRecipes:"पाककृती पहा",
+plannerTitle:"झटपट जेवण योजना",
+plannerSubtitle:"AI आवश्यक नाही. न्यूट्रीप्लेटचे स्वतःचे इंजिन तुमच्या पदार्थांशी पाककृती जुळवते.",
+ingredientsLabel:"तुमच्याकडील पदार्थ",
+cuisineLabel:"पाककृतीचा प्रकार",
+dietLabel:"आहार",
+addIngredients:"पदार्थ जोडा",
+findMeals:"माझे जेवण शोधा"
+},
+
+ta:{
+navPlanner:"விரைவு உணவு திட்டம்",
+navRecipes:"சமையல் குறிப்புகள்",
+navFacts:"ஊட்டச்சத்து தகவல்கள்",
+navModes:"ஸ்மார்ட் முறைகள்",
+navAI:"நியூட்ரிபிளேட் AI",
+navPlus:"பிளஸ்",
+navSettings:"அமைப்புகள்",
+heroText:"நியூட்ரிபிளேட் உங்களிடம் உள்ள பொருட்களைக் கொண்டு உணவு யோசனைகளை வழங்குகிறது.",
+startPlanning:"திட்டமிடத் தொடங்கு",
+exploreRecipes:"சமையல் குறிப்புகளைப் பார்க்க",
+plannerTitle:"விரைவு உணவு திட்டம்",
+plannerSubtitle:"AI தேவையில்லை. நியூட்ரிபிளேட்டின் சொந்த இயந்திரம் உங்கள் பொருட்களுடன் உணவுகளை பொருத்துகிறது.",
+ingredientsLabel:"உங்களிடம் உள்ள பொருட்கள்",
+cuisineLabel:"சமையல் வகை",
+dietLabel:"உணவு முறை",
+addIngredients:"பொருட்களைச் சேர்",
+findMeals:"என் உணவைக் கண்டுபிடி"
+},
+
+te:{
+navPlanner:"త్వరిత భోజన ప్రణాళిక",
+navRecipes:"వంటకాలు",
+navFacts:"పోషకాహార సమాచారం",
+navModes:"స్మార్ట్ మోడ్‌లు",
+navAI:"న్యూట్రిప్లేట్ AI",
+navPlus:"ప్లస్",
+navSettings:"సెట్టింగ్స్",
+heroText:"న్యూట్రిప్లేట్ మీ వద్ద ఉన్న పదార్థాలతో భోజన ఆలోచనలను అందిస్తుంది.",
+startPlanning:"ప్రణాళిక ప్రారంభించండి",
+exploreRecipes:"వంటకాలు చూడండి",
+plannerTitle:"త్వరిత భోజన ప్రణాళిక",
+plannerSubtitle:"AI అవసరం లేదు. న్యూట్రిప్లేట్ స్వంత ఇంజిన్ మీ పదార్థాలతో వంటకాలను సరిపోలుస్తుంది.",
+ingredientsLabel:"మీ వద్ద ఉన్న పదార్థాలు",
+cuisineLabel:"వంటకాల రకం",
+dietLabel:"ఆహారం",
+addIngredients:"పదార్థాలు జోడించండి",
+findMeals:"నా భోజనం కనుగొను"
+},
+
+kn:{
+navPlanner:"ತ್ವರಿತ ಊಟ ಯೋಜನೆ",
+navRecipes:"ಅಡುಗೆ ವಿಧಾನಗಳು",
+navFacts:"ಪೌಷ್ಟಿಕಾಂಶ ಮಾಹಿತಿ",
+navModes:"ಸ್ಮಾರ್ಟ್ ಮೋಡ್‌ಗಳು",
+navAI:"ನ್ಯೂಟ್ರಿಪ್ಲೇಟ್ AI",
+navPlus:"ಪ್ಲಸ್",
+navSettings:"ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+heroText:"ನ್ಯೂಟ್ರಿಪ್ಲೇಟ್ ನಿಮ್ಮಲ್ಲಿರುವ ಪದಾರ್ಥಗಳಿಂದ ಊಟದ ಸಲಹೆಗಳನ್ನು ನೀಡುತ್ತದೆ.",
+startPlanning:"ಯೋಜನೆ ಪ್ರಾರಂಭಿಸಿ",
+exploreRecipes:"ಅಡುಗೆ ವಿಧಾನಗಳನ್ನು ನೋಡಿ",
+plannerTitle:"ತ್ವರಿತ ಊಟ ಯೋಜನೆ",
+plannerSubtitle:"AI ಅಗತ್ಯವಿಲ್ಲ. ನ್ಯೂಟ್ರಿಪ್ಲೇಟ್‌ನ ಸ್ವಂತ ಎಂಜಿನ್ ನಿಮ್ಮ ಪದಾರ್ಥಗಳಿಗೆ ಊಟಗಳನ್ನು ಹೊಂದಿಸುತ್ತದೆ.",
+ingredientsLabel:"ನಿಮ್ಮಲ್ಲಿರುವ ಪದಾರ್ಥಗಳು",
+cuisineLabel:"ಪಾಕವಿಧಾನದ ಪ್ರಕಾರ",
+dietLabel:"ಆಹಾರ",
+addIngredients:"ಪದಾರ್ಥಗಳನ್ನು ಸೇರಿಸಿ",
+findMeals:"ನನ್ನ ಊಟ ಹುಡುಕಿ"
+},
+
+bn:{
+navPlanner:"দ্রুত খাবার পরিকল্পনা",
+navRecipes:"রেসিপি",
+navFacts:"পুষ্টি তথ্য",
+navModes:"স্মার্ট মোড",
+navAI:"নিউট্রিপ্লেট AI",
+navPlus:"প্লাস",
+navSettings:"সেটিংস",
+heroText:"নিউট্রিপ্লেট আপনার কাছে থাকা উপকরণ থেকে খাবারের ধারণা দেয়।",
+startPlanning:"পরিকল্পনা শুরু করুন",
+exploreRecipes:"রেসিপি দেখুন",
+plannerTitle:"দ্রুত খাবার পরিকল্পনা",
+plannerSubtitle:"AI প্রয়োজন নেই। নিউট্রিপ্লেটের নিজস্ব ইঞ্জিন আপনার উপকরণের সঙ্গে খাবার মিলিয়ে দেয়।",
+ingredientsLabel:"আপনার কাছে থাকা উপকরণ",
+cuisineLabel:"রান্নার ধরন",
+dietLabel:"খাদ্যাভ্যাস",
+addIngredients:"উপকরণ যোগ করুন",
+findMeals:"আমার খাবার খুঁজুন"
+}
+
+};
+
 
 function changeLanguage(){
 
   const language=
     document.getElementById("language").value;
 
-  /*
-    Language system can be expanded with
-    complete translations later.
-  */
+  const t=
+    translations[language] || translations.en;
 
-  const messages={
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach(el=>{
 
-    en:"Language changed to English.",
+      const key=el.getAttribute("data-i18n");
 
-    hi:"भाषा हिन्दी में बदल दी गई है।",
+      if(t[key]){
+        el.textContent=t[key];
+      }
 
-    mr:"भाषा मराठीमध्ये बदलली आहे.",
+    });
 
-    ta:"மொழி தமிழுக்கு மாற்றப்பட்டது.",
+  document.documentElement.lang=language;
 
-    te:"భాష తెలుగుకు మార్చబడింది.",
-
-    kn:"ಭಾಷೆಯನ್ನು ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ.",
-
-    bn:"ভাষা বাংলায় পরিবর্তন করা হয়েছে।"
-
-  };
-
-  alert(messages[language] || messages.en);
-
+  localStorage.setItem("nutriplate-language",language);
 }
 
 
-/* =============================
-   AI
-============================= */
+/* =========================================================
+   AI CONNECTION
+========================================================= */
 
 async function askAI(){
 
@@ -1693,16 +2515,15 @@ async function askAI(){
   const prompt=
     input.value.trim();
 
-
   if(!prompt){
 
     output.innerHTML=
-      "Please enter a question first.";
+      "<b>Please enter a question first.</b>";
 
     return;
-
   }
 
+  output.classList.add("loading");
 
   output.innerHTML=
     "🤖 NutriPlate AI is thinking...";
@@ -1710,18 +2531,15 @@ async function askAI(){
 
   /*
     IMPORTANT:
-
-    The URL below must be replaced with
-    your own secure Vercel backend endpoint.
-
-    Do NOT put your Gemini API key here.
+    This URL is your Vercel backend.
+    The Gemini API key is NOT placed here.
   */
 
   try{
 
     const response=
-     await fetch(
-  "https://nutri-plate.vercel.app/api/chat",
+      await fetch(
+        "https://nutri-plate.vercel.app/api/chat",
         {
           method:"POST",
 
@@ -1730,49 +2548,194 @@ async function askAI(){
           },
 
           body:JSON.stringify({
-            prompt
+            prompt:
+              "You are NutriPlate AI. The user asks: "+
+              prompt+
+              ". Give practical vegetarian food guidance. "+
+              "Clearly separate dish name, ingredients, steps, "+
+              "and nutrition highlights. Do not claim food cures diseases."
           })
-
         }
       );
 
 
-    const data=
-      await response.json();
+    let data={};
+
+    try{
+      data=await response.json();
+    }catch(e){
+      data={};
+    }
+
+
+    if(!response.ok){
+
+      throw new Error(
+        data.error ||
+        "Backend returned an error."
+      );
+    }
 
 
     if(data.text){
 
       output.innerHTML=
-        `<p>${data.text}</p>`;
+        `<div><b>🤖 NutriPlate AI</b></div>
+         <p>${formatAIText(data.text)}</p>`;
 
     }else{
 
-      output.innerHTML=
-        "AI could not generate a response right now.";
-
+      throw new Error("No AI response received.");
     }
+
 
   }catch(error){
 
-    output.innerHTML=
-      "NutriPlate AI is currently unavailable. You can still use Quick Meal Planner because it works independently.";
+    console.error(error);
+
+    output.innerHTML=`
+
+      <div>
+
+        <b>⚠️ NutriPlate AI could not connect right now.</b>
+
+        <p class="small">
+          Your Quick Meal Planner is still working independently.
+          Check your Vercel backend, Gemini API key and
+          <code>/api/chat</code> endpoint.
+        </p>
+
+      </div>
+
+    `;
+
+  }finally{
+
+    output.classList.remove("loading");
+
+  }
+}
+
+
+/*
+  Basic safe display.
+  Prevents AI HTML from being interpreted as page HTML.
+*/
+
+function formatAIText(text){
+
+  return escapeHTML(text)
+    .replace(/\n/g,"<br>");
+}
+
+
+/* =========================================================
+   PAYMENT DEMO
+========================================================= */
+
+function openPaymentDemo(){
+
+  const box=document.getElementById("paymentDemo");
+
+  box.innerHTML=`
+
+    <div class="status">
+
+      <b>⭐ Plus Checkout — Demo</b>
+
+      <p>
+        Price: ₹999
+      </p>
+
+      <p class="small">
+        This is currently a competition/demo interface.
+        A real payment gateway must be connected separately
+        before accepting payments.
+      </p>
+
+      <button
+        class="btn outline"
+        onclick="alert('Payment gateway placeholder. Connect an approved payment provider here.')"
+      >
+        Continue to Payment
+      </button>
+
+    </div>
+  `;
+}
+
+
+/* =========================================================
+   SAFETY / HTML ESCAPING
+========================================================= */
+
+function escapeHTML(value){
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+/* =========================================================
+   INITIAL LOAD
+========================================================= */
+
+function init(){
+
+  document.getElementById("recipeCount").textContent=
+    recipes.length+"+";
+
+  renderIngredients();
+
+  renderFamilyMembers();
+
+  showCuisine(
+    "Indian",
+    document.querySelector(".tab")
+  );
+
+
+  const savedLanguage=
+    localStorage.getItem("nutriplate-language");
+
+  if(savedLanguage){
+
+    const select=
+      document.getElementById("language");
+
+    if(
+      [...select.options]
+        .some(o=>o.value===savedLanguage)
+    ){
+
+      select.value=savedLanguage;
+
+      changeLanguage();
+
+    }
+
+  }
+
+
+  const savedTheme=
+    localStorage.getItem("nutriplate-theme");
+
+  if(savedTheme==="dark"){
+
+    document.body.classList.add("dark");
+
+    document.getElementById("appearance").value="dark";
 
   }
 
 }
 
 
-/* =============================
-   INITIAL LOAD
-============================= */
-
-renderIngredients();
-
-showCuisine(
-  "Indian",
-  document.querySelector(".tab")
-);
+window.addEventListener("load",init);
 
 </script>
 
