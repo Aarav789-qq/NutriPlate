@@ -2008,9 +2008,9 @@ async function fetchIndianWikiRecipes(){
       continuation=data.continue?.cmcontinue?"&cmcontinue="+encodeURIComponent(data.continue.cmcontinue):"";
     }while(continuation&&titles.length<250);
     const pages=[];
-    for(let offset=0;offset<titles.length;offset+=40){
-      const batch=titles.slice(offset,offset+40);
-      const url=WIKIBOOKS_API+"?action=query&prop=extracts&explaintext=1&exsectionformat=plain&titles="+encodeURIComponent(batch.join("|"))+"&format=json&origin=*";
+    for(let offset=0;offset<titles.length;offset+=20){
+      const batch=titles.slice(offset,offset+20);
+      const url=WIKIBOOKS_API+"?action=query&prop=extracts&explaintext=1&exsectionformat=plain&exlimit=20&titles="+encodeURIComponent(batch.join("|"))+"&format=json&origin=*";
       const response=await fetch(url);
       if(!response.ok) throw new Error("Wikibooks returned "+response.status);
       const data=await response.json();
