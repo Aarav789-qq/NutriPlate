@@ -2088,7 +2088,6 @@ async function attachCommonsPhotos(recipes){
   });
   await Promise.all(workers);
   const result=recipes.map(recipe=>output.find(item=>item.id===recipe.id)||recipe);
-  if(indianRecipesCache) saveIndianRecipeCache(indianRecipesCache);
   return result;
 }
 
