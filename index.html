@@ -373,6 +373,48 @@ textarea{
   box-shadow:var(--shadow);
 }
 
+.recipe-photo{
+  display:block;
+  width:100%;
+  height:190px;
+  object-fit:cover;
+  border-radius:14px;
+  margin-bottom:14px;
+  background:var(--accent);
+}
+
+.recipe-credit{
+  color:var(--muted);
+  font-size:12px;
+  margin:8px 0;
+}
+
+.recipe-credit a{
+  color:var(--primary);
+}
+
+.recipe-details{
+  margin-top:14px;
+  border-top:1px solid var(--border);
+  padding-top:12px;
+}
+
+.recipe-details summary{
+  cursor:pointer;
+  font-weight:850;
+  color:var(--primary);
+}
+
+.recipe-details ol,
+.recipe-details ul{
+  padding-left:22px;
+  line-height:1.6;
+}
+
+.recipe-details li{
+  margin:5px 0;
+}
+
 .recipe h3{
   margin:0 0 8px;
   color:var(--primary);
@@ -1792,296 +1834,247 @@ function languageSpeechCode(lang){
 */
 
 
-const baseRecipes=[
-
-/* INDIAN */
-
-{name:"Rajma Rice Bowl",cuisine:"Indian",diet:"Vegetarian",meal:"Lunch",needs:["beans","rice","tomato"],extra:["onion","cucumber"]},
-{name:"Dal Rice",cuisine:"Indian",diet:"Vegetarian",meal:"Lunch",needs:["dal","rice"],extra:["tomato","onion"]},
-{name:"Chole Roti",cuisine:"Indian",diet:"Vegan",meal:"Lunch",needs:["chickpeas","roti"],extra:["onion","tomato"]},
-{name:"Paneer Roti Wrap",cuisine:"Indian",diet:"Vegetarian",meal:"Lunch",needs:["paneer","roti"],extra:["tomato","onion","cucumber"]},
-{name:"Vegetable Pulao",cuisine:"Indian",diet:"Vegan",meal:"Lunch",needs:["rice","onion"],extra:["carrot","peas","beans"]},
-{name:"Aloo Roti",cuisine:"Indian",diet:"Vegan",meal:"Breakfast",needs:["potato","roti"],extra:["onion","tomato"]},
-{name:"Poha",cuisine:"Indian",diet:"Vegan",meal:"Breakfast",needs:["poha","onion"],extra:["peanuts","potato","lemon"]},
-{name:"Upma",cuisine:"Indian",diet:"Vegan",meal:"Breakfast",needs:["semolina","onion"],extra:["carrot","peas"]},
-{name:"Paneer Bhurji",cuisine:"Indian",diet:"Vegetarian",meal:"Breakfast",needs:["paneer","tomato","onion"],extra:["pepper","roti"]},
-{name:"Vegetable Biryani",cuisine:"Indian",diet:"Vegetarian",meal:"Dinner",needs:["rice","onion","tomato"],extra:["peas","carrot","beans"]},
-{name:"Aloo Gobi",cuisine:"Indian",diet:"Vegan",meal:"Dinner",needs:["potato","cauliflower"],extra:["tomato","onion"]},
-{name:"Vegetable Khichdi",cuisine:"Indian",diet:"Vegan",meal:"Dinner",needs:["rice","dal"],extra:["carrot","peas","beans"]},
-{name:"Masala Dosa",cuisine:"Indian",diet:"Vegan",meal:"Breakfast",needs:["rice","potato"],extra:["onion","coconut"]},
-{name:"Vegetable Sandwich",cuisine:"Indian",diet:"Vegetarian",meal:"Snack",needs:["bread","tomato","cucumber"],extra:["onion","cheese"]},
-{name:"Chana Chaat",cuisine:"Indian",diet:"Vegan",meal:"Snack",needs:["chickpeas","tomato","onion"],extra:["cucumber","lemon"]},
-{name:"Sprout Chaat",cuisine:"Indian",diet:"Vegan",meal:"Snack",needs:["sprouts","tomato","onion"],extra:["cucumber","lemon"]},
-{name:"Palak Paneer",cuisine:"Indian",diet:"Vegetarian",meal:"Dinner",needs:["spinach","paneer"],extra:["tomato","onion"]},
-{name:"Dal Tadka",cuisine:"Indian",diet:"Vegetarian",meal:"Dinner",needs:["dal","tomato","onion"],extra:["roti","rice"]},
-{name:"Matar Paneer",cuisine:"Indian",diet:"Vegetarian",meal:"Dinner",needs:["paneer","peas","tomato"],extra:["onion","roti"]},
-{name:"Vegetable Paratha",cuisine:"Indian",diet:"Vegetarian",meal:"Breakfast",needs:["roti","potato"],extra:["cauliflower","peas","curd"]},
-
-/* KOREAN */
-
-{name:"Bibimbap",cuisine:"Korean",diet:"Vegetarian",meal:"Lunch",needs:["rice","spinach","carrot"],extra:["cucumber","beans","egg"]},
-{name:"Korean Veggie Rice Bowl",cuisine:"Korean",diet:"Vegan",meal:"Lunch",needs:["rice","cucumber","carrot"],extra:["beans","onion","spinach"]},
-{name:"Korean Bean Rice Bowl",cuisine:"Korean",diet:"Vegan",meal:"Dinner",needs:["rice","beans"],extra:["cucumber","carrot","onion"]},
-{name:"Vegetable Japchae",cuisine:"Korean",diet:"Vegan",meal:"Dinner",needs:["noodles","carrot","onion"],extra:["spinach","pepper","mushroom"]},
-{name:"Korean Vegetable Pancake",cuisine:"Korean",diet:"Vegetarian",meal:"Snack",needs:["flour","onion","carrot"],extra:["pepper","egg"]},
-{name:"Korean Tofu Bowl",cuisine:"Korean",diet:"Vegan",meal:"Dinner",needs:["tofu","rice"],extra:["cucumber","carrot","onion"]},
-{name:"Korean Potato Pancake",cuisine:"Korean",diet:"Vegan",meal:"Breakfast",needs:["potato","flour"],extra:["onion","pepper"]},
-{name:"Korean Mushroom Rice",cuisine:"Korean",diet:"Vegan",meal:"Dinner",needs:["rice","mushroom"],extra:["onion","carrot"]},
-{name:"Korean Veggie Noodles",cuisine:"Korean",diet:"Vegan",meal:"Lunch",needs:["noodles","onion"],extra:["carrot","cucumber","beans"]},
-{name:"Korean Roti Wrap",cuisine:"Korean",diet:"Vegetarian",meal:"Lunch",needs:["roti","cucumber","onion"],extra:["beans","tofu"]},
-
-/* MEXICAN */
-
-{name:"Bean Burrito",cuisine:"Mexican",diet:"Vegan",meal:"Lunch",needs:["beans","roti","tomato"],extra:["rice","onion","cucumber"]},
-{name:"Veggie Tacos",cuisine:"Mexican",diet:"Vegetarian",meal:"Dinner",needs:["tortilla","beans","tomato"],extra:["onion","pepper","cheese"]},
-{name:"Bean Quesadilla",cuisine:"Mexican",diet:"Vegetarian",meal:"Snack",needs:["beans","tortilla","cheese"],extra:["tomato","onion"]},
-{name:"Mexican Rice Bowl",cuisine:"Mexican",diet:"Vegan",meal:"Lunch",needs:["rice","beans","tomato"],extra:["corn","pepper","onion"]},
-{name:"Bean Nachos",cuisine:"Mexican",diet:"Vegetarian",meal:"Snack",needs:["beans","corn","cheese"],extra:["tomato","onion"]},
-{name:"Mexican Veggie Wrap",cuisine:"Mexican",diet:"Vegan",meal:"Lunch",needs:["roti","beans","tomato"],extra:["cucumber","onion","pepper"]},
-{name:"Guacamole Rice Bowl",cuisine:"Mexican",diet:"Vegan",meal:"Lunch",needs:["rice","avocado","tomato"],extra:["beans","onion","corn"]},
-{name:"Mexican Bean Salad",cuisine:"Mexican",diet:"Vegan",meal:"Snack",needs:["beans","tomato","corn"],extra:["cucumber","onion"]},
-{name:"Veggie Fajita Bowl",cuisine:"Mexican",diet:"Vegan",meal:"Dinner",needs:["rice","pepper","onion"],extra:["beans","tomato"]},
-{name:"Mexican Potato Tacos",cuisine:"Mexican",diet:"Vegan",meal:"Dinner",needs:["potato","tortilla","tomato"],extra:["onion","beans"]},
-
-/* CHINESE */
-
-{name:"Vegetable Fried Rice",cuisine:"Chinese",diet:"Vegan",meal:"Lunch",needs:["rice","onion","carrot"],extra:["beans","pepper"]},
-{name:"Hakka Noodles",cuisine:"Chinese",diet:"Vegan",meal:"Dinner",needs:["noodles","onion","carrot"],extra:["pepper","cabbage"]},
-{name:"Vegetable Stir Fry",cuisine:"Chinese",diet:"Vegan",meal:"Dinner",needs:["onion","pepper"],extra:["carrot","beans","mushroom"]},
-{name:"Chilli Paneer",cuisine:"Chinese",diet:"Vegetarian",meal:"Dinner",needs:["paneer","pepper","onion"],extra:["tomato","rice"]},
-{name:"Chinese Rice Bowl",cuisine:"Chinese",diet:"Vegan",meal:"Lunch",needs:["rice","beans","carrot"],extra:["cucumber","onion"]},
-{name:"Vegetable Chow Mein",cuisine:"Chinese",diet:"Vegan",meal:"Dinner",needs:["noodles","onion"],extra:["carrot","cabbage","pepper"]},
-{name:"Tofu Stir Fry",cuisine:"Chinese",diet:"Vegan",meal:"Dinner",needs:["tofu","pepper","onion"],extra:["carrot","mushroom"]},
-{name:"Vegetable Spring Rolls",cuisine:"Chinese",diet:"Vegan",meal:"Snack",needs:["flour","cabbage","carrot"],extra:["onion","pepper"]},
-{name:"Mushroom Fried Rice",cuisine:"Chinese",diet:"Vegan",meal:"Lunch",needs:["rice","mushroom","onion"],extra:["carrot","pepper"]},
-{name:"Corn Vegetable Rice",cuisine:"Chinese",diet:"Vegan",meal:"Lunch",needs:["rice","corn","carrot"],extra:["onion","pepper"]},
-
-/* ITALIAN */
-
-{name:"Tomato Pasta",cuisine:"Italian",diet:"Vegan",meal:"Dinner",needs:["pasta","tomato"],extra:["onion","garlic"]},
-{name:"Bean Tomato Pasta",cuisine:"Italian",diet:"Vegan",meal:"Dinner",needs:["pasta","beans","tomato"],extra:["onion"]},
-{name:"Vegetable Pasta",cuisine:"Italian",diet:"Vegan",meal:"Dinner",needs:["pasta","tomato","onion"],extra:["pepper","mushroom"]},
-{name:"Margherita Pizza",cuisine:"Italian",diet:"Vegetarian",meal:"Dinner",needs:["flour","tomato","cheese"],extra:["basil","onion"]},
-{name:"Vegetable Pizza",cuisine:"Italian",diet:"Vegetarian",meal:"Dinner",needs:["flour","tomato","cheese"],extra:["pepper","onion","mushroom"]},
-{name:"Garlic Bread",cuisine:"Italian",diet:"Vegetarian",meal:"Snack",needs:["bread","garlic","butter"],extra:["cheese"]},
-{name:"Pasta Primavera",cuisine:"Italian",diet:"Vegetarian",meal:"Dinner",needs:["pasta","tomato","pepper"],extra:["carrot","peas","cheese"]},
-{name:"Mushroom Pasta",cuisine:"Italian",diet:"Vegetarian",meal:"Dinner",needs:["pasta","mushroom"],extra:["onion","cheese"]},
-{name:"Italian Bean Bowl",cuisine:"Italian",diet:"Vegan",meal:"Lunch",needs:["beans","tomato"],extra:["rice","onion","cucumber"]},
-{name:"Vegetable Risotto",cuisine:"Italian",diet:"Vegetarian",meal:"Dinner",needs:["rice","onion"],extra:["mushroom","peas","cheese"]},
-
-/* JAPANESE */
-
-{name:"Vegetable Sushi",cuisine:"Japanese",diet:"Vegan",meal:"Lunch",needs:["rice","cucumber","carrot"],extra:["avocado","tofu"]},
-{name:"Japanese Rice Bowl",cuisine:"Japanese",diet:"Vegan",meal:"Lunch",needs:["rice","tofu"],extra:["cucumber","carrot","onion"]},
-{name:"Yakisoba Vegetable Noodles",cuisine:"Japanese",diet:"Vegan",meal:"Dinner",needs:["noodles","cabbage","onion"],extra:["carrot","pepper"]},
-{name:"Japanese Vegetable Curry",cuisine:"Japanese",diet:"Vegan",meal:"Dinner",needs:["rice","potato","carrot"],extra:["onion","beans"]},
-{name:"Tofu Rice Bowl",cuisine:"Japanese",diet:"Vegan",meal:"Lunch",needs:["tofu","rice"],extra:["cucumber","carrot"]},
-{name:"Edamame Rice Bowl",cuisine:"Japanese",diet:"Vegan",meal:"Lunch",needs:["rice","beans"],extra:["cucumber","carrot"]},
-{name:"Japanese Potato Bowl",cuisine:"Japanese",diet:"Vegan",meal:"Dinner",needs:["potato","rice"],extra:["carrot","onion"]},
-{name:"Vegetable Noodle Soup",cuisine:"Japanese",diet:"Vegan",meal:"Dinner",needs:["noodles","onion"],extra:["mushroom","carrot"]},
-{name:"Cucumber Rice Roll",cuisine:"Japanese",diet:"Vegan",meal:"Snack",needs:["rice","cucumber"],extra:["carrot","avocado"]},
-{name:"Mushroom Rice Bowl",cuisine:"Japanese",diet:"Vegan",meal:"Dinner",needs:["rice","mushroom"],extra:["tofu","onion"]},
-
-/* THAI */
-
-{name:"Thai Vegetable Rice Bowl",cuisine:"Thai",diet:"Vegan",meal:"Lunch",needs:["rice","pepper","onion"],extra:["beans","carrot"]},
-{name:"Thai Tofu Bowl",cuisine:"Thai",diet:"Vegan",meal:"Dinner",needs:["tofu","rice"],extra:["pepper","onion","carrot"]},
-{name:"Thai Vegetable Noodles",cuisine:"Thai",diet:"Vegan",meal:"Dinner",needs:["noodles","onion"],extra:["pepper","carrot","beans"]},
-{name:"Thai Green Vegetable Curry",cuisine:"Thai",diet:"Vegan",meal:"Dinner",needs:["coconut milk","pepper"],extra:["tofu","beans","rice"]},
-{name:"Thai Bean Rice Bowl",cuisine:"Thai",diet:"Vegan",meal:"Lunch",needs:["beans","rice"],extra:["tomato","onion"]},
-{name:"Thai Vegetable Soup",cuisine:"Thai",diet:"Vegan",meal:"Dinner",needs:["vegetables","onion"],extra:["tofu","mushroom"]},
-{name:"Thai Mango Rice Bowl",cuisine:"Thai",diet:"Vegan",meal:"Snack",needs:["rice","mango"],extra:["coconut","beans"]},
-{name:"Thai Peanut Noodles",cuisine:"Thai",diet:"Vegan",meal:"Dinner",needs:["noodles","peanuts"],extra:["carrot","pepper","onion"]},
-{name:"Thai Basil Tofu",cuisine:"Thai",diet:"Vegan",meal:"Dinner",needs:["tofu","pepper"],extra:["onion","rice"]},
-{name:"Thai Vegetable Fried Rice",cuisine:"Thai",diet:"Vegan",meal:"Lunch",needs:["rice","onion"],extra:["carrot","pepper","beans"]},
-
-/* AMERICAN */
-
-{name:"Bean Veggie Wrap",cuisine:"American",diet:"Vegan",meal:"Lunch",needs:["roti","beans","tomato"],extra:["cucumber","onion"]},
-{name:"Vegetable Sandwich",cuisine:"American",diet:"Vegetarian",meal:"Lunch",needs:["bread","tomato","cucumber"],extra:["cheese","onion"]},
-{name:"Bean Burger",cuisine:"American",diet:"Vegan",meal:"Dinner",needs:["beans","bread"],extra:["tomato","onion","lettuce"]},
-{name:"Veggie Burger",cuisine:"American",diet:"Vegetarian",meal:"Dinner",needs:["bread","beans","tomato"],extra:["cheese","lettuce"]},
-{name:"Loaded Potato Bowl",cuisine:"American",diet:"Vegetarian",meal:"Dinner",needs:["potato","beans"],extra:["cheese","tomato","onion"]},
-{name:"Peanut Butter Toast",cuisine:"American",diet:"Vegetarian",meal:"Breakfast",needs:["bread","peanut butter"],extra:["banana","apple"]},
-{name:"Vegetable Pasta Bowl",cuisine:"American",diet:"Vegetarian",meal:"Dinner",needs:["pasta","tomato"],extra:["beans","cheese"]},
-{name:"Bean Rice Bowl",cuisine:"American",diet:"Vegan",meal:"Lunch",needs:["rice","beans"],extra:["tomato","corn","onion"]},
-{name:"Veggie Breakfast Burrito",cuisine:"American",diet:"Egg Vegetarian",meal:"Breakfast",needs:["roti","beans","egg"],extra:["tomato","onion"]},
-{name:"Corn Bean Salad",cuisine:"American",diet:"Vegan",meal:"Snack",needs:["corn","beans","tomato"],extra:["cucumber","onion"]},
-
-/* MEDITERRANEAN */
-
-{name:"Mediterranean Bean Bowl",cuisine:"Mediterranean",diet:"Vegan",meal:"Lunch",needs:["beans","cucumber","tomato"],extra:["rice","onion"]},
-{name:"Hummus Rice Bowl",cuisine:"Mediterranean",diet:"Vegan",meal:"Lunch",needs:["chickpeas","rice"],extra:["cucumber","tomato"]},
-{name:"Falafel Wrap",cuisine:"Mediterranean",diet:"Vegan",meal:"Lunch",needs:["chickpeas","roti"],extra:["tomato","cucumber","onion"]},
-{name:"Greek Vegetable Bowl",cuisine:"Mediterranean",diet:"Vegetarian",meal:"Lunch",needs:["cucumber","tomato","cheese"],extra:["beans","onion"]},
-{name:"Mediterranean Lentil Bowl",cuisine:"Mediterranean",diet:"Vegan",meal:"Dinner",needs:["lentils","tomato"],extra:["cucumber","onion","rice"]},
-{name:"Chickpea Salad",cuisine:"Mediterranean",diet:"Vegan",meal:"Snack",needs:["chickpeas","cucumber","tomato"],extra:["onion","lemon"]},
-{name:"Vegetable Couscous",cuisine:"Mediterranean",diet:"Vegan",meal:"Dinner",needs:["couscous","carrot","onion"],extra:["beans","tomato"]},
-{name:"Mediterranean Rice Plate",cuisine:"Mediterranean",diet:"Vegan",meal:"Lunch",needs:["rice","beans","tomato"],extra:["cucumber","onion"]},
-{name:"Paneer Mediterranean Bowl",cuisine:"Mediterranean",diet:"Vegetarian",meal:"Dinner",needs:["paneer","cucumber","tomato"],extra:["rice","onion"]},
-{name:"Lentil Vegetable Soup",cuisine:"Mediterranean",diet:"Vegan",meal:"Dinner",needs:["lentils","carrot","tomato"],extra:["onion","spinach"]}
-
-];
-
-
-const allRecipes=[...baseRecipes];
+const allRecipes=[];
 
 
 /* =========================================================
    RECIPE FILTER
 ========================================================= */
 
-function dietCompatible(recipeDiet,userDiet){
 
-  // The selected category is an exact filter. This prevents vegan,
-  // vegetarian, egg-vegetarian, and non-vegetarian labels from mixing.
+const MEAL_API_ROOT="https://www.themealdb.com/api/json/v1/1";
+const mealDetailsCache=new Map();
+
+function dietCompatible(recipeDiet,userDiet){
   return recipeDiet===userDiet;
 }
 
+function mealAreas(cuisine){
+  const areas={
+    Indian:["Indian"],
+    Korean:["South Korean"],
+    Mexican:["Mexican"],
+    Chinese:["Chinese"],
+    Italian:["Italian"],
+    Japanese:["Japanese"],
+    Thai:["Thai"],
+    American:["American"],
+    Mediterranean:["Greek","Turkish","Moroccan"]
+  };
+  return cuisine==="Any" ? Object.values(areas).flat() : (areas[cuisine]||[]);
+}
 
-function findMeals(){
+async function fetchMealList(url){
+  const response=await fetch(url);
+  if(!response.ok) throw new Error("Recipe service returned "+response.status);
+  const data=await response.json();
+  return Array.isArray(data.meals) ? data.meals : [];
+}
+
+function getMealDiet(ingredients){
+  const text=ingredients.join(" ").toLowerCase();
+  if(/\b(chicken|beef|pork|lamb|mutton|turkey|duck|goose|fish|salmon|tuna|cod|prawn|shrimp|crab|lobster|clam|mussel|oyster|anchov|sardine|bacon|ham|sausage|chorizo|gelatin|lard|suet|meat|stock)\b/.test(text)){
+    return "Non-Vegetarian";
+  }
+  if(/\b(egg|eggs|mayonnaise)\b/.test(text)){
+    return "Egg Vegetarian";
+  }
+  if(/\b(milk|cream|cheese|butter|ghee|yogurt|yoghurt|paneer|curd|whey|honey|buttermilk)\b/.test(text)){
+    return "Vegetarian";
+  }
+  return "Vegan";
+}
+
+function areaCuisine(area){
+  if(area==="South Korean"||area==="Korean") return "Korean";
+  if(["Greek","Turkish","Moroccan","Tunisian","Lebanese","Israeli"].includes(area)) return "Mediterranean";
+  return area;
+}
+
+function mealTypeFromCategory(category){
+  const value=(category||"").toLowerCase();
+  if(value.includes("breakfast")) return "Breakfast";
+  if(/starter|side|dessert|snack/.test(value)) return "Snack";
+  return "Main";
+}
+
+function parseMealDbRecipe(meal){
+  const ingredients=[];
+  for(let i=1;i<=20;i++){
+    const name=(meal["strIngredient"+i]||"").trim();
+    if(!name) continue;
+    const measure=(meal["strMeasure"+i]||"").trim();
+    ingredients.push({name,measure});
+  }
+  const instructionText=(meal.strInstructions||"").replace(/\r/g,"").trim();
+  const instructions=instructionText
+    .split(/\n+|(?<=[.!?])\s+(?=[A-Z0-9])/)
+    .map(step=>step.trim())
+    .filter(Boolean);
+  const names=ingredients.map(item=>item.name);
+  return{
+    id:meal.idMeal,
+    name:meal.strMeal||"Untitled recipe",
+    cuisine:areaCuisine(meal.strArea||"International"),
+    area:meal.strArea||"International",
+    category:meal.strCategory||"Main",
+    meal:mealTypeFromCategory(meal.strCategory),
+    diet:getMealDiet(names),
+    ingredients,
+    needs:names,
+    extra:[],
+    image:meal.strMealThumb||"",
+    instructions,
+    sourceUrl:meal.strSource||"https://www.themealdb.com/"
+  };
+}
+
+async function loadMealDetails(ids){
+  const unique=[...new Set(ids)].slice(0,20);
+  return Promise.all(unique.map(async id=>{
+    if(mealDetailsCache.has(id)) return mealDetailsCache.get(id);
+    try{
+      const meals=await fetchMealList(MEAL_API_ROOT+"/lookup.php?i="+encodeURIComponent(id));
+      if(!meals[0]) return null;
+      const recipe=parseMealDbRecipe(meals[0]);
+      mealDetailsCache.set(id,recipe);
+      return recipe;
+    }catch(error){
+      console.warn("Could not load recipe details",id,error);
+      return null;
+    }
+  })).then(items=>items.filter(Boolean));
+}
+
+async function recipesForIngredients(userIngredients){
+  const queries=[...new Set(userIngredients)].slice(0,3);
+  const resultLists=await Promise.all(queries.map(async item=>{
+    const query=normalizeIngredient(item).replace(/\s+/g,"_");
+    if(!query) return [];
+    return fetchMealList(MEAL_API_ROOT+"/filter.php?i="+encodeURIComponent(query));
+  }));
+  const frequencies=new Map();
+  resultLists.forEach(list=>list.forEach((meal,index)=>{
+    const id=meal.idMeal;
+    const old=frequencies.get(id)||{count:0,rank:index};
+    old.count++;
+    old.rank=Math.min(old.rank,index);
+    frequencies.set(id,old);
+  }));
+  const ids=[...frequencies.entries()]
+    .sort((a,b)=>b[1].count-a[1].count||a[1].rank-b[1].rank)
+    .map(([id])=>id)
+    .slice(0,20);
+  return loadMealDetails(ids);
+}
+
+async function recipesForCuisine(cuisine){
+  const areas=mealAreas(cuisine);
+  const lists=await Promise.all(areas.map(area=>
+    fetchMealList(MEAL_API_ROOT+"/filter.php?a="+encodeURIComponent(area))
+  ));
+  const ids=[];
+  lists.forEach(list=>list.forEach(meal=>ids.push(meal.idMeal)));
+  return loadMealDetails([...new Set(ids)].slice(0,cuisine==="Any"?24:20));
+}
+
+function recipeIngredientMatches(userIngredient,recipeIngredient){
+  const user=normalizeIngredient(userIngredient);
+  const recipe=normalizeIngredient(recipeIngredient);
+  if(user===recipe) return true;
+  return user.length>=4 && recipe.startsWith(user+" ") ||
+         recipe.length>=4 && user.startsWith(recipe+" ");
+}
+
+function matchingIngredients(recipe,userIngredients){
+  return recipe.ingredients
+    .filter(item=>userIngredients.some(user=>recipeIngredientMatches(user,item.name)))
+    .map(item=>item.name);
+}
+
+function mealTypeMatches(recipe,selected){
+  if(selected==="Any") return true;
+  if(selected==="Lunch"||selected==="Dinner") return recipe.meal==="Main";
+  return recipe.meal===selected;
+}
+
+async function findMeals(){
 
   const results=document.getElementById("results");
-
-  const cuisine=
-    document.getElementById("cuisine").value;
-
-  const diet=
-    document.getElementById("diet").value;
-
-  const meal=
-    document.getElementById("mealType").value;
+  const cuisine=document.getElementById("cuisine").value;
+  const diet=document.getElementById("diet").value;
+  const meal=document.getElementById("mealType").value;
 
   if(ingredients.length===0){
-
     results.innerHTML=`
       <div class="card empty">
         <h3>🥕 Add some ingredients first</h3>
-        <p>Try roti, beans, tomato, cucumber and onion.</p>
-      </div>
-    `;
-
+        <p>Try adding two or more ingredients you have at home.</p>
+      </div>`;
     return;
   }
-
-  const filtered=allRecipes.filter(recipe=>{
-
-    const cuisineMatch=
-      cuisine==="Any" ||
-      recipe.cuisine===cuisine;
-
-    const dietMatch=
-      dietCompatible(recipe.diet,diet);
-
-    const mealMatch=
-      meal==="Any" ||
-      recipe.meal===meal;
-
-    return cuisineMatch && dietMatch && mealMatch;
-
-  });
-
-
-  const ranked=filtered.map(recipe=>{
-
-    const matched=
-      recipe.needs.filter(
-        item=>ingredients.includes(normalizeIngredient(item))
-      );
-
-    const optional=
-      recipe.extra.filter(
-        item=>ingredients.includes(normalizeIngredient(item))
-      );
-
-    const missing=
-      recipe.needs.filter(
-        item=>!ingredients.includes(normalizeIngredient(item))
-      );
-
-    const score=
-      matched.length*6+
-      optional.length*2-
-      missing.length;
-
-    return{
-      recipe,
-      matched,
-      optional,
-      missing,
-      score
-    };
-
-  }).sort((a,b)=>{
-
-    if(b.score!==a.score){
-      return b.score-a.score;
-    }
-
-    return a.missing.length-b.missing.length;
-
-  });
-
-
-  // Require at least two core ingredients for a recommendation.
-  // Recipes with only one coincidental match are not presented as matches.
-  const matches=
-    ranked
-      .filter(x=>x.matched.length>=Math.min(2,x.recipe.needs.length))
-      .slice(0,12);
-
-
-  if(matches.length===0){
-
-    results.innerHTML=`
-      <div class="card empty">
-        <h3>🍽️ No matching meals found</h3>
-        <p>
-          Try another meal type or add more ingredients.
-          NutriPlate AI remains optional.
-        </p>
-      </div>
-    `;
-
-    return;
-  }
-
 
   results.innerHTML=`
+    <div class="card empty">
+      <h3>🍳 Finding real recipes…</h3>
+      <p>Checking recipe ingredients, cuisine, and diet.</p>
+    </div>`;
 
-    <div class="card">
+  try{
+    const recipes=await recipesForIngredients(ingredients);
+    const ranked=recipes.map(recipe=>{
+      const matched=matchingIngredients(recipe,ingredients);
+      const missing=recipe.ingredients
+        .filter(item=>!matched.includes(item.name))
+        .map(item=>item.name);
+      return{recipe,matched,missing,optional:[]};
+    }).filter(item=>
+      (cuisine==="Any"||item.recipe.cuisine===cuisine) &&
+      dietCompatible(item.recipe.diet,diet) &&
+      mealTypeMatches(item.recipe,meal) &&
+      item.matched.length>=Math.min(2,ingredients.length,item.recipe.ingredients.length)
+    ).sort((a,b)=>
+      b.matched.length-a.matched.length ||
+      a.missing.length-b.missing.length
+    ).slice(0,12);
 
-      <h2>
-        🍽️ ${
-          cuisine==="Any"
-          ? "NutriPlate Meal Matches"
-          : cuisine+" Meal Matches"
-        }
-      </h2>
+    if(!ranked.length){
+      results.innerHTML=`
+        <div class="card empty">
+          <h3>🍽️ No close recipe matches found</h3>
+          <p>
+            The recipe source did not find a dish with enough of your ingredients
+            for the selected cuisine, diet, and meal. Try adding ingredients or
+            changing a filter.
+          </p>
+        </div>`;
+      return;
+    }
 
-      <p class="counter">
-        Found ${matches.length} recommendation${matches.length===1?"":"s"}.
-        Powered by NutriPlate's own engine — AI is not required.
-      </p>
-
-      <div class="grid">
-
-        ${
-          matches.map(x=>
-            plannerRecipeCard(
-              x.recipe,
-              x.matched,
-              x.optional,
-              x.missing
-            )
-          ).join("")
-        }
-
-      </div>
-
-    </div>
-
-  `;
+    results.innerHTML=`
+      <div class="card">
+        <h2>🍽️ ${cuisine==="Any"?"NutriPlate Meal Matches":escapeHTML(cuisine)+" Meal Matches"}</h2>
+        <p class="counter">
+          Showing ${ranked.length} real recipes with at least
+          ${Math.min(2,ingredients.length)} of your ingredients.
+          Recipes, instructions, and photos are provided by TheMealDB.
+        </p>
+        <div class="grid">
+          ${ranked.map(item=>plannerRecipeCard(item.recipe,item.matched,item.optional,item.missing)).join("")}
+        </div>
+      </div>`;
+  }catch(error){
+    console.error(error);
+    results.innerHTML=`
+      <div class="card empty">
+        <h3>⚠️ Recipe search is temporarily unavailable</h3>
+        <p>Please check your internet connection and try again.</p>
+        <p class="recipe-credit">
+          Recipe data is supplied by
+          <a href="https://www.themealdb.com/" target="_blank" rel="noopener noreferrer">TheMealDB</a>.
+        </p>
+      </div>`;
+  }
 
 }
 
@@ -2089,101 +2082,45 @@ function findMeals(){
 function plannerRecipeCard(r,matched,optional,missing){
 
   return`
-
-    <div class="recipe">
-
+    <article class="recipe">
+      ${r.image?'<img class="recipe-photo" src="'+escapeHTML(r.image)+'" alt="'+escapeHTML(r.name)+'" loading="lazy">':""}
       <h3>${escapeHTML(r.name)}</h3>
-
       <div class="meta">
         <span>🌎 ${escapeHTML(r.cuisine)}</span>
         <span>🥗 ${escapeHTML(r.diet)}</span>
-        <span>🍽️ ${escapeHTML(r.meal)}</span>
+        <span>🍽️ ${escapeHTML(r.meal==="Main"?"Main meal":r.meal)}</span>
       </div>
-
-      <p>
-        <b>✅ You have:</b>
-        ${matched.length
-          ? matched.map(escapeHTML).join(", ")
-          : "No exact required ingredients"}
+      <p><b>✅ You have:</b> ${matched.length?matched.map(escapeHTML).join(", "):"No matching ingredients"}</p>
+      ${missing.length?`<p><b>🛒 Also needed:</b> ${missing.map(escapeHTML).join(", ")}</p>`:""}
+      <details class="recipe-details">
+        <summary>Ingredients and cooking steps</summary>
+        <ul>
+          ${r.ingredients.map(item=>`<li>${escapeHTML([item.measure,item.name].filter(Boolean).join(" "))}</li>`).join("")}
+        </ul>
+        <ol>
+          ${r.instructions.map(step=>`<li>${escapeHTML(step)}</li>`).join("")}
+        </ol>
+      </details>
+      <p class="recipe-credit">
+        Recipe and photo:
+        <a href="${escapeHTML(r.sourceUrl||"https://www.themealdb.com/")}" target="_blank" rel="noopener noreferrer">TheMealDB</a>
+        · ${escapeHTML(r.area)}
       </p>
-
-      ${
-        missing.length
-        ?`
-          <p>
-            <b>🛒 You may need:</b>
-            ${missing.map(escapeHTML).join(", ")}
-          </p>
-        `
-        :""
-      }
-
-      ${
-        optional.length
-        ?`
-          <p>
-            <b>⭐ Optional you have:</b>
-            ${optional.map(escapeHTML).join(", ")}
-          </p>
-        `
-        :""
-      }
-
-      <p><b>🧺 Ingredients:</b></p>
-
-      <div class="ingredients-list">
-        ${
-          [...r.needs,...r.extra]
-            .map(i=>`
-              <span class="ingredient-pill">
-                ${escapeHTML(i)}
-              </span>
-            `)
-            .join("")
-        }
-      </div>
-
-    </div>
-
-  `;
+    </article>`;
 
 }
 
 
-/* =========================================================
-   CUISINE EXPLORER
-========================================================= */
-
 function renderCuisineCards(){
 
-  const box=
-    document.getElementById("cuisineCards");
-
-  box.innerHTML=
-    Object.entries(cuisineInfo)
-    .map(([name,info])=>`
-
-      <div
-        class="card cuisine-card"
-        onclick="showCuisine('${name}')"
-      >
-
-        <div class="cuisine-icon">
-          ${info.emoji}
-        </div>
-
-        <h3>${name}</h3>
-
-        <p>${info.description}</p>
-
-        <span class="cuisine-count">
-          ${allRecipes.filter(recipe=>recipe.cuisine===name).length} recipes
-        </span>
-
-      </div>
-
-    `)
-    .join("");
+  const box=document.getElementById("cuisineCards");
+  box.innerHTML=Object.entries(cuisineInfo).map(([name,info])=>`
+    <div class="card cuisine-card" onclick="showCuisine('${name}')">
+      <div class="cuisine-icon">${info.emoji}</div>
+      <h3>${name}</h3>
+      <p>${info.description}</p>
+      <span class="cuisine-count">Browse recipes</span>
+    </div>`).join("");
 
 }
 
@@ -2220,99 +2157,47 @@ function renderCuisineToolbar(){
 }
 
 
-function showCuisine(name,button){
+async function showCuisine(name,button){
 
-  document
-    .querySelectorAll(".cuisine-toolbar button")
+  document.querySelectorAll(".cuisine-toolbar button")
     .forEach(btn=>btn.classList.remove("active"));
+  if(button) button.classList.add("active");
 
-  if(button){
-    button.classList.add("active");
-  }
-
-  const box=
-    document.getElementById("cuisineResults");
-
-  let list;
-
-  if(name==="All"){
-    list=allRecipes;
-  }else{
-    list=allRecipes.filter(
-      recipe=>recipe.cuisine===name
-    );
-  }
-
-  /*
-    World Explorer shows exactly 50+ dishes per cuisine.
-    Only ingredients are required here, as requested.
-  */
+  const box=document.getElementById("cuisineResults");
+  const selected=name==="All"?"Any":name;
 
   box.innerHTML=`
+    <div class="card empty">
+      <h3>🌍 Loading ${selected==="Any"?"world recipes":escapeHTML(selected+" recipes")}…</h3>
+    </div>`;
 
-    <div class="card">
-
-      <h2>
-        ${
-          name==="All"
-          ? "🌍 World Food Collection"
-          : `${cuisineInfo[name].emoji} ${name} Cuisine`
-        }
-      </h2>
-
-      <p class="counter">
-        ${name==="All"
-          ? "Explore dishes from every NutriPlate cuisine."
-          : `${list.length} recipes with their listed ingredients.`
-        }
-      </p>
-
-      <div class="grid">
-
-        ${
-          list.map(recipe=>`
-
-            <div class="recipe">
-
-              <h3>${escapeHTML(recipe.name)}</h3>
-
-              <div class="meta">
-                <span>🌎 ${escapeHTML(recipe.cuisine)}</span>
-                <span>🥗 ${escapeHTML(recipe.diet)}</span>
-                <span>🍽️ ${escapeHTML(recipe.meal)}</span>
-              </div>
-
-              <p><b>🧺 Ingredients needed:</b></p>
-
-              <div class="ingredients-list">
-
-                ${
-                  [...recipe.needs,...recipe.extra]
-                    .map(i=>`
-                      <span class="ingredient-pill">
-                        ${escapeHTML(i)}
-                      </span>
-                    `)
-                    .join("")
-                }
-
-              </div>
-
-            </div>
-
-          `).join("")
-        }
-
-      </div>
-
-    </div>
-
-  `;
-
-  if(name!=="All"){
-    document
-      .getElementById("cuisineResults")
-      .scrollIntoView({behavior:"smooth",block:"start"});
+  try{
+    const recipes=await recipesForCuisine(selected);
+    if(!recipes.length){
+      box.innerHTML=`
+        <div class="card empty">
+          <h3>🍽️ No recipes found for this cuisine yet</h3>
+          <p>Choose another cuisine or try again later.</p>
+        </div>`;
+      return;
+    }
+    box.innerHTML=`
+      <div class="card">
+        <h2>${selected==="Any"?"🌍 World Food Collection":(cuisineInfo[selected]?.emoji||"🌍")+" "+escapeHTML(selected)+" Cuisine"}</h2>
+        <p class="counter">Real recipes with ingredients, cooking steps, and photos from TheMealDB.</p>
+        <div class="grid">${recipes.map(recipe=>plannerRecipeCard(recipe,[],[],recipe.ingredients.map(item=>item.name))).join("")}</div>
+      </div>`;
+  }catch(error){
+    console.error(error);
+    box.innerHTML=`
+      <div class="card empty">
+        <h3>⚠️ Recipe collection is temporarily unavailable</h3>
+        <p>Please check your internet connection and try again.</p>
+        <p class="recipe-credit">
+          Recipe data is supplied by
+          <a href="https://www.themealdb.com/" target="_blank" rel="noopener noreferrer">TheMealDB</a>.
+        </p>
+      </div>`;
   }
 
 }
