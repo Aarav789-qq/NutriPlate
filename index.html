@@ -2047,7 +2047,7 @@ function licenseIsReusable(metadata){
 }
 
 async function commonsPhotoForRecipe(recipe){
-  const url=COMMONS_API+"?action=query&generator=search&gsrsearch="+encodeURIComponent(recipe.name+" Indian food dish")+"&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=640&format=json&origin=*";
+  const url=COMMONS_API+"?action=query&generator=search&gsrsearch="+encodeURIComponent(recipe.name+" "+(recipe.cuisine&&recipe.cuisine!=="International"?recipe.cuisine.toLowerCase()+" ":"")+"food dish")+"&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=640&format=json&origin=*";
   const response=await fetch(url);
   if(!response.ok) return recipe;
   const data=await response.json();
