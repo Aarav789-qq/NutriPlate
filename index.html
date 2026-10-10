@@ -1933,8 +1933,8 @@ function wikiSectionLines(text,heading){
 }
 
 function parseWikiRecipe(title,extract){
-  const ingredientLines=wikiSectionLines(extract,"Ingredients");
-  const instructionLines=wikiSectionLines(extract,"Procedure");
+  const ingredientLines=wikiSectionLines(extract,"Ingredients").filter(line=>!/^(.+\\s+)?ingredients?$/i.test(line));
+  const instructionLines=wikiSectionLines(extract,"Procedure").filter(line=>! /^(preparation|cooking|directions|method)$/i.test(line));
   if(ingredientLines.length<3||instructionLines.length<2) return null;
   const ingredients=ingredientLines.filter(line=>!/^edit\b/i.test(line)&&!/^image$/i.test(line)).map(line=>{
     const measureMatch=line.match(/^\s*((?:\d+\s+)?(?:\d+\/\d+|[¼½¾⅓⅔⅛⅜⅝⅞])?\s*(?:kg|g|mg|ml|l|cups?|tablespoons?|tbsp|teaspoons?|tsp|ounces?|oz|pounds?|lb|pinches?|cloves?|pieces?)?\s*)/i);
