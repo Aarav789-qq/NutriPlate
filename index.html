@@ -1937,9 +1937,13 @@ function parseWikiRecipe(title,extract,cuisineOverride,categories=[]){
   const instructionLines=wikiSectionLines(extract,"Procedure").filter(line=>! /^(preparation|cooking|directions|method)$/i.test(line));
   if(ingredientLines.length<3||instructionLines.length<2) return null;
   const ingredients=ingredientLines.filter(line=>!/^edit\b/i.test(line)&&!/^image$/i.test(line)).map(line=>{
-    const measureMatch=line.match(/^\s*((?:\d+\s+)?(?:\d+\/\d+|[¼½¾⅓⅔⅛⅜⅝⅞])?\s*(?:kg|g|mg|ml|l|cups?|tablespoons?|tbsp|teaspoons?|tsp|ounces?|oz|pounds?|lb|pinches?|cloves?|pieces?)?\s*)/i);
-    let name=line.replace(/^\s*(?:\d+\s+)?(?:\d+\/\d+|[¼½¾⅓⅔⅝⅞])?\s*(?:kg|g|mg|ml|l|cups?|tablespoons?|tbsp|teaspoons?|tsp|ounces?|oz|pounds?|lb|pinches?|cloves?|pieces?)?\s*/i,"");
-    name=name.replace(/^\([^)]*\)\s*/,"")
+    const amountPattern="(?:\\d+(?:[.,]\\d+)?(?:(?:\\s*(?:to|[-–—])\\s*\\d+(?:[.,]\\d+)?)|(?:\\s*[¼½¾⅓⅔⅛⅜⅝⅞])|(?:\\s+\\d+\\s*\\/\\s*\\d+))?|\\d+\\s*\\/\\s*\\d+|[¼½¾⅓⅔⅛⅜⅝⅞])";
+    const unitPattern="(?:kg|g|mg|ml|l|cups?|tablespoons?|tbsp|teaspoons?|tsp|ounces?|oz|pounds?|lb|pinches?|cloves?|pieces?)";
+    const measurePattern=new RegExp("^\\s*("+amountPattern+"(?:\\s+"+amountPattern+")?\\s*(?:"+unitPattern+")?)\\s*","i");
+    const measureMatch=line.match(measurePattern);
+    let name=line.replace(measurePattern,"");
+    name=name.replace(/^(?:of\s+)/i,"")
+      .replace(/^\([^)]*\)\s*/,"")
       .replace(/^(?:(?:finely|roughly|thinly|coarsely)[- ]?)?(?:chopped|diced|minced|sliced|grated|crushed|ground)\s+/i,"")
       .replace(/,?\s*(?:preferably|to taste|for garnish|for cooking|for serving)\b.*$/i,"")
       .replace(/\s*\([^)]*\)\s*$/,"")
@@ -2143,7 +2147,12 @@ function recipeIngredientMatches(userIngredient,recipeIngredient){
   if(userWords==="rice" && /\brice\b/.test(recipeWords)) return true;
   if(userWords==="flour" && /\bflour\b/.test(recipeWords)) return true;
   if(userWords==="onion" && /\b(?:red|white|yellow|spring|green) onion\b/.test(recipeWords)) return true;
+  if(userWords==="butter" && /\bpeanut butter\b/.test(recipeWords)) return false;
   if((userWords==="ginger"||userWords==="garlic") && /\bginger garlic paste\b/.test(recipeWords)) return true;
+  const recipeTokens=recipeWords.split(/[^a-z0-9]+/).filter(Boolean);
+  const userTokens=userWords.split(/[^a-z0-9]+/).filter(Boolean);
+  if(userTokens.length===1 && recipeTokens.includes(userTokens[0])) return true;
+  if(userTokens.length>1 && recipeTokens.some((_,index)=>recipeTokens.slice(index,index+userTokens.length).join(" ")===userTokens.join(" "))) return true;
   return user.length>=4 && recipe.startsWith(user+" ") ||
          recipe.length>=4 && user.startsWith(recipe+" ");
 }
