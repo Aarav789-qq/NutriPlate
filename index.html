@@ -1985,23 +1985,23 @@ async function recipesForCuisine(cuisine){
 
 function mealApiIngredientQuery(item){
   const raw=String(item||"").trim().toLowerCase().replace(/_/g," ").replace(/\s+/g," ");
+  const canonical=normalizeIngredient(raw);
   const aliases={
-    "rajma":"kidney_beans",
     "kidney bean":"kidney_beans",
-    "chana":"chickpeas",
-    "chickpea":"chickpeas",
-    "garbanzo":"chickpeas",
-    "capsicum":"bell_pepper",
+    chickpea:"chickpeas",
+    bean:"beans",
+    pea:"peas",
+    "spring onion":"spring_onion",
     "bell pepper":"bell_pepper",
-    "shimla mirch":"bell_pepper",
-    "beans":"beans",
-    "bean":"beans",
-    "peas":"peas",
-    "pea":"peas",
-    "soya":"soy"
+    tomato:"tomato",
+    potato:"potato",
+    onion:"onion",
+    carrot:"carrot",
+    "soy chunk":"soy_chunks"
   };
-  return aliases[raw]||raw.replace(/\s+/g,"_");
+  return aliases[canonical]||canonical.replace(/\s+/g,"_");
 }
+
 
 function recipeIngredientMatches(userIngredient,recipeIngredient){
   const user=normalizeIngredient(userIngredient);
