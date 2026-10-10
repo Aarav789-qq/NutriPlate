@@ -2193,9 +2193,18 @@ async function showCuisine(name,button){
   const box=document.getElementById("cuisineResults");
   const selected=name==="All"?"Any":name;
 
+  if(selected==="Any"){
+    box.innerHTML=`
+      <div class="card empty">
+        <h3>🌍 Choose a cuisine to browse</h3>
+        <p>Select a cuisine card or tab to load its available recipes, photos, ingredients, and cooking steps.</p>
+      </div>`;
+    return;
+  }
+
   box.innerHTML=`
     <div class="card empty">
-      <h3>🌍 Loading ${selected==="Any"?"world recipes":escapeHTML(selected+" recipes")}…</h3>
+      <h3>🌍 Loading ${escapeHTML(selected+" recipes")}…</h3>
     </div>`;
 
   try{
