@@ -2052,7 +2052,8 @@ async function recipesForIngredients(userIngredients,cuisine){
   if(!includeIndian) return globalRecipes;
   const indian=await fetchIndianWikiRecipes();
   const candidates=indian.filter(recipe=>matchingIngredients(recipe,userIngredients).length>0);
-  return attachCommonsPhotos([...globalRecipes,...candidates].slice(0,12));
+  if(cuisine==="Indian") return attachCommonsPhotos(candidates.slice(0,12));
+  return [...globalRecipes,...await attachCommonsPhotos(candidates.slice(0,8))];
 }
 
 async function recipesForCuisine(cuisine){
@@ -2063,7 +2064,9 @@ async function recipesForCuisine(cuisine){
   const globalRecipes=await loadMealDetails(lists.flat().map(meal=>meal.idMeal));
   if(cuisine!=="Indian"&&cuisine!=="Any") return globalRecipes.slice(0,12);
   const indian=await fetchIndianWikiRecipes();
-  return attachCommonsPhotos((cuisine==="Indian"?indian:[...indian,...globalRecipes]).slice(0,12));
+  if(cuisine==="Indian") return attachCommonsPhotos(indian.slice(0,12));
+  const withPhotos=await attachCommonsPhotos(indian.slice(0,6));
+  return [...globalRecipes.slice(0,6),...withPhotos].slice(0,12);
 }
 
 function mealApiIngredientQuery(item){
@@ -2153,7 +2156,7 @@ async function findMeals(){
         <p class="counter">
           Showing ${ranked.length} real recipes with at least
           ${Math.min(2,ingredients.length)} of your ingredients.
-          Recipes, instructions, and photos are from TheMealDB. Diet labels use listed ingredients; check packaged sauces and stocks.
+          Each card links to its recipe source and, when available, photo credit and license. Diet labels use listed ingredients; check packaged sauces and stocks.
         </p>
         <div class="grid">
           ${ranked.map(item=>plannerRecipeCard(item.recipe,item.matched,item.optional,item.missing)).join("")}
@@ -2291,7 +2294,7 @@ async function showCuisine(name,button){
     box.innerHTML=`
       <div class="card">
         <h2>${selected==="Any"?"🌍 World Food Collection":(cuisineInfo[selected]?.emoji||"🌍")+" "+escapeHTML(selected)+" Cuisine"}</h2>
-        <p class="counter">Real recipes with ingredients, cooking steps, and photos from TheMealDB.</p>
+        <p class="counter">Recipes show ingredients and cooking steps with source and photo credits.</p>
         <div class="grid">${recipes.map(recipe=>plannerRecipeCard(recipe,null,null,null)).join("")}</div>
       </div>`;
   }catch(error){
