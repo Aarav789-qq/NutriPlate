@@ -1635,6 +1635,7 @@ function normalizeIngredient(item){
     "chapati":"roti",
     "chapatti":"roti",
     "green onion":"spring onion",
+    "green onions":"spring onion",
     "spring onions":"spring onion",
     "capsicum":"bell pepper",
     "shimla mirch":"bell pepper",
@@ -1643,7 +1644,8 @@ function normalizeIngredient(item){
     "curd":"yogurt",
     "yoghurt":"yogurt",
     "soya":"soy",
-    "soya chunks":"soy chunks",
+    "soya chunks":"soy chunk",
+    "soy chunks":"soy chunk",
     "tomatoes":"tomato",
     "potatoes":"potato",
     "onions":"onion",
@@ -1653,6 +1655,14 @@ function normalizeIngredient(item){
     "mangoes":"mango",
     "mangos":"mango",
     "beans":"bean",
+    "black beans":"bean",
+    "pinto beans":"bean",
+    "white beans":"bean",
+    "kidney beans":"kidney bean",
+    "red onion":"onion",
+    "red onions":"onion",
+    "brown rice":"rice",
+    "white rice":"rice",
     "peas":"pea",
     "lentils":"lentil",
     "eggs":"egg"
@@ -1915,6 +1925,12 @@ function getMealDiet(ingredients){
 
 function areaCuisine(area){
   if(area==="South Korean"||area==="Korean") return "Korean";
+  if(area==="United States"||area==="American") return "American";
+  if(area==="India") return "Indian";
+  if(area==="Mexico") return "Mexican";
+  if(area==="Japan") return "Japanese";
+  if(area==="Thailand") return "Thai";
+  if(area==="China") return "Chinese";
   if(["Greek","Turkish","Moroccan","Tunisian","Lebanese","Israeli"].includes(area)) return "Mediterranean";
   return area;
 }
@@ -1943,8 +1959,8 @@ function parseMealDbRecipe(meal){
   return{
     id:meal.idMeal,
     name:meal.strMeal||"Untitled recipe",
-    cuisine:areaCuisine(meal.strArea||"International"),
-    area:meal.strArea||"International",
+    cuisine:areaCuisine(meal.strArea||meal.strCountry||"International"),
+    area:meal.strArea||meal.strCountry||"International",
     category:meal.strCategory||"Main",
     meal:mealTypeFromCategory(meal.strCategory),
     diet:getMealDiet(names),
@@ -1959,7 +1975,7 @@ function parseMealDbRecipe(meal){
 }
 
 async function loadMealDetails(ids){
-  const unique=[...new Set(ids)].slice(0,20);
+  const unique=[...new Set(ids)].slice(0,12);
   return Promise.all(unique.map(async id=>{
     if(mealDetailsCache.has(id)) return mealDetailsCache.get(id);
     try{
@@ -1976,7 +1992,7 @@ async function loadMealDetails(ids){
 }
 
 async function recipesForIngredients(userIngredients){
-  const queries=[...new Set(userIngredients)].slice(0,3);
+  const queries=[...new Set(userIngredients)].slice(0,2);
   const resultLists=await Promise.all(queries.map(async item=>{
     const query=normalizeIngredient(item).replace(/\s+/g,"_");
     if(!query) return [];
@@ -2004,7 +2020,27 @@ async function recipesForCuisine(cuisine){
   ));
   const ids=[];
   lists.forEach(list=>list.forEach(meal=>ids.push(meal.idMeal)));
-  return loadMealDetails([...new Set(ids)].slice(0,cuisine==="Any"?24:20));
+  return loadMealDetails([...new Set(ids)].slice(0,12));
+}
+
+function mealApiIngredientQuery(item){
+  const raw=String(item||"").trim().toLowerCase().replace(/_/g," ").replace(/\\s+/g," ");
+  const aliases={
+    "rajma":"kidney_beans",
+    "kidney bean":"kidney_beans",
+    "chana":"chickpeas",
+    "chickpea":"chickpeas",
+    "garbanzo":"chickpeas",
+    "capsicum":"bell_pepper",
+    "bell pepper":"bell_pepper",
+    "shimla mirch":"bell_pepper",
+    "beans":"beans",
+    "bean":"beans",
+    "peas":"peas",
+    "pea":"peas",
+    "soya":"soy"
+  };
+  return aliases[raw]||raw.replace(/\\s+/g,"_");
 }
 
 function recipeIngredientMatches(userIngredient,recipeIngredient){
