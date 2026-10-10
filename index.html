@@ -1625,27 +1625,55 @@ const cuisineInfo = {
 function normalizeIngredient(item){
 
   const aliases={
-    "rajma":"beans",
-    "kidney beans":"beans",
-    "red kidney beans":"beans",
-    "chana":"chickpeas",
-    "garbanzo":"chickpeas",
+    "rajma":"kidney bean",
+    "kidney beans":"kidney bean",
+    "red kidney beans":"kidney bean",
+    "chana":"chickpea",
+    "garbanzo":"chickpea",
+    "garbanzo beans":"chickpea",
+    "chickpeas":"chickpea",
     "chapati":"roti",
     "chapatti":"roti",
-    "green onion":"onion",
-    "spring onion":"onion",
-    "capsicum":"pepper",
-    "bell pepper":"pepper",
-    "shimla mirch":"pepper",
-    "dahi":"curd",
-    "yogurt":"curd",
+    "green onion":"spring onion",
+    "spring onions":"spring onion",
+    "capsicum":"bell pepper",
+    "shimla mirch":"bell pepper",
+    "bell peppers":"bell pepper",
+    "dahi":"yogurt",
+    "curd":"yogurt",
+    "yoghurt":"yogurt",
     "soya":"soy",
-    "soya chunks":"soy chunks"
+    "soya chunks":"soy chunks",
+    "tomatoes":"tomato",
+    "potatoes":"potato",
+    "onions":"onion",
+    "carrots":"carrot",
+    "apples":"apple",
+    "bananas":"banana",
+    "mangoes":"mango",
+    "mangos":"mango",
+    "beans":"bean",
+    "peas":"pea",
+    "lentils":"lentil",
+    "eggs":"egg"
   };
 
-  const value=item.trim().toLowerCase();
+  let value=String(item||"")
+    .trim()
+    .toLowerCase()
+    .replace(/_/g," ")
+    .replace(/\\s+/g," ");
 
-  return aliases[value] || value;
+  const modifiers=/^(fresh|dried|ground|minced|chopped|diced|crushed|sliced|grated|shredded|boneless|skinless|large|small|whole|raw|cooked|frozen|canned)\\s+/;
+  while(modifiers.test(value)){
+    value=value.replace(modifiers,"");
+  }
+
+  if(aliases[value]) return aliases[value];
+  if(value.length>4 && value.endsWith("s") && !value.endsWith("ss")){
+    value=value.slice(0,-1);
+  }
+  return value;
 }
 
 
@@ -1834,7 +1862,7 @@ function languageSpeechCode(lang){
 */
 
 
-const allRecipes=[];
+
 
 
 /* =========================================================
@@ -1923,9 +1951,10 @@ function parseMealDbRecipe(meal){
     ingredients,
     needs:names,
     extra:[],
-    image:meal.strMealThumb||"",
+    image:(meal.strMealThumb||"").replace(/^http:\\/\\//,"https:\\/\\/"),
     instructions,
-    sourceUrl:meal.strSource||"https://www.themealdb.com/"
+    sourceUrl:"https://www.themealdb.com/meal/"+encodeURIComponent(meal.idMeal),
+    originalSource:/^https?:\\/\\//i.test(meal.strSource||"")?meal.strSource:""
   };
 }
 
@@ -2057,7 +2086,7 @@ async function findMeals(){
         <p class="counter">
           Showing ${ranked.length} real recipes with at least
           ${Math.min(2,ingredients.length)} of your ingredients.
-          Recipes, instructions, and photos are provided by TheMealDB.
+          Recipes, instructions, and photos are from TheMealDB. Diet labels use listed ingredients; check packaged sauces and stocks.
         </p>
         <div class="grid">
           ${ranked.map(item=>plannerRecipeCard(item.recipe,item.matched,item.optional,item.missing)).join("")}
@@ -2103,8 +2132,9 @@ function plannerRecipeCard(r,matched,optional,missing){
       </details>
       <p class="recipe-credit">
         Recipe and photo:
-        <a href="${escapeHTML(r.sourceUrl||"https://www.themealdb.com/")}" target="_blank" rel="noopener noreferrer">TheMealDB</a>
+        <a href="https://www.themealdb.com/" target="_blank" rel="noopener noreferrer">TheMealDB</a>
         · ${escapeHTML(r.area)}
+        ${r.originalSource?'· <a href="'+escapeHTML(r.originalSource)+'" target="_blank" rel="noopener noreferrer">Original recipe source</a>':""}
       </p>
     </article>`;
 
