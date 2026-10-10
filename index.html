@@ -2019,15 +2019,29 @@ async function attachCommonsPhotos(recipes){
   return recipes.map(recipe=>output.find(item=>item.id===recipe.id)||recipe);
 }
 
+async function mapWithConcurrency(items,limit,worker){
+  const queue=[...items],results=new Array(items.length);
+  let index=0;
+  const workers=Array.from({length:Math.min(limit,queue.length)},async()=>{
+    while(queue.length){
+      const item=queue.shift();
+      const current=index++;
+      results[current]=await worker(item);
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
+
 async function recipesForIngredients(userIngredients,cuisine){
   const includeIndian=cuisine==="Indian"||cuisine==="Any";
-  const queryItems=[...new Set(userIngredients)].slice(0,6);
-  const resultLists=await Promise.all(queryItems.map(async item=>{
+  const queryItems=[...new Set(userIngredients)];
+  const resultLists=await mapWithConcurrency(queryItems,4,async item=>{
     const query=mealApiIngredientQuery(item);
     if(!query) return [];
     try{return await fetchMealList(MEAL_API_ROOT+"/filter.php?i="+encodeURIComponent(query));}
     catch(error){console.warn("Recipe ingredient lookup failed",query,error);return [];}
-  }));
+  });
   const frequencies=new Map();
   resultLists.forEach(list=>list.forEach((meal,index)=>{
     const id=meal.idMeal,old=frequencies.get(id)||{count:0,rank:index};
@@ -2488,20 +2502,40 @@ function toggleAccordion(id){
    NAVIGATION
 ========================================================= */
 
-function scrollToId(id){
-
+function navigateTo(id,updateHistory=true){
   const element=document.getElementById(id);
-
-  if(element){
-
-    element.scrollIntoView({
-      behavior:"smooth",
-      block:"start"
-    });
-
+  if(!element) return;
+  const page=element.matches("main.container > .section")
+    ? element
+    : element.closest("main.container > .section");
+  if(!page) return;
+  document.querySelectorAll("main.container > .section").forEach(section=>{
+    section.classList.toggle("hidden",section!==page);
+  });
+  if(updateHistory){
+    const route="#"+encodeURIComponent(page.id);
+    if(location.hash!==route) history.pushState({page:page.id},"",route);
   }
-
+  window.scrollTo({top:0,behavior:"auto"});
 }
+
+function scrollToId(id){
+  const element=document.getElementById(id);
+  if(!element) return;
+  const page=element.matches("main.container > .section")
+    ? element
+    : element.closest("main.container > .section");
+  if(page){
+    navigateTo(page.id);
+  }else{
+    element.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+}
+
+window.addEventListener("popstate",()=>{
+  const id=decodeURIComponent(location.hash.slice(1))||"home";
+  navigateTo(id,false);
+});
 
 
 /* =========================================================
@@ -3548,6 +3582,9 @@ function initialize(){
   loadState();
 
   showCuisine("All");
+
+  const initialPage=decodeURIComponent(location.hash.slice(1))||"home";
+  navigateTo(document.getElementById(initialPage)?initialPage:"home",false);
 
 }
 
