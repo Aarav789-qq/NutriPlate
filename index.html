@@ -1958,21 +1958,25 @@ async function fetchWikiRecipePages(titles){
   const pages=[];
   for(let offset=0;offset<titles.length;offset+=20){
     const batch=titles.slice(offset,offset+20);
-    const params=new URLSearchParams({
-      action:"query",
-      prop:"extracts|categories",
-      explaintext:"1",
-      exsectionformat:"plain",
-      exlimit:"20",
-      cllimit:"max",
-      titles:batch.join("|"),
-      format:"json",
-      origin:"*"
-    });
-    const response=await fetch(WIKIBOOKS_API+"?"+params.toString());
-    if(!response.ok) throw new Error("Wikibooks returned "+response.status);
-    const data=await response.json();
-    pages.push(...Object.values(data.query?.pages||{}));
+    try{
+      const params=new URLSearchParams({
+        action:"query",
+        prop:"extracts|categories",
+        explaintext:"1",
+        exsectionformat:"plain",
+        exlimit:"20",
+        cllimit:"max",
+        titles:batch.join("|"),
+        format:"json",
+        origin:"*"
+      });
+      const response=await fetch(WIKIBOOKS_API+"?"+params.toString());
+      if(!response.ok) throw new Error("Wikibooks returned "+response.status);
+      const data=await response.json();
+      pages.push(...Object.values(data.query?.pages||{}));
+    }catch(error){
+      console.warn("Could not load one Wikibooks recipe batch",error);
+    }
   }
   const pageByTitle=new Map(pages.map(page=>[page.title,page]));
   return titles.map(title=>pageByTitle.get(title)).filter(Boolean);
@@ -1994,19 +1998,24 @@ async function searchWikiRecipes(cuisine,ingredients=[]){
 
   const queries=terms.length?terms:[""];
   const resultLists=await mapWithConcurrency(queries,2,async term=>{
-    const params=new URLSearchParams({
-      action:"query",
-      list:"search",
-      srsearch:'incategory:"'+category+'"'+(term?" "+term:""),
-      srnamespace:"0",
-      srlimit:terms.length?"20":"40",
-      format:"json",
-      origin:"*"
-    });
-    const response=await fetch(WIKIBOOKS_API+"?"+params.toString());
-    if(!response.ok) throw new Error("Wikibooks returned "+response.status);
-    const data=await response.json();
-    return data.query?.search||[];
+    try{
+      const params=new URLSearchParams({
+        action:"query",
+        list:"search",
+        srsearch:'incategory:"'+category+'"'+(term?" "+term:""),
+        srnamespace:"0",
+        srlimit:terms.length?"20":"40",
+        format:"json",
+        origin:"*"
+      });
+      const response=await fetch(WIKIBOOKS_API+"?"+params.toString());
+      if(!response.ok) throw new Error("Wikibooks returned "+response.status);
+      const data=await response.json();
+      return data.query?.search||[];
+    }catch(error){
+      console.warn("Wikibooks recipe search failed",term,error);
+      return [];
+    }
   });
 
   const ranking=new Map();
@@ -2020,15 +2029,14 @@ async function searchWikiRecipes(cuisine,ingredients=[]){
     .sort((a,b)=>b[1].count-a[1].count||a[1].rank-b[1].rank)
     .map(([title])=>title)
     .slice(0,terms.length?60:40);
-  if(!titles.length){
-    wikiRecipeSearchCache.set(cacheKey,[]);
-    return [];
-  }
+  if(!titles.length) return [];
 
   const pages=await fetchWikiRecipePages(titles);
   const recipes=pages.map(page=>parseWikiRecipe(page.title,page.extract||"",cuisine==="Any"?"Any":cuisine,page.categories||[])).filter(Boolean);
-  wikiRecipeSearchCache.set(cacheKey,recipes);
-  if(terms.length===0) saveWikiRecipeCache(cuisine,recipes);
+  if(recipes.length){
+    wikiRecipeSearchCache.set(cacheKey,recipes);
+    if(terms.length===0) saveWikiRecipeCache(cuisine,recipes);
+  }
   return recipes;
 }
 
