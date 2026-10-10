@@ -1841,6 +1841,26 @@ function languageSpeechCode(lang){
 const MEAL_API_ROOT="https://www.themealdb.com/api/json/v1/1";
 const WIKIBOOKS_API="https://en.wikibooks.org/w/api.php";
 const COMMONS_API="https://commons.wikimedia.org/w/api.php";
+const INDIAN_RECIPE_CACHE_KEY="nutriplate-indian-recipes-v1";
+const SOURCE_CACHE_TTL=7*24*60*60*1000;
+
+function loadIndianRecipeCache(){
+  try{
+    const cached=JSON.parse(localStorage.getItem(INDIAN_RECIPE_CACHE_KEY)||"null");
+    if(cached&&Date.now()-cached.savedAt<SOURCE_CACHE_TTL&&Array.isArray(cached.recipes)) return cached.recipes;
+  }catch(error){
+    console.warn("Could not read the saved recipe catalog",error);
+  }
+  return null;
+}
+
+function saveIndianRecipeCache(recipes){
+  try{
+    localStorage.setItem(INDIAN_RECIPE_CACHE_KEY,JSON.stringify({savedAt:Date.now(),recipes}));
+  }catch(error){
+    console.warn("Could not save the recipe catalog in this browser",error);
+  }
+}
 const mealDetailsCache=new Map();
 let indianRecipesCache=null;
 let indianRecipesPromise=null;
@@ -1963,6 +1983,11 @@ function parseWikiRecipe(title,extract){
 async function fetchIndianWikiRecipes(){
   if(indianRecipesCache) return indianRecipesCache;
   if(indianRecipesPromise) return indianRecipesPromise;
+  const saved=loadIndianRecipeCache();
+  if(saved){
+    indianRecipesCache=saved;
+    return indianRecipesCache;
+  }
   indianRecipesPromise=(async()=>{
     const titles=[];
     let continuation="";
@@ -1984,6 +2009,7 @@ async function fetchIndianWikiRecipes(){
       pages.push(...Object.values(data.query?.pages||{}));
     }
     indianRecipesCache=pages.map(page=>parseWikiRecipe(page.title,page.extract||"")).filter(Boolean);
+    saveIndianRecipeCache(indianRecipesCache);
     return indianRecipesCache;
   })();
   try{return await indianRecipesPromise;}finally{indianRecipesPromise=null;}
@@ -2008,12 +2034,16 @@ async function commonsPhotoForRecipe(recipe){
     const score=wanted.filter(word=>filename.includes(word)).length;
     return score?{page,info,metadata,score}:null;
   }).filter(Boolean).sort((a,b)=>b.score-a.score);
-  if(!ranked.length) return recipe;
+  if(!ranked.length){
+    recipe.imageLookupAt=Date.now();
+    return recipe;
+  }
   const selected=ranked[0],metadata=selected.metadata;
   recipe.image=selected.info.thumburl||selected.info.url||"";
   recipe.imagePage="https://commons.wikimedia.org/wiki/"+encodeURIComponent(selected.page.title.replace(/ /g,"_"));
   recipe.imageCredit=cleanText(metadata.Artist?.value||"Wikimedia Commons contributor");
   recipe.imageLicenseUrl=metadata.LicenseUrl?.value||"";
+  recipe.imageLookupAt=Date.now();
   return recipe;
 }
 
@@ -2022,12 +2052,18 @@ async function attachCommonsPhotos(recipes){
   const workers=Array.from({length:4},async()=>{
     while(queue.length){
       const recipe=queue.shift();
+      if(recipe.imageLookupAt&&Date.now()-recipe.imageLookupAt<SOURCE_CACHE_TTL){
+        output.push(recipe);
+        continue;
+      }
       try{output.push(await commonsPhotoForRecipe(recipe));}
       catch(error){console.warn("Could not load a licensed food photo",recipe.name,error);output.push(recipe);}
     }
   });
   await Promise.all(workers);
-  return recipes.map(recipe=>output.find(item=>item.id===recipe.id)||recipe);
+  const result=recipes.map(recipe=>output.find(item=>item.id===recipe.id)||recipe);
+  if(indianRecipesCache) saveIndianRecipeCache(indianRecipesCache);
+  return result;
 }
 
 async function mapWithConcurrency(items,limit,worker){
