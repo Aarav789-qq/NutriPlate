@@ -2145,7 +2145,8 @@ function recipeIngredientMatches(userIngredient,recipeIngredient){
   const userWords=user.replace(/[-_/]+/g," ");
   const recipeWords=recipe.replace(/[-_/]+/g," ");
   if(userWords==="dal" && /\bdal\b/.test(recipeWords)) return true;
-  if(userWords==="rice" && /\brice\b/.test(recipeWords) && !/\brice (?:vinegar|flour|paper|wine)\b/.test(recipeWords)) return true;
+  if(userWords==="rice" && /\brice (?:vinegar|flour|paper|wine)\b/.test(recipeWords)) return false;
+  if(userWords==="rice" && /\brice\b/.test(recipeWords)) return true;
   if(userWords==="flour" && /\bflour\b/.test(recipeWords)) return true;
   if(userWords==="onion" && /\b(?:red|white|yellow|spring|green) onion\b/.test(recipeWords)) return true;
   if((userWords==="ginger"||userWords==="garlic") && /\bginger garlic paste\b/.test(recipeWords)) return true;
