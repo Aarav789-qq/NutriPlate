@@ -1862,6 +1862,7 @@ function saveIndianRecipeCache(recipes){
   }
 }
 const mealDetailsCache=new Map();
+const mealIngredientSearchCache=new Map();
 let indianRecipesCache=null;
 let indianRecipesPromise=null;
 
@@ -1877,6 +1878,13 @@ async function fetchMealList(url){
   if(!response.ok) throw new Error("Recipe service returned "+response.status);
   const data=await response.json();
   return Array.isArray(data.meals) ? data.meals : [];
+}
+
+async function mealsForIngredient(query){
+  if(mealIngredientSearchCache.has(query)) return mealIngredientSearchCache.get(query);
+  const meals=await fetchMealList(MEAL_API_ROOT+"/filter.php?i="+encodeURIComponent(query));
+  mealIngredientSearchCache.set(query,meals);
+  return meals;
 }
 
 function getMealDiet(ingredients){
@@ -2086,7 +2094,7 @@ async function recipesForIngredients(userIngredients,cuisine){
   const resultLists=await mapWithConcurrency(queryItems,4,async item=>{
     const query=mealApiIngredientQuery(item);
     if(!query) return [];
-    try{return await fetchMealList(MEAL_API_ROOT+"/filter.php?i="+encodeURIComponent(query));}
+    try{return await mealsForIngredient(query);}
     catch(error){console.warn("Recipe ingredient lookup failed",query,error);return [];}
   });
   const frequencies=new Map();
@@ -2098,7 +2106,13 @@ async function recipesForIngredients(userIngredients,cuisine){
   const globalRecipes=await loadMealDetails(ids);
   if(!includeIndian) return globalRecipes;
   const indian=await fetchIndianWikiRecipes();
-  const candidates=indian.filter(recipe=>matchingIngredients(recipe,userIngredients).length>0);
+  const candidates=indian.map(recipe=>{
+    const matched=matchingIngredients(recipe,userIngredients);
+    const required=Math.min(2,userIngredients.length,recipe.ingredients.length);
+    return {recipe,matched,missing:recipe.ingredients.length-matched.length,required};
+  }).filter(item=>item.matched.length>=item.required)
+    .sort((a,b)=>b.matched.length-a.matched.length||a.missing-b.missing)
+    .map(item=>item.recipe);
   if(cuisine==="Indian") return attachCommonsPhotos(candidates.slice(0,12));
   return [...globalRecipes,...await attachCommonsPhotos(candidates.slice(0,8))];
 }
