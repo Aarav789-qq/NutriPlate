@@ -1623,66 +1623,24 @@ const cuisineInfo = {
 ========================================================= */
 
 function normalizeIngredient(item){
-
   const aliases={
-    "rajma":"kidney bean",
-    "kidney beans":"kidney bean",
-    "red kidney beans":"kidney bean",
-    "chana":"chickpea",
-    "garbanzo":"chickpea",
-    "garbanzo beans":"chickpea",
-    "chickpeas":"chickpea",
-    "chapati":"roti",
-    "chapatti":"roti",
-    "green onion":"spring onion",
-    "green onions":"spring onion",
-    "spring onions":"spring onion",
-    "capsicum":"bell pepper",
-    "shimla mirch":"bell pepper",
-    "bell peppers":"bell pepper",
-    "dahi":"yogurt",
-    "curd":"yogurt",
-    "yoghurt":"yogurt",
-    "soya":"soy",
-    "soya chunks":"soy chunk",
-    "soy chunks":"soy chunk",
-    "tomatoes":"tomato",
-    "potatoes":"potato",
-    "onions":"onion",
-    "carrots":"carrot",
-    "apples":"apple",
-    "bananas":"banana",
-    "mangoes":"mango",
-    "mangos":"mango",
-    "beans":"bean",
-    "black beans":"bean",
-    "pinto beans":"bean",
-    "white beans":"bean",
-    "kidney beans":"kidney bean",
-    "red onion":"onion",
-    "red onions":"onion",
-    "brown rice":"rice",
-    "white rice":"rice",
-    "peas":"pea",
-    "lentils":"lentil",
-    "eggs":"egg"
+    rajma:"kidney bean","kidney beans":"kidney bean","red kidney beans":"kidney bean",
+    chana:"chickpea",garbanzo:"chickpea","garbanzo beans":"chickpea",chickpeas:"chickpea",
+    chapati:"roti",chapatti:"roti","green onion":"spring onion","green onions":"spring onion",
+    "spring onions":"spring onion",capsicum:"bell pepper","bell peppers":"bell pepper",
+    "shimla mirch":"bell pepper",dahi:"yogurt",curd:"yogurt",yoghurt:"yogurt",
+    soya:"soy","soya chunks":"soy chunk","soy chunks":"soy chunk",
+    tomatoes:"tomato",potatoes:"potato",onions:"onion",carrots:"carrot",
+    apples:"apple",bananas:"banana",mangoes:"mango",mangos:"mango",
+    beans:"bean","black beans":"bean","pinto beans":"bean","white beans":"bean",
+    "red onion":"onion","red onions":"onion","brown rice":"rice","white rice":"rice",
+    peas:"pea",lentils:"lentil",eggs:"egg"
   };
-
-  let value=String(item||"")
-    .trim()
-    .toLowerCase()
-    .replace(/_/g," ")
-    .replace(/\\s+/g," ");
-
-  const modifiers=/^(fresh|dried|ground|minced|chopped|diced|crushed|sliced|grated|shredded|boneless|skinless|large|small|whole|raw|cooked|frozen|canned)\\s+/;
-  while(modifiers.test(value)){
-    value=value.replace(modifiers,"");
-  }
-
+  let value=String(item||"").trim().toLowerCase().replace(/_/g," ").replace(/\s+/g," ");
+  const modifiers=/^(fresh|dried|ground|minced|chopped|diced|crushed|sliced|grated|shredded|boneless|skinless|large|small|whole|raw|cooked|frozen|canned)\s+/;
+  while(modifiers.test(value)) value=value.replace(modifiers,"");
   if(aliases[value]) return aliases[value];
-  if(value.length>4 && value.endsWith("s") && !value.endsWith("ss")){
-    value=value.slice(0,-1);
-  }
+  if(value.length>4 && value.endsWith("s") && !value.endsWith("ss")) value=value.slice(0,-1);
   return value;
 }
 
@@ -1911,17 +1869,19 @@ async function fetchMealList(url){
 
 function getMealDiet(ingredients){
   const text=ingredients.join(" ").toLowerCase();
-  if(/\b(chicken|beef|pork|lamb|mutton|turkey|duck|goose|fish|salmon|tuna|cod|prawn|shrimp|crab|lobster|clam|mussel|oyster|anchov|sardine|bacon|ham|sausage|chorizo|gelatin|lard|suet|meat|stock)\b/.test(text)){
+  if(/\b(chicken|beef|pork|lamb|mutton|turkey|duck|goose|fish|salmon|tuna|cod|prawn|shrimp|crab|lobster|clam|mussel|oyster|anchov|sardine|bacon|ham|sausage|chorizo|gelatin|gelatine|lard|suet|meat|worcestershire|rennet)\b/.test(text)){
     return "Non-Vegetarian";
   }
-  if(/\b(egg|eggs|mayonnaise)\b/.test(text)){
-    return "Egg Vegetarian";
+  if(/\b(stock|broth|bouillon)\b/.test(text) && !/\b(vegetable|mushroom)\s+(stock|broth)\b/.test(text)){
+    return "Diet not verified";
   }
-  if(/\b(milk|cream|cheese|butter|ghee|yogurt|yoghurt|paneer|curd|whey|honey|buttermilk)\b/.test(text)){
+  if(/\b(egg|eggs|mayonnaise|mayo)\b/.test(text)) return "Egg Vegetarian";
+  if(/\b(milk|cream|cheese|butter|ghee|yogurt|yoghurt|paneer|curd|whey|honey|buttermilk|parmesan|mozzarella|cheddar|feta|ricotta)\b/.test(text)){
     return "Vegetarian";
   }
   return "Vegan";
 }
+
 
 function areaCuisine(area){
   if(area==="South Korean"||area==="Korean") return "Korean";
@@ -1967,10 +1927,10 @@ function parseMealDbRecipe(meal){
     ingredients,
     needs:names,
     extra:[],
-    image:(meal.strMealThumb||"").replace(/^http:\\/\\//,"https:\\/\\/"),
+    image:(meal.strMealThumb||"").replace("http://","https://"),
     instructions,
     sourceUrl:"https://www.themealdb.com/meal/"+encodeURIComponent(meal.idMeal),
-    originalSource:/^https?:\\/\\//i.test(meal.strSource||"")?meal.strSource:""
+    originalSource:((meal.strSource||"").startsWith("https://")||(meal.strSource||"").startsWith("http://"))?meal.strSource:""
   };
 }
 
@@ -2024,7 +1984,7 @@ async function recipesForCuisine(cuisine){
 }
 
 function mealApiIngredientQuery(item){
-  const raw=String(item||"").trim().toLowerCase().replace(/_/g," ").replace(/\\s+/g," ");
+  const raw=String(item||"").trim().toLowerCase().replace(/_/g," ").replace(/\s+/g," ");
   const aliases={
     "rajma":"kidney_beans",
     "kidney bean":"kidney_beans",
@@ -2040,13 +2000,14 @@ function mealApiIngredientQuery(item){
     "pea":"peas",
     "soya":"soy"
   };
-  return aliases[raw]||raw.replace(/\\s+/g,"_");
+  return aliases[raw]||raw.replace(/\s+/g,"_");
 }
 
 function recipeIngredientMatches(userIngredient,recipeIngredient){
   const user=normalizeIngredient(userIngredient);
   const recipe=normalizeIngredient(recipeIngredient);
   if(user===recipe) return true;
+  if(user==="bean" && /\bbean\b/.test(recipe)) return true;
   return user.length>=4 && recipe.startsWith(user+" ") ||
          recipe.length>=4 && user.startsWith(recipe+" ");
 }
