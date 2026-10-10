@@ -1888,14 +1888,16 @@ async function mealsForIngredient(query){
 }
 
 function getMealDiet(ingredients){
-  const text=ingredients.join(" ").toLowerCase();
+  const text=ingredients.join(" ").toLowerCase()
+    .replace(/\b(?:coconut|oat|almond|soy|soya|rice|cashew|hemp|pea|macadamia|hazelnut)\s+(?:milk|cream|yogurt|yoghurt|cheese)\b/g,"")
+    .replace(/\b(?:vegan|plant[- ]based|dairy[- ]free)\s+(?:butter|cheese|cream|milk|mayo|mayonnaise|yogurt|yoghurt)\b/g,"")
+    .replace(/\bpeanut butter\b|\bcream of coconut\b/g,"");
   if(/\b(chicken|beef|pork|lamb|mutton|turkey|duck|goose|fish|salmon|tuna|cod|prawn|shrimp|crab|lobster|clam|mussel|oyster|anchov|sardine|bacon|ham|sausage|chorizo|gelatin|gelatine|lard|suet|meat|worcestershire|rennet)\b/.test(text)) return "Non-Vegetarian";
   if(/\b(stock|broth|bouillon)\b/.test(text) && !/\b(vegetable|mushroom)\s+(stock|broth)\b/.test(text)) return "Diet not verified";
   if(/\b(egg|eggs|mayonnaise|mayo)\b/.test(text)) return "Egg Vegetarian";
   if(/\b(milk|cream|cheese|butter|ghee|yogurt|yoghurt|paneer|curd|whey|honey|buttermilk|parmesan|mozzarella|cheddar|feta|ricotta)\b/.test(text)) return "Vegetarian";
   return "Vegan";
 }
-
 function areaCuisine(area){
   if(["South Korean","North Korean","Korean","South Korea","North Korea"].includes(area)) return "Korean";
   if(["United States","American"].includes(area)) return "American";
