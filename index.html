@@ -1633,11 +1633,11 @@ function normalizeIngredient(item){
     tomatoes:"tomato",potatoes:"potato",onions:"onion",carrots:"carrot",
     apples:"apple",bananas:"banana",mangoes:"mango",mangos:"mango",
     beans:"bean","black beans":"bean","pinto beans":"bean","white beans":"bean",
-    "red onion":"onion","red onions":"onion","brown rice":"rice","white rice":"rice",
+    "red onion":"onion","red onions":"onion","brown rice":"rice","white rice":"rice","basmati rice":"rice","dosa rice":"rice","idli rice":"rice",
     peas:"pea",lentils:"lentil",eggs:"egg"
   };
   let value=String(item||"").trim().toLowerCase().replace(/_/g," ").replace(/\s+/g," ");
-  const modifiers=/^(fresh|dried|ground|minced|chopped|diced|crushed|sliced|grated|shredded|boneless|skinless|large|small|whole|raw|cooked|frozen|canned)\s+/;
+  const modifiers=/^(fresh|dried|ground|minced|chopped|diced|crushed|sliced|grated|shredded|boneless|skinless|medium|large|small|whole|raw|cooked|frozen|canned)\\s+/;
   while(modifiers.test(value)) value=value.replace(modifiers,"");
   if(aliases[value]) return aliases[value];
   if(value.length>4 && value.endsWith("s") && !value.endsWith("ss")) value=value.slice(0,-1);
@@ -2142,6 +2142,13 @@ function recipeIngredientMatches(userIngredient,recipeIngredient){
   const recipe=normalizeIngredient(recipeIngredient);
   if(user===recipe) return true;
   if(user==="bean" && /\bbean\b/.test(recipe)) return true;
+  const userWords=user.replace(/[-_/]+/g," ");
+  const recipeWords=recipe.replace(/[-_/]+/g," ");
+  if(userWords==="dal" && /\bdal\b/.test(recipeWords)) return true;
+  if(userWords==="rice" && /\brice\b/.test(recipeWords) && !/\brice (?:vinegar|flour|paper|wine)\b/.test(recipeWords)) return true;
+  if(userWords==="flour" && /\bflour\b/.test(recipeWords)) return true;
+  if(userWords==="onion" && /\b(?:red|white|yellow|spring|green) onion\b/.test(recipeWords)) return true;
+  if((userWords==="ginger"||userWords==="garlic") && /\bginger garlic paste\b/.test(recipeWords)) return true;
   return user.length>=4 && recipe.startsWith(user+" ") ||
          recipe.length>=4 && user.startsWith(recipe+" ");
 }
