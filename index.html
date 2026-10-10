@@ -1854,8 +1854,8 @@ function mealAreas(cuisine){
     Italian:["Italian"],
     Japanese:["Japanese"],
     Thai:["Thai"],
-    American:["American"],
-    Mediterranean:["Greek","Turkish","Moroccan"]
+    American:["American","United States"],
+    Mediterranean:["Greek","Turkish","Moroccan","Tunisian","Lebanese","Israeli"]
   };
   return cuisine==="Any" ? Object.values(areas).flat() : (areas[cuisine]||[]);
 }
@@ -1884,14 +1884,15 @@ function getMealDiet(ingredients){
 
 
 function areaCuisine(area){
-  if(area==="South Korean"||area==="Korean") return "Korean";
-  if(area==="United States"||area==="American") return "American";
-  if(area==="India") return "Indian";
-  if(area==="Mexico") return "Mexican";
-  if(area==="Japan") return "Japanese";
-  if(area==="Thailand") return "Thai";
-  if(area==="China") return "Chinese";
-  if(["Greek","Turkish","Moroccan","Tunisian","Lebanese","Israeli"].includes(area)) return "Mediterranean";
+  if(["South Korean","North Korean","Korean","South Korea","North Korea"].includes(area)) return "Korean";
+  if(["United States","American"].includes(area)) return "American";
+  if(["India","Indian"].includes(area)) return "Indian";
+  if(["Mexico","Mexican"].includes(area)) return "Mexican";
+  if(["Japan","Japanese"].includes(area)) return "Japanese";
+  if(["Thailand","Thai"].includes(area)) return "Thai";
+  if(["China","Chinese"].includes(area)) return "Chinese";
+  if(["Italy","Italian"].includes(area)) return "Italian";
+  if(["Greece","Greek","Turkey","Turkish","Morocco","Moroccan","Tunisia","Tunisian","Lebanon","Lebanese","Israel","Israeli"].includes(area)) return "Mediterranean";
   return area;
 }
 
