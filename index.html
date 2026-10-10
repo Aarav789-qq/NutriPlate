@@ -2116,8 +2116,8 @@ function plannerRecipeCard(r,matched,optional,missing){
         <span>🥗 ${escapeHTML(r.diet)}</span>
         <span>🍽️ ${escapeHTML(r.meal==="Main"?"Main meal":r.meal)}</span>
       </div>
-      <p><b>✅ You have:</b> ${matched.length?matched.map(escapeHTML).join(", "):"No matching ingredients"}</p>
-      ${missing.length?`<p><b>🛒 Also needed:</b> ${missing.map(escapeHTML).join(", ")}</p>`:""}
+      ${matched===null?"":`<p><b>✅ You have:</b> ${matched.length?matched.map(escapeHTML).join(", "):"No matching ingredients"}</p>`}
+      ${missing&&missing.length?`<p><b>🛒 Also needed:</b> ${missing.map(escapeHTML).join(", ")}</p>`:""}
       <details class="recipe-details">
         <summary>Ingredients and cooking steps</summary>
         <ul>
@@ -2221,7 +2221,7 @@ async function showCuisine(name,button){
       <div class="card">
         <h2>${selected==="Any"?"🌍 World Food Collection":(cuisineInfo[selected]?.emoji||"🌍")+" "+escapeHTML(selected)+" Cuisine"}</h2>
         <p class="counter">Real recipes with ingredients, cooking steps, and photos from TheMealDB.</p>
-        <div class="grid">${recipes.map(recipe=>plannerRecipeCard(recipe,[],[],recipe.ingredients.map(item=>item.name))).join("")}</div>
+        <div class="grid">${recipes.map(recipe=>plannerRecipeCard(recipe,null,null,null)).join("")}</div>
       </div>`;
   }catch(error){
     console.error(error);
