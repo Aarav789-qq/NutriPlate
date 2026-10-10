@@ -949,7 +949,7 @@ footer{
   <h2 class="section-title" data-i18n="worldTitle">🌎 Explore the World of Food</h2>
 
   <p class="section-sub" data-i18n="worldSub">
-    Every cuisine below contains 50 dishes with their ingredient lists.
+    Browse cuisines and see each recipe’s listed ingredients.
   </p>
 
   <div id="cuisineCards" class="grid small-grid"></div>
@@ -1924,366 +1924,7 @@ const baseRecipes=[
 ];
 
 
-/* =========================================================
-   EXPAND RECIPE DATABASE TO 50 DISHES PER CUISINE
-========================================================= */
-
-const dishNameBanks={
-
-Indian:[
-"Dal Tadka","Rajma Rice","Chole Masala","Paneer Tikka","Aloo Gobi",
-"Palak Paneer","Matar Paneer","Vegetable Korma","Kadhi Rice","Dal Makhani",
-"Moong Dal Khichdi","Masala Dosa","Idli Sambar","Vegetable Uttapam","Poha",
-"Upma","Besan Chilla","Moong Chilla","Aloo Paratha","Gobi Paratha",
-"Paneer Paratha","Vegetable Paratha","Pav Bhaji","Bhel Puri","Sev Puri",
-"Chana Chaat","Sprout Chaat","Dahi Puri","Samosa","Kachori",
-"Vegetable Biryani","Jeera Rice","Lemon Rice","Curd Rice","Tamarind Rice",
-"Vegetable Fried Rice","Masala Rice","Tawa Pulao","Veg Pulao","Vegetable Kofta",
-"Baingan Bharta","Bhindi Masala","Lauki Dal","Palak Dal","Aloo Matar",
-"Mixed Vegetable Curry","Chana Masala","Rajma Masala","Tofu Masala","Soy Chunk Curry"
-],
-
-Korean:[
-"Bibimbap","Japchae","Kimchi Rice Bowl","Korean Tofu Bowl","Korean Potato Pancake",
-"Vegetable Pajeon","Korean Mushroom Rice","Korean Bean Bowl","Korean Noodle Bowl","Vegetable Kimbap",
-"Tofu Kimbap","Cucumber Rice Bowl","Carrot Rice Bowl","Spinach Rice Bowl","Mushroom Japchae",
-"Vegetable Japchae","Tofu Japchae","Korean Vegetable Soup","Bean Sprout Soup","Mushroom Soup",
-"Korean Potato Bowl","Korean Vegetable Bowl","Sesame Tofu Bowl","Spicy Tofu Rice","Vegetable Tteokbokki",
-"Rice Cake Vegetable Bowl","Korean Corn Bowl","Korean Cabbage Bowl","Korean Pepper Rice","Korean Pumpkin Bowl",
-"Korean Sweet Potato Bowl","Korean Bean Noodles","Korean Vegetable Noodles","Korean Rice Noodles","Korean Roti Wrap",
-"Korean Veggie Wrap","Korean Tofu Wrap","Korean Potato Wrap","Korean Mushroom Wrap","Korean Vegetable Pancake",
-"Korean Spinach Bowl","Korean Carrot Bowl","Korean Cucumber Bowl","Korean Sesame Rice","Korean Soy Tofu",
-"Korean Vegetable Stir Fry","Korean Bean Stir Fry","Korean Mushroom Stir Fry","Korean Potato Stir Fry","Korean Mixed Vegetable Bowl"
-],
-
-Mexican:[
-"Bean Burrito","Veggie Tacos","Bean Quesadilla","Mexican Rice Bowl","Bean Nachos",
-"Mexican Veggie Wrap","Guacamole Bowl","Mexican Bean Salad","Veggie Fajita Bowl","Potato Tacos",
-"Bean Tostada","Veggie Enchiladas","Bean Enchiladas","Mexican Corn Bowl","Black Bean Bowl",
-"Refried Bean Bowl","Mexican Potato Bowl","Mexican Lentil Bowl","Mexican Chickpea Bowl","Mexican Rice Wrap",
-"Bean Tortilla Wrap","Veggie Tortilla Wrap","Corn Bean Salad","Tomato Bean Salad","Avocado Bean Bowl",
-"Mexican Pasta Bowl","Mexican Vegetable Pasta","Mexican Rice Salad","Mexican Potato Salad","Mexican Vegetable Soup",
-"Bean Vegetable Soup","Mexican Tomato Rice","Mexican Pepper Rice","Mexican Corn Rice","Mexican Bean Rice",
-"Veggie Taco Bowl","Bean Taco Bowl","Avocado Taco Bowl","Potato Taco Bowl","Mexican Veggie Bowl",
-"Bean Fajita Wrap","Vegetable Fajita Wrap","Mexican Tofu Bowl","Mexican Paneer Bowl","Mexican Tofu Tacos",
-"Mexican Paneer Tacos","Mexican Veggie Nachos","Bean Corn Nachos","Mexican Vegetable Plate","Mexican Rice Plate"
-],
-
-Chinese:[
-"Vegetable Fried Rice","Hakka Noodles","Vegetable Stir Fry","Chilli Paneer","Chinese Rice Bowl",
-"Vegetable Chow Mein","Tofu Stir Fry","Vegetable Spring Rolls","Mushroom Fried Rice","Corn Vegetable Rice",
-"Tofu Fried Rice","Mushroom Noodles","Vegetable Noodles","Cabbage Noodles","Carrot Noodles",
-"Pepper Rice","Chinese Bean Bowl","Chinese Tofu Bowl","Chinese Mushroom Bowl","Chinese Vegetable Bowl",
-"Vegetable Dumplings","Tofu Dumplings","Mushroom Dumplings","Cabbage Dumplings","Mixed Vegetable Dumplings",
-"Vegetable Manchurian","Tofu Manchurian","Gobi Manchurian","Paneer Manchurian","Bean Manchurian",
-"Vegetable Soup","Tofu Soup","Mushroom Soup","Corn Soup","Hot Vegetable Soup",
-"Chinese Potato Bowl","Chinese Corn Bowl","Chinese Pepper Bowl","Chinese Egg Rice","Vegetable Egg Rice",
-"Chinese Paneer Rice","Chinese Tofu Rice","Chinese Bean Rice","Chinese Mushroom Rice","Chinese Vegetable Rice",
-"Chinese Stir Fry Noodles","Chinese Tofu Noodles","Chinese Mushroom Noodles","Chinese Vegetable Plate","Chinese Rice Plate"
-],
-
-Italian:[
-"Tomato Pasta","Bean Tomato Pasta","Vegetable Pasta","Margherita Pizza","Vegetable Pizza",
-"Garlic Bread","Pasta Primavera","Mushroom Pasta","Italian Bean Bowl","Vegetable Risotto",
-"Tomato Risotto","Mushroom Risotto","Vegetable Lasagna","Spinach Lasagna","Cheese Lasagna",
-"Tomato Bruschetta","Mushroom Bruschetta","Vegetable Bruschetta","Bean Bruschetta","Caprese Salad",
-"Garden Pasta","Garlic Pasta","Pepper Pasta","Spinach Pasta","Broccoli Pasta",
-"Tomato Bean Pasta","Creamy Vegetable Pasta","Italian Vegetable Bowl","Italian Rice Bowl","Italian Lentil Bowl",
-"Vegetable Minestrone","Bean Minestrone","Tomato Soup","Mushroom Soup","Vegetable Soup",
-"Cheese Ravioli","Spinach Ravioli","Mushroom Ravioli","Vegetable Ravioli","Bean Pasta Bowl",
-"Olive Vegetable Pasta","Basil Tomato Pasta","Roasted Vegetable Pasta","Italian Tofu Bowl","Italian Paneer Bowl",
-"Vegetable Gnocchi","Tomato Gnocchi","Mushroom Gnocchi","Italian Bean Plate","Italian Vegetable Plate"
-],
-
-Japanese:[
-"Vegetable Sushi","Japanese Rice Bowl","Yakisoba Vegetable Noodles","Japanese Vegetable Curry","Tofu Rice Bowl",
-"Edamame Rice Bowl","Japanese Potato Bowl","Vegetable Noodle Soup","Cucumber Rice Roll","Mushroom Rice Bowl",
-"Tofu Sushi","Avocado Sushi","Carrot Sushi","Cucumber Sushi","Vegetable Kimbap",
-"Japanese Tofu Bowl","Japanese Mushroom Bowl","Japanese Vegetable Bowl","Japanese Bean Bowl","Japanese Corn Bowl",
-"Vegetable Udon","Tofu Udon","Mushroom Udon","Vegetable Soba","Tofu Soba",
-"Mushroom Soba","Japanese Fried Rice","Vegetable Fried Rice","Tofu Fried Rice","Mushroom Fried Rice",
-"Japanese Potato Curry","Japanese Tofu Curry","Japanese Vegetable Curry Bowl","Japanese Pumpkin Bowl","Japanese Sweet Potato Bowl",
-"Japanese Spinach Bowl","Japanese Carrot Bowl","Japanese Cucumber Bowl","Japanese Sesame Bowl","Japanese Noodle Bowl",
-"Japanese Tofu Noodles","Japanese Mushroom Noodles","Japanese Vegetable Noodles","Japanese Rice Plate","Japanese Tofu Plate",
-"Japanese Vegetable Plate","Japanese Mushroom Plate","Japanese Bean Plate","Japanese Avocado Bowl","Japanese Mixed Vegetable Bowl"
-],
-
-Thai:[
-"Thai Vegetable Rice Bowl","Thai Tofu Bowl","Thai Vegetable Noodles","Thai Green Vegetable Curry","Thai Bean Rice Bowl",
-"Thai Vegetable Soup","Thai Mango Rice Bowl","Thai Peanut Noodles","Thai Basil Tofu","Thai Vegetable Fried Rice",
-"Thai Coconut Rice","Thai Coconut Noodles","Thai Vegetable Curry","Thai Tofu Curry","Thai Mushroom Curry",
-"Thai Potato Curry","Thai Pumpkin Curry","Thai Lentil Curry","Thai Chickpea Curry","Thai Bean Curry",
-"Thai Vegetable Stir Fry","Thai Tofu Stir Fry","Thai Mushroom Stir Fry","Thai Pepper Stir Fry","Thai Basil Vegetables",
-"Thai Corn Bowl","Thai Bean Bowl","Thai Mushroom Bowl","Thai Tofu Noodles","Thai Vegetable Noodle Bowl",
-"Thai Rice Noodles","Thai Coconut Soup","Thai Tofu Soup","Thai Mushroom Soup","Thai Vegetable Soup Bowl",
-"Thai Mango Bowl","Thai Pineapple Rice","Thai Vegetable Rice","Thai Tofu Rice","Thai Bean Noodles",
-"Thai Peanut Rice","Thai Peanut Bowl","Thai Vegetable Wrap","Thai Tofu Wrap","Thai Bean Wrap",
-"Thai Vegetable Plate","Thai Tofu Plate","Thai Mushroom Plate","Thai Rice Plate","Thai Mixed Vegetable Bowl"
-],
-
-American:[
-"Bean Veggie Wrap","Vegetable Sandwich","Bean Burger","Veggie Burger","Loaded Potato Bowl",
-"Peanut Butter Toast","Vegetable Pasta Bowl","Bean Rice Bowl","Veggie Breakfast Burrito","Corn Bean Salad",
-"Grilled Vegetable Sandwich","Cheese Vegetable Sandwich","Bean Sandwich","Tofu Sandwich","Veggie Wrap",
-"Tofu Wrap","Bean Wrap","Potato Wrap","Avocado Toast","Tomato Toast",
-"Vegetable Toast","Peanut Banana Toast","Bean Burrito Bowl","Veggie Burrito Bowl","Rice Bean Bowl",
-"American Vegetable Bowl","American Tofu Bowl","American Bean Bowl","American Potato Bowl","American Corn Bowl",
-"Vegetable Pasta","Tomato Pasta","Bean Pasta","Cheese Pasta","Mushroom Pasta",
-"Vegetable Soup","Tomato Soup","Bean Soup","Potato Soup","Corn Soup",
-"Veggie Pizza","Cheese Pizza","Mushroom Pizza","Vegetable Flatbread","Bean Flatbread",
-"Tofu Rice Bowl","American Lentil Bowl","American Chickpea Bowl","American Vegetable Plate","American Bean Plate"
-],
-
-Mediterranean:[
-"Mediterranean Bean Bowl","Hummus Rice Bowl","Falafel Wrap","Greek Vegetable Bowl","Mediterranean Lentil Bowl",
-"Chickpea Salad","Vegetable Couscous","Mediterranean Rice Plate","Paneer Mediterranean Bowl","Lentil Vegetable Soup",
-"Hummus Wrap","Falafel Bowl","Falafel Plate","Chickpea Bowl","Lentil Bowl",
-"Greek Salad","Greek Bean Salad","Greek Rice Bowl","Greek Vegetable Rice","Greek Tofu Bowl",
-"Mediterranean Tofu Bowl","Mediterranean Bean Salad","Mediterranean Tomato Salad","Mediterranean Cucumber Bowl","Mediterranean Pepper Bowl",
-"Vegetable Couscous Bowl","Chickpea Couscous","Lentil Couscous","Bean Couscous","Tofu Couscous",
-"Mediterranean Vegetable Soup","Chickpea Soup","Lentil Soup","Bean Soup","Tomato Soup",
-"Vegetable Hummus Plate","Falafel Hummus Plate","Paneer Hummus Bowl","Tofu Hummus Bowl","Bean Hummus Bowl",
-"Mediterranean Potato Bowl","Mediterranean Sweet Potato Bowl","Mediterranean Rice Bowl","Mediterranean Grain Bowl","Mediterranean Vegetable Bowl",
-"Mediterranean Bean Plate","Mediterranean Lentil Plate","Mediterranean Chickpea Plate","Mediterranean Tofu Plate","Mediterranean Mixed Vegetable Plate"
-]
-};
-
-
-/* =========================================================
-   GENERIC INGREDIENT PROFILES
-   Every generated dish gets a visible ingredient list.
-========================================================= */
-
-const profiles={
-
-Indian:[
-["rice","dal","tomato","onion"],
-["roti","potato","onion","tomato"],
-["rice","beans","tomato","onion"],
-["paneer","tomato","onion","pepper"],
-["chickpeas","tomato","onion","cucumber"],
-["rice","peas","carrot","beans"],
-["poha","onion","peanuts","lemon"],
-["flour","potato","onion","curd"],
-["spinach","paneer","tomato","onion"],
-["rice","vegetables","beans","peas"]
-],
-
-Korean:[
-["rice","spinach","carrot","cucumber"],
-["noodles","onion","carrot","cabbage"],
-["tofu","rice","cucumber","carrot"],
-["beans","rice","onion","carrot"],
-["potato","flour","onion","pepper"],
-["mushroom","rice","onion","carrot"],
-["cucumber","rice","sesame","carrot"],
-["tofu","noodles","onion","spinach"],
-["rice","beans","cucumber","tomato"],
-["vegetables","rice","onion","pepper"]
-],
-
-Mexican:[
-["beans","rice","tomato","onion"],
-["tortilla","beans","tomato","pepper"],
-["rice","corn","beans","avocado"],
-["potato","tortilla","tomato","onion"],
-["beans","corn","cheese","tomato"],
-["rice","pepper","onion","beans"],
-["chickpeas","tomato","cucumber","corn"],
-["avocado","tomato","onion","lime"],
-["roti","beans","tomato","cucumber"],
-["tofu","rice","pepper","onion"]
-],
-
-Chinese:[
-["rice","onion","carrot","pepper"],
-["noodles","onion","carrot","cabbage"],
-["tofu","pepper","onion","mushroom"],
-["rice","mushroom","onion","carrot"],
-["cabbage","carrot","flour","onion"],
-["beans","rice","carrot","pepper"],
-["corn","rice","carrot","onion"],
-["paneer","pepper","onion","rice"],
-["vegetables","noodles","onion","carrot"],
-["potato","pepper","onion","rice"]
-],
-
-Italian:[
-["pasta","tomato","onion","garlic"],
-["pasta","beans","tomato","onion"],
-["flour","tomato","cheese","basil"],
-["rice","mushroom","onion","cheese"],
-["bread","tomato","basil","olive oil"],
-["vegetables","pasta","tomato","pepper"],
-["lasagna sheets","tomato","cheese","spinach"],
-["rice","vegetables","peas","cheese"],
-["lentils","tomato","carrot","onion"],
-["potato","flour","tomato","cheese"]
-],
-
-Japanese:[
-["rice","cucumber","carrot","avocado"],
-["rice","tofu","mushroom","onion"],
-["noodles","cabbage","carrot","onion"],
-["rice","potato","carrot","onion"],
-["tofu","rice","cucumber","sesame"],
-["edamame","rice","carrot","cucumber"],
-["mushroom","rice","tofu","onion"],
-["rice","spinach","carrot","sesame"],
-["noodles","tofu","mushroom","onion"],
-["potato","rice","vegetables","tofu"]
-],
-
-Thai:[
-["rice","pepper","onion","carrot"],
-["tofu","rice","pepper","onion"],
-["noodles","carrot","beans","onion"],
-["coconut milk","vegetables","tofu","rice"],
-["beans","rice","tomato","onion"],
-["mushroom","tofu","onion","pepper"],
-["mango","rice","coconut","peanuts"],
-["noodles","peanuts","carrot","pepper"],
-["tofu","basil","pepper","rice"],
-["rice","corn","beans","vegetables"]
-],
-
-American:[
-["bread","tomato","cucumber","cheese"],
-["beans","bread","tomato","onion"],
-["potato","beans","cheese","tomato"],
-["rice","beans","corn","tomato"],
-["bread","peanut butter","banana","apple"],
-["pasta","tomato","beans","cheese"],
-["roti","beans","tomato","cucumber"],
-["avocado","bread","tomato","onion"],
-["rice","tofu","vegetables","beans"],
-["corn","beans","cucumber","tomato"]
-],
-
-Mediterranean:[
-["beans","cucumber","tomato","onion"],
-["chickpeas","rice","cucumber","tomato"],
-["chickpeas","roti","tomato","cucumber"],
-["lentils","tomato","carrot","onion"],
-["couscous","vegetables","chickpeas","onion"],
-["rice","beans","tomato","cucumber"],
-["tofu","cucumber","tomato","olive oil"],
-["paneer","cucumber","tomato","onion"],
-["potato","chickpeas","tomato","cucumber"],
-["lentils","carrot","tomato","spinach"]
-]
-
-};
-
-
-/* =========================================================
-   DIET DETECTION
-========================================================= */
-
-function detectDiet(name){
-
-  const n=name.toLowerCase();
-
-  if(
-    n.includes("chicken") ||
-    n.includes("fish") ||
-    n.includes("meat") ||
-    n.includes("prawn") ||
-    n.includes("shrimp") ||
-    n.includes("mutton")
-  ){
-    return "Non-Vegetarian";
-  }
-
-  if(n.includes("egg")){
-    return "Egg Vegetarian";
-  }
-
-  if(
-    n.includes("paneer") ||
-    n.includes("cheese") ||
-    n.includes("curd") ||
-    n.includes("yogurt") ||
-    n.includes("milk")
-  ){
-    return "Vegetarian";
-  }
-
-  return "Vegan";
-}
-
-
-/* =========================================================
-   BUILD COMPLETE 50-DISH CUISINE DATABASE
-========================================================= */
-
 const allRecipes=[...baseRecipes];
-
-Object.keys(dishNameBanks).forEach(cuisine=>{
-
-  const existing=allRecipes.filter(r=>r.cuisine===cuisine);
-
-  const names=dishNameBanks[cuisine];
-
-  names.forEach((name,index)=>{
-
-    if(
-      existing.some(
-        r=>r.name.toLowerCase()===name.toLowerCase()
-      )
-    ){
-      return;
-    }
-
-    const profile=
-      profiles[cuisine][
-        index % profiles[cuisine].length
-      ];
-
-    const diet=detectDiet(name);
-
-    let meal="Lunch";
-
-    const n=name.toLowerCase();
-
-    if(
-      n.includes("breakfast") ||
-      n.includes("toast") ||
-      n.includes("pancake") ||
-      n.includes("poha") ||
-      n.includes("upma")
-    ){
-      meal="Breakfast";
-    }
-    else if(
-      n.includes("snack") ||
-      n.includes("chaat") ||
-      n.includes("nachos") ||
-      n.includes("salad")
-    ){
-      meal="Snack";
-    }
-    else if(
-      n.includes("pasta") ||
-      n.includes("curry") ||
-      n.includes("soup") ||
-      n.includes("noodle")
-    ){
-      meal="Dinner";
-    }
-
-    allRecipes.push({
-      name,
-      cuisine,
-      diet,
-      meal,
-      needs:profile.slice(0,3),
-      extra:profile.slice(3)
-    });
-
-  });
-
-});
 
 
 /* =========================================================
@@ -2292,30 +1933,9 @@ Object.keys(dishNameBanks).forEach(cuisine=>{
 
 function dietCompatible(recipeDiet,userDiet){
 
-  if(userDiet==="Non-Vegetarian"){
-    return true;
-  }
-
-  if(userDiet==="Egg Vegetarian"){
-    return (
-      recipeDiet==="Vegan" ||
-      recipeDiet==="Vegetarian" ||
-      recipeDiet==="Egg Vegetarian"
-    );
-  }
-
-  if(userDiet==="Vegetarian"){
-    return (
-      recipeDiet==="Vegan" ||
-      recipeDiet==="Vegetarian"
-    );
-  }
-
-  if(userDiet==="Vegan"){
-    return recipeDiet==="Vegan";
-  }
-
-  return true;
+  // The selected category is an exact filter. This prevents vegan,
+  // vegetarian, egg-vegetarian, and non-vegetarian labels from mixing.
+  return recipeDiet===userDiet;
 }
 
 
@@ -2403,16 +2023,12 @@ function findMeals(){
   });
 
 
-  const strong=
-    ranked
-      .filter(x=>x.matched.length>0)
-      .slice(0,12);
-
-
+  // Require at least two core ingredients for a recommendation.
+  // Recipes with only one coincidental match are not presented as matches.
   const matches=
-    strong.length
-      ? strong
-      : ranked.slice(0,12);
+    ranked
+      .filter(x=>x.matched.length>=Math.min(2,x.recipe.needs.length))
+      .slice(0,12);
 
 
   if(matches.length===0){
@@ -2647,7 +2263,7 @@ function showCuisine(name,button){
       <p class="counter">
         ${name==="All"
           ? "Explore dishes from every NutriPlate cuisine."
-          : "50 dishes with their ingredient lists."
+          : `${list.length} recipes with their listed ingredients.`
         }
       </p>
 
