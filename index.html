@@ -1839,25 +1839,17 @@ function languageSpeechCode(lang){
 
 
 const MEAL_API_ROOT="https://www.themealdb.com/api/json/v1/1";
+const WIKIBOOKS_API="https://en.wikibooks.org/w/api.php";
+const COMMONS_API="https://commons.wikimedia.org/w/api.php";
 const mealDetailsCache=new Map();
+let indianRecipesCache=null;
+let indianRecipesPromise=null;
 
-function dietCompatible(recipeDiet,userDiet){
-  return recipeDiet===userDiet;
-}
+function dietCompatible(recipeDiet,userDiet){ return recipeDiet===userDiet; }
 
 function mealAreas(cuisine){
-  const areas={
-    Indian:["Indian"],
-    Korean:["South Korean"],
-    Mexican:["Mexican"],
-    Chinese:["Chinese"],
-    Italian:["Italian"],
-    Japanese:["Japanese"],
-    Thai:["Thai"],
-    American:["American","United States"],
-    Mediterranean:["Greek","Turkish","Moroccan","Tunisian","Lebanese","Israeli"]
-  };
-  return cuisine==="Any" ? Object.values(areas).flat() : (areas[cuisine]||[]);
+  const areas={Indian:[],Korean:["South Korean"],Mexican:["Mexican"],Chinese:["Chinese"],Italian:["Italian"],Japanese:["Japanese"],Thai:["Thai"],American:["American","United States"],Mediterranean:["Greek","Turkish","Moroccan","Tunisian","Lebanese","Israeli"]};
+  return cuisine==="Any" ? Object.entries(areas).filter(([key])=>key!=="Indian").flatMap(([,values])=>values) : (areas[cuisine]||[]);
 }
 
 async function fetchMealList(url){
@@ -1869,19 +1861,12 @@ async function fetchMealList(url){
 
 function getMealDiet(ingredients){
   const text=ingredients.join(" ").toLowerCase();
-  if(/\b(chicken|beef|pork|lamb|mutton|turkey|duck|goose|fish|salmon|tuna|cod|prawn|shrimp|crab|lobster|clam|mussel|oyster|anchov|sardine|bacon|ham|sausage|chorizo|gelatin|gelatine|lard|suet|meat|worcestershire|rennet)\b/.test(text)){
-    return "Non-Vegetarian";
-  }
-  if(/\b(stock|broth|bouillon)\b/.test(text) && !/\b(vegetable|mushroom)\s+(stock|broth)\b/.test(text)){
-    return "Diet not verified";
-  }
+  if(/\b(chicken|beef|pork|lamb|mutton|turkey|duck|goose|fish|salmon|tuna|cod|prawn|shrimp|crab|lobster|clam|mussel|oyster|anchov|sardine|bacon|ham|sausage|chorizo|gelatin|gelatine|lard|suet|meat|worcestershire|rennet)\b/.test(text)) return "Non-Vegetarian";
+  if(/\b(stock|broth|bouillon)\b/.test(text) && !/\b(vegetable|mushroom)\s+(stock|broth)\b/.test(text)) return "Diet not verified";
   if(/\b(egg|eggs|mayonnaise|mayo)\b/.test(text)) return "Egg Vegetarian";
-  if(/\b(milk|cream|cheese|butter|ghee|yogurt|yoghurt|paneer|curd|whey|honey|buttermilk|parmesan|mozzarella|cheddar|feta|ricotta)\b/.test(text)){
-    return "Vegetarian";
-  }
+  if(/\b(milk|cream|cheese|butter|ghee|yogurt|yoghurt|paneer|curd|whey|honey|buttermilk|parmesan|mozzarella|cheddar|feta|ricotta)\b/.test(text)) return "Vegetarian";
   return "Vegan";
 }
-
 
 function areaCuisine(area){
   if(["South Korean","North Korean","Korean","South Korea","North Korea"].includes(area)) return "Korean";
@@ -1908,31 +1893,12 @@ function parseMealDbRecipe(meal){
   for(let i=1;i<=20;i++){
     const name=(meal["strIngredient"+i]||"").trim();
     if(!name) continue;
-    const measure=(meal["strMeasure"+i]||"").trim();
-    ingredients.push({name,measure});
+    ingredients.push({name,measure:(meal["strMeasure"+i]||"").trim()});
   }
   const instructionText=(meal.strInstructions||"").replace(/\r/g,"").trim();
-  const instructions=instructionText
-    .split(/\n+|(?<=[.!?])\s+(?=[A-Z0-9])/)
-    .map(step=>step.trim())
-    .filter(Boolean);
+  const instructions=instructionText.split(/\n+|(?<=[.!?])\s+(?=[A-Z0-9])/).map(step=>step.trim()).filter(Boolean);
   const names=ingredients.map(item=>item.name);
-  return{
-    id:meal.idMeal,
-    name:meal.strMeal||"Untitled recipe",
-    cuisine:areaCuisine(meal.strArea||meal.strCountry||"International"),
-    area:meal.strArea||meal.strCountry||"International",
-    category:meal.strCategory||"Main",
-    meal:mealTypeFromCategory(meal.strCategory),
-    diet:getMealDiet(names),
-    ingredients,
-    needs:names,
-    extra:[],
-    image:(meal.strMealThumb||"").replace("http://","https://"),
-    instructions,
-    sourceUrl:"https://www.themealdb.com/meal/"+encodeURIComponent(meal.idMeal),
-    originalSource:((meal.strSource||"").startsWith("https://")||(meal.strSource||"").startsWith("http://"))?meal.strSource:""
-  };
+  return {id:meal.idMeal,name:meal.strMeal||"Untitled recipe",cuisine:areaCuisine(meal.strArea||meal.strCountry||"International"),area:meal.strArea||meal.strCountry||"International",category:meal.strCategory||"Main",meal:mealTypeFromCategory(meal.strCategory),diet:getMealDiet(names),ingredients,needs:names,extra:[],image:(meal.strMealThumb||"").replace("http://","https://"),imagePage:"https://www.themealdb.com/",imageCredit:"TheMealDB",imageLicenseUrl:"",instructions,sourceUrl:"https://www.themealdb.com/meal/"+encodeURIComponent(meal.idMeal),originalSource:((meal.strSource||"").startsWith("https://")||(meal.strSource||"").startsWith("http://"))?meal.strSource:"",attribution:"TheMealDB"};
 }
 
 async function loadMealDetails(ids){
@@ -1945,61 +1911,150 @@ async function loadMealDetails(ids){
       const recipe=parseMealDbRecipe(meals[0]);
       mealDetailsCache.set(id,recipe);
       return recipe;
-    }catch(error){
-      console.warn("Could not load recipe details",id,error);
-      return null;
-    }
+    }catch(error){ console.warn("Could not load recipe details",id,error); return null; }
   })).then(items=>items.filter(Boolean));
 }
 
-async function recipesForIngredients(userIngredients){
-  const queries=[...new Set(userIngredients)].slice(0,2);
-  const resultLists=await Promise.all(queries.map(async item=>{
-    const query=normalizeIngredient(item).replace(/\s+/g,"_");
+function wikiPageUrl(title){ return "https://en.wikibooks.org/wiki/"+encodeURIComponent(title.replace(/ /g,"_")); }
+
+function cleanText(value){
+  const element=document.createElement("div");
+  element.innerHTML=String(value||"");
+  return (element.textContent||"").replace(/\s+/g," ").trim();
+}
+
+function wikiSectionLines(text,heading){
+  const match=new RegExp("(?:^|\\n)\\s*"+heading+"\\s*\\n","i").exec(text);
+  if(!match) return [];
+  const tail=text.slice(match.index+match[0].length);
+  const stop=/\n(?:Procedure|Directions|Method|Notes(?:, tips, and variations)?|See also|References|External links)\s*\n/i.exec(tail);
+  const section=stop?tail.slice(0,stop.index):tail;
+  return section.split("\n").map(line=>line.replace(/^\s*(?:[*•·]+|[-–—]+)\s*/,"").replace(/^\s*\d+[.)]\s*/,"").trim()).filter(line=>line.length>2);
+}
+
+function parseWikiRecipe(title,extract){
+  const ingredientLines=wikiSectionLines(extract,"Ingredients");
+  const instructionLines=wikiSectionLines(extract,"Procedure");
+  if(ingredientLines.length<3||instructionLines.length<2) return null;
+  const ingredients=ingredientLines.filter(line=>!/^edit\b/i.test(line)&&!/^image$/i.test(line)).map(line=>{
+    const measureMatch=line.match(/^\s*((?:\d+\s+)?(?:\d+\/\d+|[¼½¾⅓⅔⅛⅜⅝⅞])?\s*(?:kg|g|mg|ml|l|cups?|tablespoons?|tbsp|teaspoons?|tsp|ounces?|oz|pounds?|lb|pinches?|cloves?|pieces?)?\s*)/i);
+    let name=line.replace(/^\s*(?:\d+\s+)?(?:\d+\/\d+|[¼½¾⅓⅔⅛⅜⅝⅞])?\s*(?:kg|g|mg|ml|l|cups?|tablespoons?|tbsp|teaspoons?|tsp|ounces?|oz|pounds?|lb|pinches?|cloves?|pieces?)?\s*/i,"");
+    name=name.replace(/^\([^)]*\)\s*/,"").replace(/,?\s*(?:finely[- ]?)?(?:chopped|diced|minced|sliced|grated|crushed|ground|to taste|for garnish|for cooking).*$/i,"").trim();
+    return {name:name||line,measure:measureMatch?measureMatch[1].trim():""};
+  });
+  if(ingredients.length<3) return null;
+  const name=title.replace(/^Cookbook:/,"").replace(/_/g," ").replace(/\s+(?:I{1,3}|IV|V)$/,"");
+  const category=/(breakfast|dosa|idli|pancake|poha|upma)/i.test(name)?"Breakfast":/(dessert|kheer|halwa|sweet|rasmalai|ladoo|payasam)/i.test(name)?"Dessert":/(snack|samosa|vada|puri|pakora|chaat)/i.test(name)?"Snack":"Main";
+  const sourceUrl=wikiPageUrl(title);
+  return {id:"wikibooks-"+title.toLowerCase().replace(/[^a-z0-9]+/g,"-"),name,cuisine:"Indian",area:"Indian",category,meal:category==="Breakfast"?"Breakfast":category==="Snack"||category==="Dessert"?"Snack":"Main",diet:getMealDiet(ingredients.map(item=>item.name)),ingredients,needs:ingredients.map(item=>item.name),extra:[],image:"",imagePage:"",imageCredit:"",imageLicenseUrl:"https://creativecommons.org/licenses/by-sa/4.0/",instructions:instructionLines.map(line=>line.replace(/^\d+[.)]\s*/,"")).filter(Boolean),sourceUrl,originalSource:sourceUrl,attribution:"Wikibooks contributors",recipeLicense:"CC BY-SA"};
+}
+
+async function fetchIndianWikiRecipes(){
+  if(indianRecipesCache) return indianRecipesCache;
+  if(indianRecipesPromise) return indianRecipesPromise;
+  indianRecipesPromise=(async()=>{
+    const titles=[];
+    let continuation="";
+    do{
+      const url=WIKIBOOKS_API+"?action=query&list=categorymembers&cmtitle=Category:Indian_recipes&cmtype=page&cmlimit=100&format=json&origin=*"+continuation;
+      const response=await fetch(url);
+      if(!response.ok) throw new Error("Wikibooks returned "+response.status);
+      const data=await response.json();
+      titles.push(...(data.query?.categorymembers||[]).map(page=>page.title));
+      continuation=data.continue?.cmcontinue?"&cmcontinue="+encodeURIComponent(data.continue.cmcontinue):"";
+    }while(continuation&&titles.length<250);
+    const pages=[];
+    for(let offset=0;offset<titles.length;offset+=40){
+      const batch=titles.slice(offset,offset+40);
+      const url=WIKIBOOKS_API+"?action=query&prop=extracts&explaintext=1&exsectionformat=plain&titles="+encodeURIComponent(batch.join("|"))+"&format=json&origin=*";
+      const response=await fetch(url);
+      if(!response.ok) throw new Error("Wikibooks returned "+response.status);
+      const data=await response.json();
+      pages.push(...Object.values(data.query?.pages||{}));
+    }
+    indianRecipesCache=pages.map(page=>parseWikiRecipe(page.title,page.extract||"")).filter(Boolean);
+    return indianRecipesCache;
+  })();
+  try{return await indianRecipesPromise;}finally{indianRecipesPromise=null;}
+}
+
+function licenseIsReusable(metadata){
+  const license=cleanText(metadata?.LicenseShortName?.value||"").toLowerCase();
+  if(/\b(nc|nd)\b|non.?commercial|no.?derivatives/.test(license)) return false;
+  return /^(public domain|cc0|cc by(?:-sa)?(?:\s|$))/.test(license);
+}
+
+async function commonsPhotoForRecipe(recipe){
+  const url=COMMONS_API+"?action=query&generator=search&gsrsearch="+encodeURIComponent(recipe.name+" Indian food dish")+"&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=640&format=json&origin=*";
+  const response=await fetch(url);
+  if(!response.ok) return recipe;
+  const data=await response.json();
+  const wanted=recipe.name.toLowerCase().split(/\W+/).filter(word=>word.length>2&&!["indian","recipe","curry","dish"].includes(word));
+  const ranked=Object.values(data.query?.pages||{}).map(page=>{
+    const info=page.imageinfo?.[0],metadata=info?.extmetadata||{};
+    if(!info||!licenseIsReusable(metadata)) return null;
+    const filename=page.title.toLowerCase().replace(/[_-]+/g," ");
+    const score=wanted.filter(word=>filename.includes(word)).length;
+    return score?{page,info,metadata,score}:null;
+  }).filter(Boolean).sort((a,b)=>b.score-a.score);
+  if(!ranked.length) return recipe;
+  const selected=ranked[0],metadata=selected.metadata;
+  recipe.image=selected.info.thumburl||selected.info.url||"";
+  recipe.imagePage="https://commons.wikimedia.org/wiki/"+encodeURIComponent(selected.page.title.replace(/ /g,"_"));
+  recipe.imageCredit=cleanText(metadata.Artist?.value||"Wikimedia Commons contributor");
+  recipe.imageLicenseUrl=metadata.LicenseUrl?.value||"";
+  return recipe;
+}
+
+async function attachCommonsPhotos(recipes){
+  const queue=[...recipes],output=[];
+  const workers=Array.from({length:4},async()=>{
+    while(queue.length){
+      const recipe=queue.shift();
+      try{output.push(await commonsPhotoForRecipe(recipe));}
+      catch(error){console.warn("Could not load a licensed food photo",recipe.name,error);output.push(recipe);}
+    }
+  });
+  await Promise.all(workers);
+  return recipes.map(recipe=>output.find(item=>item.id===recipe.id)||recipe);
+}
+
+async function recipesForIngredients(userIngredients,cuisine){
+  const includeIndian=cuisine==="Indian"||cuisine==="Any";
+  const queryItems=[...new Set(userIngredients)].slice(0,6);
+  const resultLists=await Promise.all(queryItems.map(async item=>{
+    const query=mealApiIngredientQuery(item);
     if(!query) return [];
-    return fetchMealList(MEAL_API_ROOT+"/filter.php?i="+encodeURIComponent(query));
+    try{return await fetchMealList(MEAL_API_ROOT+"/filter.php?i="+encodeURIComponent(query));}
+    catch(error){console.warn("Recipe ingredient lookup failed",query,error);return [];}
   }));
   const frequencies=new Map();
   resultLists.forEach(list=>list.forEach((meal,index)=>{
-    const id=meal.idMeal;
-    const old=frequencies.get(id)||{count:0,rank:index};
-    old.count++;
-    old.rank=Math.min(old.rank,index);
-    frequencies.set(id,old);
+    const id=meal.idMeal,old=frequencies.get(id)||{count:0,rank:index};
+    old.count++;old.rank=Math.min(old.rank,index);frequencies.set(id,old);
   }));
-  const ids=[...frequencies.entries()]
-    .sort((a,b)=>b[1].count-a[1].count||a[1].rank-b[1].rank)
-    .map(([id])=>id)
-    .slice(0,20);
-  return loadMealDetails(ids);
+  const ids=[...frequencies.entries()].sort((a,b)=>b[1].count-a[1].count||a[1].rank-b[1].rank).map(([id])=>id).slice(0,20);
+  const globalRecipes=await loadMealDetails(ids);
+  if(!includeIndian) return globalRecipes;
+  const indian=await fetchIndianWikiRecipes();
+  const candidates=indian.filter(recipe=>matchingIngredients(recipe,userIngredients).length>0);
+  return attachCommonsPhotos([...globalRecipes,...candidates].slice(0,12));
 }
 
 async function recipesForCuisine(cuisine){
-  const areas=mealAreas(cuisine);
-  const lists=await Promise.all(areas.map(area=>
-    fetchMealList(MEAL_API_ROOT+"/filter.php?a="+encodeURIComponent(area))
-  ));
-  const ids=[];
-  lists.forEach(list=>list.forEach(meal=>ids.push(meal.idMeal)));
-  return loadMealDetails([...new Set(ids)].slice(0,12));
+  const lists=await Promise.all(mealAreas(cuisine).map(async area=>{
+    try{return await fetchMealList(MEAL_API_ROOT+"/filter.php?a="+encodeURIComponent(area));}
+    catch(error){console.warn("Cuisine lookup failed",area,error);return [];}
+  }));
+  const globalRecipes=await loadMealDetails(lists.flat().map(meal=>meal.idMeal));
+  if(cuisine!=="Indian"&&cuisine!=="Any") return globalRecipes.slice(0,12);
+  const indian=await fetchIndianWikiRecipes();
+  return attachCommonsPhotos((cuisine==="Indian"?indian:[...indian,...globalRecipes]).slice(0,12));
 }
 
 function mealApiIngredientQuery(item){
-  const raw=String(item||"").trim().toLowerCase().replace(/_/g," ").replace(/\s+/g," ");
-  const canonical=normalizeIngredient(raw);
-  const aliases={
-    "kidney bean":"kidney_beans",
-    chickpea:"chickpeas",
-    bean:"beans",
-    pea:"peas",
-    "spring onion":"spring_onion",
-    "bell pepper":"bell_pepper",
-    tomato:"tomato",
-    potato:"potato",
-    onion:"onion",
-    carrot:"carrot",
-    "soy chunk":"soy_chunks"
-  };
+  const canonical=normalizeIngredient(String(item||"").trim().toLowerCase().replace(/_/g," ").replace(/\s+/g," "));
+  const aliases={"kidney bean":"kidney_beans",chickpea:"chickpeas",bean:"beans",pea:"peas","spring onion":"spring_onion","bell pepper":"bell_pepper",tomato:"tomato",potato:"potato",onion:"onion",carrot:"carrot","soy chunk":"soy_chunks"};
   return aliases[canonical]||canonical.replace(/\s+/g,"_");
 }
 
@@ -2048,7 +2103,7 @@ async function findMeals(){
     </div>`;
 
   try{
-    const recipes=await recipesForIngredients(ingredients);
+    const recipes=await recipesForIngredients(ingredients,cuisine);
     const ranked=recipes.map(recipe=>{
       const matched=matchingIngredients(recipe,ingredients);
       const missing=recipe.ingredients
@@ -2129,10 +2184,11 @@ function plannerRecipeCard(r,matched,optional,missing){
         </ol>
       </details>
       <p class="recipe-credit">
-        Recipe and photo:
-        <a href="https://www.themealdb.com/" target="_blank" rel="noopener noreferrer">TheMealDB</a>
-        · ${escapeHTML(r.area)}
-        ${r.originalSource?'· <a href="'+escapeHTML(r.originalSource)+'" target="_blank" rel="noopener noreferrer">Original recipe source</a>':""}
+        Recipe: <a href="${escapeHTML(r.sourceUrl||r.originalSource||"https://www.themealdb.com/")}" target="_blank" rel="noopener noreferrer">${escapeHTML(r.attribution||"TheMealDB")}</a>
+        ${r.recipeLicense?'· <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">${escapeHTML(r.recipeLicense)}</a>':""}
+        ${r.imagePage?'· Photo: <a href="'+escapeHTML(r.imagePage)+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(r.imageCredit||"Image details")+'</a>':""}
+        ${r.imageLicenseUrl?'· <a href="'+escapeHTML(r.imageLicenseUrl)+'" target="_blank" rel="noopener noreferrer">Photo license</a>':""}
+        ${r.area&&r.area!=="Indian"?'· '+escapeHTML(r.area):""}
       </p>
     </article>`;
 
