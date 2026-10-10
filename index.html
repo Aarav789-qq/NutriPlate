@@ -1637,7 +1637,7 @@ function normalizeIngredient(item){
     peas:"pea",lentils:"lentil",eggs:"egg"
   };
   let value=String(item||"").trim().toLowerCase().replace(/_/g," ").replace(/\s+/g," ");
-  const modifiers=/^(fresh|dried|ground|minced|chopped|diced|crushed|sliced|grated|shredded|boneless|skinless|medium|large|small|whole|raw|cooked|frozen|canned)\\s+/;
+  const modifiers=/^(fresh|dried|ground|minced|chopped|diced|crushed|sliced|grated|shredded|boneless|skinless|medium|large|small|whole|raw|cooked|frozen|canned)\s+/;
   while(modifiers.test(value)) value=value.replace(modifiers,"");
   if(aliases[value]) return aliases[value];
   if(value.length>4 && value.endsWith("s") && !value.endsWith("ss")) value=value.slice(0,-1);
