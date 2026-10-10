@@ -2177,7 +2177,7 @@ function renderCuisineCards(){
         <p>${info.description}</p>
 
         <span class="cuisine-count">
-          50+ dishes
+          ${allRecipes.filter(recipe=>recipe.cuisine===name).length} recipes
         </span>
 
       </div>
@@ -2560,7 +2560,7 @@ en:{
   ageGroup:"Age Group",
   findMeals:"🍳 Find My Meals",
   worldTitle:"🌎 Explore the World of Food",
-  worldSub:"Every cuisine below contains 50 dishes with their ingredient lists.",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 Nutri Facts",
   factsSub:"Explore general nutrition information for different life stages.",
   modesTitle:"🧠 Smart Modes",
@@ -2601,7 +2601,7 @@ hi:{
   ageGroup:"आयु समूह",
   findMeals:"🍳 मेरे भोजन खोजें",
   worldTitle:"🌎 दुनिया के भोजन देखें",
-  worldSub:"हर व्यंजन शैली में 50 भोजन और उनकी सामग्री दी गई है।",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 पोषण तथ्य",
   factsSub:"अलग-अलग आयु समूहों के लिए सामान्य पोषण जानकारी देखें।",
   modesTitle:"🧠 स्मार्ट मोड",
@@ -2642,7 +2642,7 @@ mr:{
   ageGroup:"वयोगट",
   findMeals:"🍳 माझे भोजन शोधा",
   worldTitle:"🌎 जगातील पदार्थ पहा",
-  worldSub:"प्रत्येक पाककृती शैलीमध्ये 50 पदार्थ आणि त्यांची सामग्री आहे.",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 पोषण माहिती",
   factsSub:"वेगवेगळ्या वयोगटांसाठी सामान्य पोषण माहिती पहा.",
   modesTitle:"🧠 स्मार्ट मोड",
@@ -2683,7 +2683,7 @@ ta:{
   ageGroup:"வயது குழு",
   findMeals:"🍳 எனது உணவுகளைத் தேடு",
   worldTitle:"🌎 உலக உணவுகளை ஆராயுங்கள்",
-  worldSub:"ஒவ்வொரு சமையல் வகையிலும் 50 உணவுகளும் அவற்றின் பொருட்களும் உள்ளன.",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 ஊட்டச்சத்து தகவல்",
   factsSub:"வயது குழுக்களுக்கான பொதுவான ஊட்டச்சத்து தகவல்களைப் பாருங்கள்.",
   modesTitle:"🧠 ஸ்மார்ட் முறைகள்",
@@ -2724,7 +2724,7 @@ te:{
   ageGroup:"వయస్సు సమూహం",
   findMeals:"🍳 నా భోజనాలను కనుగొనండి",
   worldTitle:"🌎 ప్రపంచ ఆహారాన్ని అన్వేషించండి",
-  worldSub:"ప్రతి వంటకాల విభాగంలో 50 వంటకాలు మరియు వాటి పదార్థాలు ఉన్నాయి.",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 పోషక సమాచారం",
   factsSub:"వివిధ వయస్సుల కోసం సాధారణ పోషక సమాచారాన్ని చూడండి.",
   modesTitle:"🧠 స్మార్ట్ మోడ్‌లు",
@@ -2765,7 +2765,7 @@ kn:{
   ageGroup:"ವಯಸ್ಸಿನ ಗುಂಪು",
   findMeals:"🍳 ನನ್ನ ಊಟಗಳನ್ನು ಹುಡುಕಿ",
   worldTitle:"🌎 ವಿಶ್ವ ಆಹಾರವನ್ನು ಅನ್ವೇಷಿಸಿ",
-  worldSub:"ಪ್ರತಿ ಅಡುಗೆ ವಿಭಾಗದಲ್ಲಿ 50 ಆಹಾರಗಳು ಮತ್ತು ಅವುಗಳ ಪದಾರ್ಥಗಳಿವೆ.",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 ಪೌಷ್ಟಿಕ ಮಾಹಿತಿ",
   factsSub:"ವಿವಿಧ ವಯಸ್ಸಿನ ಗುಂಪುಗಳಿಗೆ ಸಾಮಾನ್ಯ ಪೌಷ್ಟಿಕ ಮಾಹಿತಿಯನ್ನು ನೋಡಿ.",
   modesTitle:"🧠 ಸ್ಮಾರ್ಟ್ ಮೋಡ್‌ಗಳು",
@@ -2806,7 +2806,7 @@ bn:{
   ageGroup:"বয়সের গ্রুপ",
   findMeals:"🍳 আমার খাবার খুঁজুন",
   worldTitle:"🌎 বিশ্বের খাবার অন্বেষণ করুন",
-  worldSub:"প্রতিটি রান্নার বিভাগে ৫০টি খাবার এবং তাদের উপকরণ রয়েছে।",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 পুষ্টি তথ্য",
   factsSub:"বিভিন্ন বয়সের জন্য সাধারণ পুষ্টি তথ্য দেখুন।",
   modesTitle:"🧠 স্মার্ট মোড",
