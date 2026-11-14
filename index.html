@@ -373,6 +373,48 @@ textarea{
   box-shadow:var(--shadow);
 }
 
+.recipe-photo{
+  display:block;
+  width:100%;
+  height:190px;
+  object-fit:cover;
+  border-radius:14px;
+  margin-bottom:14px;
+  background:var(--accent);
+}
+
+.recipe-credit{
+  color:var(--muted);
+  font-size:12px;
+  margin:8px 0;
+}
+
+.recipe-credit a{
+  color:var(--primary);
+}
+
+.recipe-details{
+  margin-top:14px;
+  border-top:1px solid var(--border);
+  padding-top:12px;
+}
+
+.recipe-details summary{
+  cursor:pointer;
+  font-weight:850;
+  color:var(--primary);
+}
+
+.recipe-details ol,
+.recipe-details ul{
+  padding-left:22px;
+  line-height:1.6;
+}
+
+.recipe-details li{
+  margin:5px 0;
+}
+
 .recipe h3{
   margin:0 0 8px;
   color:var(--primary);
@@ -725,9 +767,8 @@ footer{
 }
 
 @media(max-width:850px){
-  nav{
-    display:none;
-  }
+  .nav{flex-wrap:wrap}
+  nav{display:flex;flex:1 1 100%;order:3}
 }
 
 @media(max-width:650px){
@@ -949,7 +990,7 @@ footer{
   <h2 class="section-title" data-i18n="worldTitle">🌎 Explore the World of Food</h2>
 
   <p class="section-sub" data-i18n="worldSub">
-    Every cuisine below contains 50 dishes with their ingredient lists.
+    Browse cuisines and see each recipe’s listed ingredients.
   </p>
 
   <div id="cuisineCards" class="grid small-grid"></div>
@@ -964,6 +1005,10 @@ footer{
 
 </section>
 
+<section id="cuisineDetail" class="section hidden">
+  <button class="secondary" onclick="navigateTo('cuisines')">← Back to Cuisines</button>
+  <div id="cuisineDetailContent" class="cuisine-results"></div>
+</section>
 
 <!-- NUTRI FACTS -->
 
@@ -1581,29 +1626,35 @@ const cuisineInfo = {
 ========================================================= */
 
 function normalizeIngredient(item){
-
   const aliases={
-    "rajma":"beans",
-    "kidney beans":"beans",
-    "red kidney beans":"beans",
-    "chana":"chickpeas",
-    "garbanzo":"chickpeas",
-    "chapati":"roti",
-    "chapatti":"roti",
-    "green onion":"onion",
-    "spring onion":"onion",
-    "capsicum":"pepper",
-    "bell pepper":"pepper",
-    "shimla mirch":"pepper",
-    "dahi":"curd",
-    "yogurt":"curd",
-    "soya":"soy",
-    "soya chunks":"soy chunks"
+    rajma:"kidney bean","kidney beans":"kidney bean","red kidney beans":"kidney bean",
+    chana:"chickpea",garbanzo:"chickpea","garbanzo beans":"chickpea",chickpeas:"chickpea",
+    chapati:"roti",chapatti:"roti","green onion":"spring onion","green onions":"spring onion",
+    "spring onions":"spring onion",capsicum:"bell pepper","bell peppers":"bell pepper",
+    "shimla mirch":"bell pepper",dahi:"yogurt",curd:"yogurt",yoghurt:"yogurt",
+    soya:"soy","soya chunks":"soy chunk","soy chunks":"soy chunk",
+    brinjal:"eggplant",baingan:"eggplant",aubergine:"eggplant","egg plant":"eggplant",
+    bhindi:"okra","lady finger":"okra","lady fingers":"okra",aloo:"potato",palak:"spinach",
+    jeera:"cumin",haldi:"turmeric",mirchi:"chili",mirch:"chili",
+    "chana dal":"split chickpea","chana dhal":"split chickpea","channa dal":"split chickpea","channa dhal":"split chickpea",
+    chilli:"chili","green chilli":"green chili","green chillies":"green chili","green chilies":"green chili",
+    besan:"chickpea flour","gram flour":"chickpea flour",atta:"wheat flour","chapati flour":"wheat flour",maida:"all-purpose flour","plain flour":"all-purpose flour",
+    methi:"fenugreek",saunf:"fennel",ajwain:"carom seed",hing:"asafoetida",amchur:"mango powder",
+    cilantro:"coriander leaf","coriander leaves":"coriander leaf","dhania leaves":"coriander leaf",
+    leaves:"leaf","curry leaves":"curry leaf","bay leaves":"bay leaf",chilies:"chili",chillies:"chili",
+    tomatoes:"tomato",potatoes:"potato",onions:"onion",carrots:"carrot",
+    apples:"apple",bananas:"banana",mangoes:"mango",mangos:"mango",
+    beans:"bean","black beans":"bean","pinto beans":"bean","white beans":"bean",
+    "red onion":"onion","red onions":"onion","brown rice":"rice","white rice":"rice","basmati rice":"rice","dosa rice":"rice","idli rice":"rice",
+    peas:"pea",lentils:"lentil",eggs:"egg"
   };
-
-  const value=item.trim().toLowerCase();
-
-  return aliases[value] || value;
+  let value=String(item||"").trim().toLowerCase().replace(/_/g," ").replace(/\s+/g," ");
+  const modifiers=/^(fresh|dried|ground|minced|chopped|diced|crushed|sliced|grated|shredded|split|boneless|skinless|medium|large|small|whole|raw|cooked|frozen|canned)\s+/;
+  while(modifiers.test(value)) value=value.replace(modifiers,"");
+  if(aliases[value]) return aliases[value];
+  if(value.length>4 && value.endsWith("ies")) value=value.slice(0,-3)+"y";
+  else if(value.length>4 && value.endsWith("s") && !value.endsWith("ss")) value=value.slice(0,-1);
+  return value;
 }
 
 
@@ -1792,680 +1843,505 @@ function languageSpeechCode(lang){
 */
 
 
-const baseRecipes=[
 
-/* INDIAN */
-
-{name:"Rajma Rice Bowl",cuisine:"Indian",diet:"Vegetarian",meal:"Lunch",needs:["beans","rice","tomato"],extra:["onion","cucumber"]},
-{name:"Dal Rice",cuisine:"Indian",diet:"Vegetarian",meal:"Lunch",needs:["dal","rice"],extra:["tomato","onion"]},
-{name:"Chole Roti",cuisine:"Indian",diet:"Vegan",meal:"Lunch",needs:["chickpeas","roti"],extra:["onion","tomato"]},
-{name:"Paneer Roti Wrap",cuisine:"Indian",diet:"Vegetarian",meal:"Lunch",needs:["paneer","roti"],extra:["tomato","onion","cucumber"]},
-{name:"Vegetable Pulao",cuisine:"Indian",diet:"Vegan",meal:"Lunch",needs:["rice","onion"],extra:["carrot","peas","beans"]},
-{name:"Aloo Roti",cuisine:"Indian",diet:"Vegan",meal:"Breakfast",needs:["potato","roti"],extra:["onion","tomato"]},
-{name:"Poha",cuisine:"Indian",diet:"Vegan",meal:"Breakfast",needs:["poha","onion"],extra:["peanuts","potato","lemon"]},
-{name:"Upma",cuisine:"Indian",diet:"Vegan",meal:"Breakfast",needs:["semolina","onion"],extra:["carrot","peas"]},
-{name:"Paneer Bhurji",cuisine:"Indian",diet:"Vegetarian",meal:"Breakfast",needs:["paneer","tomato","onion"],extra:["pepper","roti"]},
-{name:"Vegetable Biryani",cuisine:"Indian",diet:"Vegetarian",meal:"Dinner",needs:["rice","onion","tomato"],extra:["peas","carrot","beans"]},
-{name:"Aloo Gobi",cuisine:"Indian",diet:"Vegan",meal:"Dinner",needs:["potato","cauliflower"],extra:["tomato","onion"]},
-{name:"Vegetable Khichdi",cuisine:"Indian",diet:"Vegan",meal:"Dinner",needs:["rice","dal"],extra:["carrot","peas","beans"]},
-{name:"Masala Dosa",cuisine:"Indian",diet:"Vegan",meal:"Breakfast",needs:["rice","potato"],extra:["onion","coconut"]},
-{name:"Vegetable Sandwich",cuisine:"Indian",diet:"Vegetarian",meal:"Snack",needs:["bread","tomato","cucumber"],extra:["onion","cheese"]},
-{name:"Chana Chaat",cuisine:"Indian",diet:"Vegan",meal:"Snack",needs:["chickpeas","tomato","onion"],extra:["cucumber","lemon"]},
-{name:"Sprout Chaat",cuisine:"Indian",diet:"Vegan",meal:"Snack",needs:["sprouts","tomato","onion"],extra:["cucumber","lemon"]},
-{name:"Palak Paneer",cuisine:"Indian",diet:"Vegetarian",meal:"Dinner",needs:["spinach","paneer"],extra:["tomato","onion"]},
-{name:"Dal Tadka",cuisine:"Indian",diet:"Vegetarian",meal:"Dinner",needs:["dal","tomato","onion"],extra:["roti","rice"]},
-{name:"Matar Paneer",cuisine:"Indian",diet:"Vegetarian",meal:"Dinner",needs:["paneer","peas","tomato"],extra:["onion","roti"]},
-{name:"Vegetable Paratha",cuisine:"Indian",diet:"Vegetarian",meal:"Breakfast",needs:["roti","potato"],extra:["cauliflower","peas","curd"]},
-
-/* KOREAN */
-
-{name:"Bibimbap",cuisine:"Korean",diet:"Vegetarian",meal:"Lunch",needs:["rice","spinach","carrot"],extra:["cucumber","beans","egg"]},
-{name:"Korean Veggie Rice Bowl",cuisine:"Korean",diet:"Vegan",meal:"Lunch",needs:["rice","cucumber","carrot"],extra:["beans","onion","spinach"]},
-{name:"Korean Bean Rice Bowl",cuisine:"Korean",diet:"Vegan",meal:"Dinner",needs:["rice","beans"],extra:["cucumber","carrot","onion"]},
-{name:"Vegetable Japchae",cuisine:"Korean",diet:"Vegan",meal:"Dinner",needs:["noodles","carrot","onion"],extra:["spinach","pepper","mushroom"]},
-{name:"Korean Vegetable Pancake",cuisine:"Korean",diet:"Vegetarian",meal:"Snack",needs:["flour","onion","carrot"],extra:["pepper","egg"]},
-{name:"Korean Tofu Bowl",cuisine:"Korean",diet:"Vegan",meal:"Dinner",needs:["tofu","rice"],extra:["cucumber","carrot","onion"]},
-{name:"Korean Potato Pancake",cuisine:"Korean",diet:"Vegan",meal:"Breakfast",needs:["potato","flour"],extra:["onion","pepper"]},
-{name:"Korean Mushroom Rice",cuisine:"Korean",diet:"Vegan",meal:"Dinner",needs:["rice","mushroom"],extra:["onion","carrot"]},
-{name:"Korean Veggie Noodles",cuisine:"Korean",diet:"Vegan",meal:"Lunch",needs:["noodles","onion"],extra:["carrot","cucumber","beans"]},
-{name:"Korean Roti Wrap",cuisine:"Korean",diet:"Vegetarian",meal:"Lunch",needs:["roti","cucumber","onion"],extra:["beans","tofu"]},
-
-/* MEXICAN */
-
-{name:"Bean Burrito",cuisine:"Mexican",diet:"Vegan",meal:"Lunch",needs:["beans","roti","tomato"],extra:["rice","onion","cucumber"]},
-{name:"Veggie Tacos",cuisine:"Mexican",diet:"Vegetarian",meal:"Dinner",needs:["tortilla","beans","tomato"],extra:["onion","pepper","cheese"]},
-{name:"Bean Quesadilla",cuisine:"Mexican",diet:"Vegetarian",meal:"Snack",needs:["beans","tortilla","cheese"],extra:["tomato","onion"]},
-{name:"Mexican Rice Bowl",cuisine:"Mexican",diet:"Vegan",meal:"Lunch",needs:["rice","beans","tomato"],extra:["corn","pepper","onion"]},
-{name:"Bean Nachos",cuisine:"Mexican",diet:"Vegetarian",meal:"Snack",needs:["beans","corn","cheese"],extra:["tomato","onion"]},
-{name:"Mexican Veggie Wrap",cuisine:"Mexican",diet:"Vegan",meal:"Lunch",needs:["roti","beans","tomato"],extra:["cucumber","onion","pepper"]},
-{name:"Guacamole Rice Bowl",cuisine:"Mexican",diet:"Vegan",meal:"Lunch",needs:["rice","avocado","tomato"],extra:["beans","onion","corn"]},
-{name:"Mexican Bean Salad",cuisine:"Mexican",diet:"Vegan",meal:"Snack",needs:["beans","tomato","corn"],extra:["cucumber","onion"]},
-{name:"Veggie Fajita Bowl",cuisine:"Mexican",diet:"Vegan",meal:"Dinner",needs:["rice","pepper","onion"],extra:["beans","tomato"]},
-{name:"Mexican Potato Tacos",cuisine:"Mexican",diet:"Vegan",meal:"Dinner",needs:["potato","tortilla","tomato"],extra:["onion","beans"]},
-
-/* CHINESE */
-
-{name:"Vegetable Fried Rice",cuisine:"Chinese",diet:"Vegan",meal:"Lunch",needs:["rice","onion","carrot"],extra:["beans","pepper"]},
-{name:"Hakka Noodles",cuisine:"Chinese",diet:"Vegan",meal:"Dinner",needs:["noodles","onion","carrot"],extra:["pepper","cabbage"]},
-{name:"Vegetable Stir Fry",cuisine:"Chinese",diet:"Vegan",meal:"Dinner",needs:["onion","pepper"],extra:["carrot","beans","mushroom"]},
-{name:"Chilli Paneer",cuisine:"Chinese",diet:"Vegetarian",meal:"Dinner",needs:["paneer","pepper","onion"],extra:["tomato","rice"]},
-{name:"Chinese Rice Bowl",cuisine:"Chinese",diet:"Vegan",meal:"Lunch",needs:["rice","beans","carrot"],extra:["cucumber","onion"]},
-{name:"Vegetable Chow Mein",cuisine:"Chinese",diet:"Vegan",meal:"Dinner",needs:["noodles","onion"],extra:["carrot","cabbage","pepper"]},
-{name:"Tofu Stir Fry",cuisine:"Chinese",diet:"Vegan",meal:"Dinner",needs:["tofu","pepper","onion"],extra:["carrot","mushroom"]},
-{name:"Vegetable Spring Rolls",cuisine:"Chinese",diet:"Vegan",meal:"Snack",needs:["flour","cabbage","carrot"],extra:["onion","pepper"]},
-{name:"Mushroom Fried Rice",cuisine:"Chinese",diet:"Vegan",meal:"Lunch",needs:["rice","mushroom","onion"],extra:["carrot","pepper"]},
-{name:"Corn Vegetable Rice",cuisine:"Chinese",diet:"Vegan",meal:"Lunch",needs:["rice","corn","carrot"],extra:["onion","pepper"]},
-
-/* ITALIAN */
-
-{name:"Tomato Pasta",cuisine:"Italian",diet:"Vegan",meal:"Dinner",needs:["pasta","tomato"],extra:["onion","garlic"]},
-{name:"Bean Tomato Pasta",cuisine:"Italian",diet:"Vegan",meal:"Dinner",needs:["pasta","beans","tomato"],extra:["onion"]},
-{name:"Vegetable Pasta",cuisine:"Italian",diet:"Vegan",meal:"Dinner",needs:["pasta","tomato","onion"],extra:["pepper","mushroom"]},
-{name:"Margherita Pizza",cuisine:"Italian",diet:"Vegetarian",meal:"Dinner",needs:["flour","tomato","cheese"],extra:["basil","onion"]},
-{name:"Vegetable Pizza",cuisine:"Italian",diet:"Vegetarian",meal:"Dinner",needs:["flour","tomato","cheese"],extra:["pepper","onion","mushroom"]},
-{name:"Garlic Bread",cuisine:"Italian",diet:"Vegetarian",meal:"Snack",needs:["bread","garlic","butter"],extra:["cheese"]},
-{name:"Pasta Primavera",cuisine:"Italian",diet:"Vegetarian",meal:"Dinner",needs:["pasta","tomato","pepper"],extra:["carrot","peas","cheese"]},
-{name:"Mushroom Pasta",cuisine:"Italian",diet:"Vegetarian",meal:"Dinner",needs:["pasta","mushroom"],extra:["onion","cheese"]},
-{name:"Italian Bean Bowl",cuisine:"Italian",diet:"Vegan",meal:"Lunch",needs:["beans","tomato"],extra:["rice","onion","cucumber"]},
-{name:"Vegetable Risotto",cuisine:"Italian",diet:"Vegetarian",meal:"Dinner",needs:["rice","onion"],extra:["mushroom","peas","cheese"]},
-
-/* JAPANESE */
-
-{name:"Vegetable Sushi",cuisine:"Japanese",diet:"Vegan",meal:"Lunch",needs:["rice","cucumber","carrot"],extra:["avocado","tofu"]},
-{name:"Japanese Rice Bowl",cuisine:"Japanese",diet:"Vegan",meal:"Lunch",needs:["rice","tofu"],extra:["cucumber","carrot","onion"]},
-{name:"Yakisoba Vegetable Noodles",cuisine:"Japanese",diet:"Vegan",meal:"Dinner",needs:["noodles","cabbage","onion"],extra:["carrot","pepper"]},
-{name:"Japanese Vegetable Curry",cuisine:"Japanese",diet:"Vegan",meal:"Dinner",needs:["rice","potato","carrot"],extra:["onion","beans"]},
-{name:"Tofu Rice Bowl",cuisine:"Japanese",diet:"Vegan",meal:"Lunch",needs:["tofu","rice"],extra:["cucumber","carrot"]},
-{name:"Edamame Rice Bowl",cuisine:"Japanese",diet:"Vegan",meal:"Lunch",needs:["rice","beans"],extra:["cucumber","carrot"]},
-{name:"Japanese Potato Bowl",cuisine:"Japanese",diet:"Vegan",meal:"Dinner",needs:["potato","rice"],extra:["carrot","onion"]},
-{name:"Vegetable Noodle Soup",cuisine:"Japanese",diet:"Vegan",meal:"Dinner",needs:["noodles","onion"],extra:["mushroom","carrot"]},
-{name:"Cucumber Rice Roll",cuisine:"Japanese",diet:"Vegan",meal:"Snack",needs:["rice","cucumber"],extra:["carrot","avocado"]},
-{name:"Mushroom Rice Bowl",cuisine:"Japanese",diet:"Vegan",meal:"Dinner",needs:["rice","mushroom"],extra:["tofu","onion"]},
-
-/* THAI */
-
-{name:"Thai Vegetable Rice Bowl",cuisine:"Thai",diet:"Vegan",meal:"Lunch",needs:["rice","pepper","onion"],extra:["beans","carrot"]},
-{name:"Thai Tofu Bowl",cuisine:"Thai",diet:"Vegan",meal:"Dinner",needs:["tofu","rice"],extra:["pepper","onion","carrot"]},
-{name:"Thai Vegetable Noodles",cuisine:"Thai",diet:"Vegan",meal:"Dinner",needs:["noodles","onion"],extra:["pepper","carrot","beans"]},
-{name:"Thai Green Vegetable Curry",cuisine:"Thai",diet:"Vegan",meal:"Dinner",needs:["coconut milk","pepper"],extra:["tofu","beans","rice"]},
-{name:"Thai Bean Rice Bowl",cuisine:"Thai",diet:"Vegan",meal:"Lunch",needs:["beans","rice"],extra:["tomato","onion"]},
-{name:"Thai Vegetable Soup",cuisine:"Thai",diet:"Vegan",meal:"Dinner",needs:["vegetables","onion"],extra:["tofu","mushroom"]},
-{name:"Thai Mango Rice Bowl",cuisine:"Thai",diet:"Vegan",meal:"Snack",needs:["rice","mango"],extra:["coconut","beans"]},
-{name:"Thai Peanut Noodles",cuisine:"Thai",diet:"Vegan",meal:"Dinner",needs:["noodles","peanuts"],extra:["carrot","pepper","onion"]},
-{name:"Thai Basil Tofu",cuisine:"Thai",diet:"Vegan",meal:"Dinner",needs:["tofu","pepper"],extra:["onion","rice"]},
-{name:"Thai Vegetable Fried Rice",cuisine:"Thai",diet:"Vegan",meal:"Lunch",needs:["rice","onion"],extra:["carrot","pepper","beans"]},
-
-/* AMERICAN */
-
-{name:"Bean Veggie Wrap",cuisine:"American",diet:"Vegan",meal:"Lunch",needs:["roti","beans","tomato"],extra:["cucumber","onion"]},
-{name:"Vegetable Sandwich",cuisine:"American",diet:"Vegetarian",meal:"Lunch",needs:["bread","tomato","cucumber"],extra:["cheese","onion"]},
-{name:"Bean Burger",cuisine:"American",diet:"Vegan",meal:"Dinner",needs:["beans","bread"],extra:["tomato","onion","lettuce"]},
-{name:"Veggie Burger",cuisine:"American",diet:"Vegetarian",meal:"Dinner",needs:["bread","beans","tomato"],extra:["cheese","lettuce"]},
-{name:"Loaded Potato Bowl",cuisine:"American",diet:"Vegetarian",meal:"Dinner",needs:["potato","beans"],extra:["cheese","tomato","onion"]},
-{name:"Peanut Butter Toast",cuisine:"American",diet:"Vegetarian",meal:"Breakfast",needs:["bread","peanut butter"],extra:["banana","apple"]},
-{name:"Vegetable Pasta Bowl",cuisine:"American",diet:"Vegetarian",meal:"Dinner",needs:["pasta","tomato"],extra:["beans","cheese"]},
-{name:"Bean Rice Bowl",cuisine:"American",diet:"Vegan",meal:"Lunch",needs:["rice","beans"],extra:["tomato","corn","onion"]},
-{name:"Veggie Breakfast Burrito",cuisine:"American",diet:"Egg Vegetarian",meal:"Breakfast",needs:["roti","beans","egg"],extra:["tomato","onion"]},
-{name:"Corn Bean Salad",cuisine:"American",diet:"Vegan",meal:"Snack",needs:["corn","beans","tomato"],extra:["cucumber","onion"]},
-
-/* MEDITERRANEAN */
-
-{name:"Mediterranean Bean Bowl",cuisine:"Mediterranean",diet:"Vegan",meal:"Lunch",needs:["beans","cucumber","tomato"],extra:["rice","onion"]},
-{name:"Hummus Rice Bowl",cuisine:"Mediterranean",diet:"Vegan",meal:"Lunch",needs:["chickpeas","rice"],extra:["cucumber","tomato"]},
-{name:"Falafel Wrap",cuisine:"Mediterranean",diet:"Vegan",meal:"Lunch",needs:["chickpeas","roti"],extra:["tomato","cucumber","onion"]},
-{name:"Greek Vegetable Bowl",cuisine:"Mediterranean",diet:"Vegetarian",meal:"Lunch",needs:["cucumber","tomato","cheese"],extra:["beans","onion"]},
-{name:"Mediterranean Lentil Bowl",cuisine:"Mediterranean",diet:"Vegan",meal:"Dinner",needs:["lentils","tomato"],extra:["cucumber","onion","rice"]},
-{name:"Chickpea Salad",cuisine:"Mediterranean",diet:"Vegan",meal:"Snack",needs:["chickpeas","cucumber","tomato"],extra:["onion","lemon"]},
-{name:"Vegetable Couscous",cuisine:"Mediterranean",diet:"Vegan",meal:"Dinner",needs:["couscous","carrot","onion"],extra:["beans","tomato"]},
-{name:"Mediterranean Rice Plate",cuisine:"Mediterranean",diet:"Vegan",meal:"Lunch",needs:["rice","beans","tomato"],extra:["cucumber","onion"]},
-{name:"Paneer Mediterranean Bowl",cuisine:"Mediterranean",diet:"Vegetarian",meal:"Dinner",needs:["paneer","cucumber","tomato"],extra:["rice","onion"]},
-{name:"Lentil Vegetable Soup",cuisine:"Mediterranean",diet:"Vegan",meal:"Dinner",needs:["lentils","carrot","tomato"],extra:["onion","spinach"]}
-
-];
-
-
-/* =========================================================
-   EXPAND RECIPE DATABASE TO 50 DISHES PER CUISINE
-========================================================= */
-
-const dishNameBanks={
-
-Indian:[
-"Dal Tadka","Rajma Rice","Chole Masala","Paneer Tikka","Aloo Gobi",
-"Palak Paneer","Matar Paneer","Vegetable Korma","Kadhi Rice","Dal Makhani",
-"Moong Dal Khichdi","Masala Dosa","Idli Sambar","Vegetable Uttapam","Poha",
-"Upma","Besan Chilla","Moong Chilla","Aloo Paratha","Gobi Paratha",
-"Paneer Paratha","Vegetable Paratha","Pav Bhaji","Bhel Puri","Sev Puri",
-"Chana Chaat","Sprout Chaat","Dahi Puri","Samosa","Kachori",
-"Vegetable Biryani","Jeera Rice","Lemon Rice","Curd Rice","Tamarind Rice",
-"Vegetable Fried Rice","Masala Rice","Tawa Pulao","Veg Pulao","Vegetable Kofta",
-"Baingan Bharta","Bhindi Masala","Lauki Dal","Palak Dal","Aloo Matar",
-"Mixed Vegetable Curry","Chana Masala","Rajma Masala","Tofu Masala","Soy Chunk Curry"
-],
-
-Korean:[
-"Bibimbap","Japchae","Kimchi Rice Bowl","Korean Tofu Bowl","Korean Potato Pancake",
-"Vegetable Pajeon","Korean Mushroom Rice","Korean Bean Bowl","Korean Noodle Bowl","Vegetable Kimbap",
-"Tofu Kimbap","Cucumber Rice Bowl","Carrot Rice Bowl","Spinach Rice Bowl","Mushroom Japchae",
-"Vegetable Japchae","Tofu Japchae","Korean Vegetable Soup","Bean Sprout Soup","Mushroom Soup",
-"Korean Potato Bowl","Korean Vegetable Bowl","Sesame Tofu Bowl","Spicy Tofu Rice","Vegetable Tteokbokki",
-"Rice Cake Vegetable Bowl","Korean Corn Bowl","Korean Cabbage Bowl","Korean Pepper Rice","Korean Pumpkin Bowl",
-"Korean Sweet Potato Bowl","Korean Bean Noodles","Korean Vegetable Noodles","Korean Rice Noodles","Korean Roti Wrap",
-"Korean Veggie Wrap","Korean Tofu Wrap","Korean Potato Wrap","Korean Mushroom Wrap","Korean Vegetable Pancake",
-"Korean Spinach Bowl","Korean Carrot Bowl","Korean Cucumber Bowl","Korean Sesame Rice","Korean Soy Tofu",
-"Korean Vegetable Stir Fry","Korean Bean Stir Fry","Korean Mushroom Stir Fry","Korean Potato Stir Fry","Korean Mixed Vegetable Bowl"
-],
-
-Mexican:[
-"Bean Burrito","Veggie Tacos","Bean Quesadilla","Mexican Rice Bowl","Bean Nachos",
-"Mexican Veggie Wrap","Guacamole Bowl","Mexican Bean Salad","Veggie Fajita Bowl","Potato Tacos",
-"Bean Tostada","Veggie Enchiladas","Bean Enchiladas","Mexican Corn Bowl","Black Bean Bowl",
-"Refried Bean Bowl","Mexican Potato Bowl","Mexican Lentil Bowl","Mexican Chickpea Bowl","Mexican Rice Wrap",
-"Bean Tortilla Wrap","Veggie Tortilla Wrap","Corn Bean Salad","Tomato Bean Salad","Avocado Bean Bowl",
-"Mexican Pasta Bowl","Mexican Vegetable Pasta","Mexican Rice Salad","Mexican Potato Salad","Mexican Vegetable Soup",
-"Bean Vegetable Soup","Mexican Tomato Rice","Mexican Pepper Rice","Mexican Corn Rice","Mexican Bean Rice",
-"Veggie Taco Bowl","Bean Taco Bowl","Avocado Taco Bowl","Potato Taco Bowl","Mexican Veggie Bowl",
-"Bean Fajita Wrap","Vegetable Fajita Wrap","Mexican Tofu Bowl","Mexican Paneer Bowl","Mexican Tofu Tacos",
-"Mexican Paneer Tacos","Mexican Veggie Nachos","Bean Corn Nachos","Mexican Vegetable Plate","Mexican Rice Plate"
-],
-
-Chinese:[
-"Vegetable Fried Rice","Hakka Noodles","Vegetable Stir Fry","Chilli Paneer","Chinese Rice Bowl",
-"Vegetable Chow Mein","Tofu Stir Fry","Vegetable Spring Rolls","Mushroom Fried Rice","Corn Vegetable Rice",
-"Tofu Fried Rice","Mushroom Noodles","Vegetable Noodles","Cabbage Noodles","Carrot Noodles",
-"Pepper Rice","Chinese Bean Bowl","Chinese Tofu Bowl","Chinese Mushroom Bowl","Chinese Vegetable Bowl",
-"Vegetable Dumplings","Tofu Dumplings","Mushroom Dumplings","Cabbage Dumplings","Mixed Vegetable Dumplings",
-"Vegetable Manchurian","Tofu Manchurian","Gobi Manchurian","Paneer Manchurian","Bean Manchurian",
-"Vegetable Soup","Tofu Soup","Mushroom Soup","Corn Soup","Hot Vegetable Soup",
-"Chinese Potato Bowl","Chinese Corn Bowl","Chinese Pepper Bowl","Chinese Egg Rice","Vegetable Egg Rice",
-"Chinese Paneer Rice","Chinese Tofu Rice","Chinese Bean Rice","Chinese Mushroom Rice","Chinese Vegetable Rice",
-"Chinese Stir Fry Noodles","Chinese Tofu Noodles","Chinese Mushroom Noodles","Chinese Vegetable Plate","Chinese Rice Plate"
-],
-
-Italian:[
-"Tomato Pasta","Bean Tomato Pasta","Vegetable Pasta","Margherita Pizza","Vegetable Pizza",
-"Garlic Bread","Pasta Primavera","Mushroom Pasta","Italian Bean Bowl","Vegetable Risotto",
-"Tomato Risotto","Mushroom Risotto","Vegetable Lasagna","Spinach Lasagna","Cheese Lasagna",
-"Tomato Bruschetta","Mushroom Bruschetta","Vegetable Bruschetta","Bean Bruschetta","Caprese Salad",
-"Garden Pasta","Garlic Pasta","Pepper Pasta","Spinach Pasta","Broccoli Pasta",
-"Tomato Bean Pasta","Creamy Vegetable Pasta","Italian Vegetable Bowl","Italian Rice Bowl","Italian Lentil Bowl",
-"Vegetable Minestrone","Bean Minestrone","Tomato Soup","Mushroom Soup","Vegetable Soup",
-"Cheese Ravioli","Spinach Ravioli","Mushroom Ravioli","Vegetable Ravioli","Bean Pasta Bowl",
-"Olive Vegetable Pasta","Basil Tomato Pasta","Roasted Vegetable Pasta","Italian Tofu Bowl","Italian Paneer Bowl",
-"Vegetable Gnocchi","Tomato Gnocchi","Mushroom Gnocchi","Italian Bean Plate","Italian Vegetable Plate"
-],
-
-Japanese:[
-"Vegetable Sushi","Japanese Rice Bowl","Yakisoba Vegetable Noodles","Japanese Vegetable Curry","Tofu Rice Bowl",
-"Edamame Rice Bowl","Japanese Potato Bowl","Vegetable Noodle Soup","Cucumber Rice Roll","Mushroom Rice Bowl",
-"Tofu Sushi","Avocado Sushi","Carrot Sushi","Cucumber Sushi","Vegetable Kimbap",
-"Japanese Tofu Bowl","Japanese Mushroom Bowl","Japanese Vegetable Bowl","Japanese Bean Bowl","Japanese Corn Bowl",
-"Vegetable Udon","Tofu Udon","Mushroom Udon","Vegetable Soba","Tofu Soba",
-"Mushroom Soba","Japanese Fried Rice","Vegetable Fried Rice","Tofu Fried Rice","Mushroom Fried Rice",
-"Japanese Potato Curry","Japanese Tofu Curry","Japanese Vegetable Curry Bowl","Japanese Pumpkin Bowl","Japanese Sweet Potato Bowl",
-"Japanese Spinach Bowl","Japanese Carrot Bowl","Japanese Cucumber Bowl","Japanese Sesame Bowl","Japanese Noodle Bowl",
-"Japanese Tofu Noodles","Japanese Mushroom Noodles","Japanese Vegetable Noodles","Japanese Rice Plate","Japanese Tofu Plate",
-"Japanese Vegetable Plate","Japanese Mushroom Plate","Japanese Bean Plate","Japanese Avocado Bowl","Japanese Mixed Vegetable Bowl"
-],
-
-Thai:[
-"Thai Vegetable Rice Bowl","Thai Tofu Bowl","Thai Vegetable Noodles","Thai Green Vegetable Curry","Thai Bean Rice Bowl",
-"Thai Vegetable Soup","Thai Mango Rice Bowl","Thai Peanut Noodles","Thai Basil Tofu","Thai Vegetable Fried Rice",
-"Thai Coconut Rice","Thai Coconut Noodles","Thai Vegetable Curry","Thai Tofu Curry","Thai Mushroom Curry",
-"Thai Potato Curry","Thai Pumpkin Curry","Thai Lentil Curry","Thai Chickpea Curry","Thai Bean Curry",
-"Thai Vegetable Stir Fry","Thai Tofu Stir Fry","Thai Mushroom Stir Fry","Thai Pepper Stir Fry","Thai Basil Vegetables",
-"Thai Corn Bowl","Thai Bean Bowl","Thai Mushroom Bowl","Thai Tofu Noodles","Thai Vegetable Noodle Bowl",
-"Thai Rice Noodles","Thai Coconut Soup","Thai Tofu Soup","Thai Mushroom Soup","Thai Vegetable Soup Bowl",
-"Thai Mango Bowl","Thai Pineapple Rice","Thai Vegetable Rice","Thai Tofu Rice","Thai Bean Noodles",
-"Thai Peanut Rice","Thai Peanut Bowl","Thai Vegetable Wrap","Thai Tofu Wrap","Thai Bean Wrap",
-"Thai Vegetable Plate","Thai Tofu Plate","Thai Mushroom Plate","Thai Rice Plate","Thai Mixed Vegetable Bowl"
-],
-
-American:[
-"Bean Veggie Wrap","Vegetable Sandwich","Bean Burger","Veggie Burger","Loaded Potato Bowl",
-"Peanut Butter Toast","Vegetable Pasta Bowl","Bean Rice Bowl","Veggie Breakfast Burrito","Corn Bean Salad",
-"Grilled Vegetable Sandwich","Cheese Vegetable Sandwich","Bean Sandwich","Tofu Sandwich","Veggie Wrap",
-"Tofu Wrap","Bean Wrap","Potato Wrap","Avocado Toast","Tomato Toast",
-"Vegetable Toast","Peanut Banana Toast","Bean Burrito Bowl","Veggie Burrito Bowl","Rice Bean Bowl",
-"American Vegetable Bowl","American Tofu Bowl","American Bean Bowl","American Potato Bowl","American Corn Bowl",
-"Vegetable Pasta","Tomato Pasta","Bean Pasta","Cheese Pasta","Mushroom Pasta",
-"Vegetable Soup","Tomato Soup","Bean Soup","Potato Soup","Corn Soup",
-"Veggie Pizza","Cheese Pizza","Mushroom Pizza","Vegetable Flatbread","Bean Flatbread",
-"Tofu Rice Bowl","American Lentil Bowl","American Chickpea Bowl","American Vegetable Plate","American Bean Plate"
-],
-
-Mediterranean:[
-"Mediterranean Bean Bowl","Hummus Rice Bowl","Falafel Wrap","Greek Vegetable Bowl","Mediterranean Lentil Bowl",
-"Chickpea Salad","Vegetable Couscous","Mediterranean Rice Plate","Paneer Mediterranean Bowl","Lentil Vegetable Soup",
-"Hummus Wrap","Falafel Bowl","Falafel Plate","Chickpea Bowl","Lentil Bowl",
-"Greek Salad","Greek Bean Salad","Greek Rice Bowl","Greek Vegetable Rice","Greek Tofu Bowl",
-"Mediterranean Tofu Bowl","Mediterranean Bean Salad","Mediterranean Tomato Salad","Mediterranean Cucumber Bowl","Mediterranean Pepper Bowl",
-"Vegetable Couscous Bowl","Chickpea Couscous","Lentil Couscous","Bean Couscous","Tofu Couscous",
-"Mediterranean Vegetable Soup","Chickpea Soup","Lentil Soup","Bean Soup","Tomato Soup",
-"Vegetable Hummus Plate","Falafel Hummus Plate","Paneer Hummus Bowl","Tofu Hummus Bowl","Bean Hummus Bowl",
-"Mediterranean Potato Bowl","Mediterranean Sweet Potato Bowl","Mediterranean Rice Bowl","Mediterranean Grain Bowl","Mediterranean Vegetable Bowl",
-"Mediterranean Bean Plate","Mediterranean Lentil Plate","Mediterranean Chickpea Plate","Mediterranean Tofu Plate","Mediterranean Mixed Vegetable Plate"
-]
-};
-
-
-/* =========================================================
-   GENERIC INGREDIENT PROFILES
-   Every generated dish gets a visible ingredient list.
-========================================================= */
-
-const profiles={
-
-Indian:[
-["rice","dal","tomato","onion"],
-["roti","potato","onion","tomato"],
-["rice","beans","tomato","onion"],
-["paneer","tomato","onion","pepper"],
-["chickpeas","tomato","onion","cucumber"],
-["rice","peas","carrot","beans"],
-["poha","onion","peanuts","lemon"],
-["flour","potato","onion","curd"],
-["spinach","paneer","tomato","onion"],
-["rice","vegetables","beans","peas"]
-],
-
-Korean:[
-["rice","spinach","carrot","cucumber"],
-["noodles","onion","carrot","cabbage"],
-["tofu","rice","cucumber","carrot"],
-["beans","rice","onion","carrot"],
-["potato","flour","onion","pepper"],
-["mushroom","rice","onion","carrot"],
-["cucumber","rice","sesame","carrot"],
-["tofu","noodles","onion","spinach"],
-["rice","beans","cucumber","tomato"],
-["vegetables","rice","onion","pepper"]
-],
-
-Mexican:[
-["beans","rice","tomato","onion"],
-["tortilla","beans","tomato","pepper"],
-["rice","corn","beans","avocado"],
-["potato","tortilla","tomato","onion"],
-["beans","corn","cheese","tomato"],
-["rice","pepper","onion","beans"],
-["chickpeas","tomato","cucumber","corn"],
-["avocado","tomato","onion","lime"],
-["roti","beans","tomato","cucumber"],
-["tofu","rice","pepper","onion"]
-],
-
-Chinese:[
-["rice","onion","carrot","pepper"],
-["noodles","onion","carrot","cabbage"],
-["tofu","pepper","onion","mushroom"],
-["rice","mushroom","onion","carrot"],
-["cabbage","carrot","flour","onion"],
-["beans","rice","carrot","pepper"],
-["corn","rice","carrot","onion"],
-["paneer","pepper","onion","rice"],
-["vegetables","noodles","onion","carrot"],
-["potato","pepper","onion","rice"]
-],
-
-Italian:[
-["pasta","tomato","onion","garlic"],
-["pasta","beans","tomato","onion"],
-["flour","tomato","cheese","basil"],
-["rice","mushroom","onion","cheese"],
-["bread","tomato","basil","olive oil"],
-["vegetables","pasta","tomato","pepper"],
-["lasagna sheets","tomato","cheese","spinach"],
-["rice","vegetables","peas","cheese"],
-["lentils","tomato","carrot","onion"],
-["potato","flour","tomato","cheese"]
-],
-
-Japanese:[
-["rice","cucumber","carrot","avocado"],
-["rice","tofu","mushroom","onion"],
-["noodles","cabbage","carrot","onion"],
-["rice","potato","carrot","onion"],
-["tofu","rice","cucumber","sesame"],
-["edamame","rice","carrot","cucumber"],
-["mushroom","rice","tofu","onion"],
-["rice","spinach","carrot","sesame"],
-["noodles","tofu","mushroom","onion"],
-["potato","rice","vegetables","tofu"]
-],
-
-Thai:[
-["rice","pepper","onion","carrot"],
-["tofu","rice","pepper","onion"],
-["noodles","carrot","beans","onion"],
-["coconut milk","vegetables","tofu","rice"],
-["beans","rice","tomato","onion"],
-["mushroom","tofu","onion","pepper"],
-["mango","rice","coconut","peanuts"],
-["noodles","peanuts","carrot","pepper"],
-["tofu","basil","pepper","rice"],
-["rice","corn","beans","vegetables"]
-],
-
-American:[
-["bread","tomato","cucumber","cheese"],
-["beans","bread","tomato","onion"],
-["potato","beans","cheese","tomato"],
-["rice","beans","corn","tomato"],
-["bread","peanut butter","banana","apple"],
-["pasta","tomato","beans","cheese"],
-["roti","beans","tomato","cucumber"],
-["avocado","bread","tomato","onion"],
-["rice","tofu","vegetables","beans"],
-["corn","beans","cucumber","tomato"]
-],
-
-Mediterranean:[
-["beans","cucumber","tomato","onion"],
-["chickpeas","rice","cucumber","tomato"],
-["chickpeas","roti","tomato","cucumber"],
-["lentils","tomato","carrot","onion"],
-["couscous","vegetables","chickpeas","onion"],
-["rice","beans","tomato","cucumber"],
-["tofu","cucumber","tomato","olive oil"],
-["paneer","cucumber","tomato","onion"],
-["potato","chickpeas","tomato","cucumber"],
-["lentils","carrot","tomato","spinach"]
-]
-
-};
-
-
-/* =========================================================
-   DIET DETECTION
-========================================================= */
-
-function detectDiet(name){
-
-  const n=name.toLowerCase();
-
-  if(
-    n.includes("chicken") ||
-    n.includes("fish") ||
-    n.includes("meat") ||
-    n.includes("prawn") ||
-    n.includes("shrimp") ||
-    n.includes("mutton")
-  ){
-    return "Non-Vegetarian";
-  }
-
-  if(n.includes("egg")){
-    return "Egg Vegetarian";
-  }
-
-  if(
-    n.includes("paneer") ||
-    n.includes("cheese") ||
-    n.includes("curd") ||
-    n.includes("yogurt") ||
-    n.includes("milk")
-  ){
-    return "Vegetarian";
-  }
-
-  return "Vegan";
-}
-
-
-/* =========================================================
-   BUILD COMPLETE 50-DISH CUISINE DATABASE
-========================================================= */
-
-const allRecipes=[...baseRecipes];
-
-Object.keys(dishNameBanks).forEach(cuisine=>{
-
-  const existing=allRecipes.filter(r=>r.cuisine===cuisine);
-
-  const names=dishNameBanks[cuisine];
-
-  names.forEach((name,index)=>{
-
-    if(
-      existing.some(
-        r=>r.name.toLowerCase()===name.toLowerCase()
-      )
-    ){
-      return;
-    }
-
-    const profile=
-      profiles[cuisine][
-        index % profiles[cuisine].length
-      ];
-
-    const diet=detectDiet(name);
-
-    let meal="Lunch";
-
-    const n=name.toLowerCase();
-
-    if(
-      n.includes("breakfast") ||
-      n.includes("toast") ||
-      n.includes("pancake") ||
-      n.includes("poha") ||
-      n.includes("upma")
-    ){
-      meal="Breakfast";
-    }
-    else if(
-      n.includes("snack") ||
-      n.includes("chaat") ||
-      n.includes("nachos") ||
-      n.includes("salad")
-    ){
-      meal="Snack";
-    }
-    else if(
-      n.includes("pasta") ||
-      n.includes("curry") ||
-      n.includes("soup") ||
-      n.includes("noodle")
-    ){
-      meal="Dinner";
-    }
-
-    allRecipes.push({
-      name,
-      cuisine,
-      diet,
-      meal,
-      needs:profile.slice(0,3),
-      extra:profile.slice(3)
-    });
-
-  });
-
-});
 
 
 /* =========================================================
    RECIPE FILTER
 ========================================================= */
 
-function dietCompatible(recipeDiet,userDiet){
 
-  if(userDiet==="Non-Vegetarian"){
-    return true;
+const WIKIBOOKS_API="https://en.wikibooks.org/w/api.php";
+const COMMONS_API="https://commons.wikimedia.org/w/api.php";
+const SOURCE_CACHE_TTL=7*24*60*60*1000;
+const WIKI_RECIPE_CATEGORIES={
+  Indian:"Indian recipes",
+  Korean:"Korean recipes",
+  Mexican:"Mexican recipes",
+  Chinese:"Chinese recipes",
+  Italian:"Italian recipes",
+  Japanese:"Japanese recipes",
+  Thai:"Thai recipes",
+  American:"United States recipes",
+  Mediterranean:"Mediterranean recipes"
+};
+const wikiRecipeSearchCache=new Map();
+
+function recipeCacheKey(cuisine){
+  return "nutriplate-wiki-catalog-v5-"+encodeURIComponent(cuisine.toLowerCase());
+}
+function loadWikiRecipeCache(cuisine){
+  try{
+    const cached=JSON.parse(localStorage.getItem(recipeCacheKey(cuisine))||"null");
+    if(cached&&Date.now()-cached.savedAt<SOURCE_CACHE_TTL&&Array.isArray(cached.recipes)) return cached.recipes;
+  }catch(error){
+    console.warn("Could not read the saved recipe catalog",error);
   }
-
-  if(userDiet==="Egg Vegetarian"){
-    return (
-      recipeDiet==="Vegan" ||
-      recipeDiet==="Vegetarian" ||
-      recipeDiet==="Egg Vegetarian"
-    );
+  return null;
+}
+function saveWikiRecipeCache(cuisine,recipes){
+  try{
+    localStorage.setItem(recipeCacheKey(cuisine),JSON.stringify({savedAt:Date.now(),recipes}));
+  }catch(error){
+    console.warn("Could not save the recipe catalog in this browser",error);
   }
-
-  if(userDiet==="Vegetarian"){
-    return (
-      recipeDiet==="Vegan" ||
-      recipeDiet==="Vegetarian"
-    );
-  }
-
-  if(userDiet==="Vegan"){
-    return recipeDiet==="Vegan";
-  }
-
-  return true;
 }
 
+function dietCompatible(recipeDiet,userDiet){ return recipeDiet===userDiet; }
 
-function findMeals(){
+function getMealDiet(ingredients){
+  const text=ingredients.join(" ").toLowerCase()
+    .replace(/\b(?:coconut|oat|almond|soy|soya|rice|cashew|hemp|pea|macadamia|hazelnut)\s+(?:milk|cream|yogurt|yoghurt|cheese)\b/g,"")
+    .replace(/\b(?:vegan|plant[- ]based|dairy[- ]free)\s+(?:butter|cheese|cream|milk|mayo|mayonnaise|yogurt|yoghurt)\b/g,"")
+    .replace(/\bpeanut butter\b|\bcream of coconut\b/g,"");
+  if(/\b(chicken|beef|steak|veal|venison|bison|rabbit|pork|lamb|mutton|turkey|duck|goose|fish|salmon|tuna|cod|prawn|shrimp|crab|lobster|clam|mussel|oyster|anchov|sardine|bacon|ham|sausage|chorizo|gelatin|gelatine|lard|suet|meat|worcestershire|rennet)\b/.test(text)) return "Non-Vegetarian";
+  if(/\b(stock|broth|bouillon)\b/.test(text) && !/\b(vegetable|mushroom)\s+(stock|broth)\b/.test(text)) return "Diet not verified";
+  if(/\b(egg|eggs|mayonnaise|mayo)\b/.test(text)) return "Egg Vegetarian";
+  if(/\b(milk|cream|cheese|butter|ghee|yogurt|yoghurt|paneer|curd|whey|honey|buttermilk|parmesan|mozzarella|cheddar|feta|ricotta)\b/.test(text)) return "Vegetarian";
+  return "Vegan";
+}
+function wikiPageUrl(title){ return "https://en.wikibooks.org/wiki/"+encodeURIComponent(title.replace(/ /g,"_")); }
+
+function cleanText(value){
+  return String(value||"")
+    .replace(/<[^>]*>/g," ")
+    .replace(/&nbsp;|&#160;/gi," ")
+    .replace(/&amp;/gi,"&")
+    .replace(/&lt;/gi,"<")
+    .replace(/&gt;/gi,">")
+    .replace(/&quot;/gi,'"')
+    .replace(/&#39;|&apos;/gi,"'")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function wikiSectionLines(text,heading){
+  const match=new RegExp("(?:^|\\n)\\s*"+heading+"\\s*\\n","i").exec(text);
+  if(!match) return [];
+  const tail=text.slice(match.index+match[0].length);
+  const stop=/\n(?:Procedure|Directions|Method|Notes(?:, tips, and variations)?|See also|References|External links)\s*\n/i.exec(tail);
+  const section=stop?tail.slice(0,stop.index):tail;
+  return section.split("\n").map(line=>line.replace(/^\s*(?:[*•·]+|[-–—]+)\s*/,"").replace(/^\s*\d+[.)]\s*/,"").trim()).filter(line=>line.length>2);
+}
+
+function wikiCuisineFromCategories(categories=[]){
+  const categoryText=(Array.isArray(categories)?categories:[])
+    .map(category=>typeof category==="string"?category:(category.title||""))
+    .join(" ")
+    .replace(/^Category:/g,"")
+    .toLowerCase();
+  const known=[
+    ["Indian",/\bindian recipes\b/],
+    ["Korean",/\bkorean recipes\b/],
+    ["Mexican",/\bmexican recipes\b/],
+    ["Chinese",/\bchinese recipes\b/],
+    ["Italian",/\bitalian recipes\b/],
+    ["Japanese",/\bjapanese recipes\b/],
+    ["Thai",/\bthai recipes\b/],
+    ["American",/\b(?:united states|american) recipes\b/],
+    ["Mediterranean",/\b(?:mediterranean|greek|turkish|moroccan|tunisian|lebanese|israeli|cypriot) recipes\b/]
+  ];
+  const match=known.find(([,pattern])=>pattern.test(categoryText));
+  return match?match[0]:"International";
+}
+
+function parseWikiRecipe(title,extract,cuisineOverride,categories=[]){
+  const ingredientLines=wikiSectionLines(extract,"Ingredients").filter(line=>!/^(.+\s+)?ingredients?$/i.test(line));
+  const instructionLines=wikiSectionLines(extract,"Procedure").filter(line=>! /^(preparation|cooking|directions|method)$/i.test(line));
+  if(ingredientLines.length<3||instructionLines.length<2) return null;
+  const procedureLines=new Set(instructionLines.map(line=>line.toLowerCase().replace(/\s+/g," ").trim()));
+  const ingredientRows=ingredientLines.filter(line=>!/^\[?edit\b/i.test(line)&&!/^image$/i.test(line)&&!procedureLines.has(line.toLowerCase().replace(/\s+/g," ").trim())).map(line=>{
+    if(!line.includes("|")) return {line,tableMeasure:""};
+    const cells=line.split("|").map(cell=>cell.trim());
+    const label=(cells[0]||"").replace(/\s*\^?\{?\[?note[^\]]*\]?\}?/ig,"").trim();
+    if(!label||/^(?:ingredient|total|[-–—]+)$/i.test(label)) return null;
+    const tableMeasure=[cells[2],cells[1],cells[3]].find(cell=>cell&&!/^(?:[-–—]+|n\/?a)$/i.test(cell))||"";
+    return {line:label,tableMeasure};
+  }).filter(Boolean);
+  const parsedIngredients=ingredientRows.map(row=>{
+    const line=row.line;
+    const amountAtom="(?:\\d+(?:[.,]\\d+)?(?:\\s*(?:\\d+\\s*\\/\\s*\\d+|[¼½¾⅓⅔⅛⅜⅝⅞]))?|\\d+\\s*\\/\\s*\\d+|[¼½¾⅓⅔⅛⅜⅝⅞])";
+    const amountPattern=amountAtom+"(?:\\s*(?:to|[-–—])\\s*"+amountAtom+")?";
+    const unitPattern="(?:pounds?|lbs?|kilograms?|kgs?|grams?|milligrams?|milliliters?|millilitres?|ml|oz|ounces?|lb|kg|g|mg|tablespoons?|tbsp|teaspoons?|tsp|cups?|liters?|litres?|l|pinch(?:es)?|cloves?|pieces?)(?![a-z])";
+    const measurePattern=new RegExp("^\\s*("+amountPattern+"(?:\\s+"+unitPattern+")?)(?:\\s+|$)","i");
+    const measureMatch=line.match(measurePattern);
+    let name=line.replace(measurePattern,"");
+    name=name.replace(/^(?:of\s+)/i,"")
+      .replace(/^\([^)]*\)\s*/,"")
+      .replace(/^(?:(?:finely|roughly|thinly|coarsely)[- ]?)?(?:chopped|diced|minced|sliced|grated|crushed|ground)\s+/i,"")
+      .replace(/,?\s*(?:preferably|to taste|for garnish|for cooking|for serving)\b.*$/i,"")
+      .replace(/\s*\([^)]*\)\s*$/,"")
+      .trim();
+    const tableMeasureMatch=row.tableMeasure.match(measurePattern);
+    return {name,measure:tableMeasureMatch?tableMeasureMatch[1].trim():measureMatch?measureMatch[1].trim():row.tableMeasure};
+  });
+  const ingredients=parsedIngredients;
+  if(ingredients.length<3) return null;
+  const name=title.replace(/^Cookbook:/,"").replace(/_/g," ").replace(/\s+(?:I{1,3}|IV|V)$/,"");
+  const category=/(breakfast|dosa|idli|pancake|poha|upma)/i.test(name)?"Breakfast":/(dessert|kheer|halwa|sweet|rasmalai|ladoo|payasam)/i.test(name)?"Dessert":/(snack|samosa|vada|puri|pakora|chaat)/i.test(name)?"Snack":"Main";
+  const cuisine=cuisineOverride&&cuisineOverride!=="Any"?cuisineOverride:wikiCuisineFromCategories(categories);
+  const sourceUrl=wikiPageUrl(title);
+  return {id:"wikibooks-"+title.toLowerCase().replace(/[^a-z0-9]+/g,"-"),name,cuisine,area:cuisine,category,meal:category==="Breakfast"?"Breakfast":category==="Snack"||category==="Dessert"?"Snack":"Main",diet:getMealDiet(ingredients.map(item=>item.name)),ingredients,needs:ingredients.map(item=>item.name),extra:[],image:"",imagePage:"",imageCredit:"",imageLicenseUrl:"https://creativecommons.org/licenses/by-sa/4.0/",instructions:instructionLines.map(line=>line.replace(/^\d+[.)]\s*/,"")).filter(Boolean),sourceUrl,originalSource:sourceUrl,attribution:"Wikibooks contributors (adapted by NutriPlate)",recipeLicense:"CC BY-SA"};
+}
+
+async function fetchWikiRecipePages(titles){
+  const pages=[];
+  for(let offset=0;offset<titles.length;offset+=20){
+    const batch=titles.slice(offset,offset+20);
+    try{
+      const params=new URLSearchParams({
+        action:"query",
+        prop:"extracts|categories",
+        explaintext:"1",
+        exsectionformat:"plain",
+        exlimit:"20",
+        cllimit:"max",
+        titles:batch.join("|"),
+        format:"json",
+        origin:"*"
+      });
+      const response=await fetch(WIKIBOOKS_API+"?"+params.toString());
+      if(!response.ok) throw new Error("Wikibooks returned "+response.status);
+      const data=await response.json();
+      pages.push(...Object.values(data.query?.pages||{}));
+    }catch(error){
+      console.warn("Could not load one Wikibooks recipe batch",error);
+    }
+  }
+  const pageByTitle=new Map(pages.map(page=>[page.title,page]));
+  return titles.map(title=>pageByTitle.get(title)).filter(Boolean);
+}
+
+async function fetchWikiCategoryTitles(category){
+  const titles=[];
+  const visitedCategories=new Set();
+  const pendingCategories=["Category:"+category];
+  while(pendingCategories.length){
+    const currentCategory=pendingCategories.pop();
+    if(visitedCategories.has(currentCategory)) continue;
+    visitedCategories.add(currentCategory);
+    const baseParams=new URLSearchParams({action:"query",list:"categorymembers",cmtitle:currentCategory,cmtype:"page|subcat",cmlimit:"max",format:"json",origin:"*"});
+    let continuation=null;
+    do{
+      const params=new URLSearchParams(baseParams);
+      if(continuation) Object.entries(continuation).forEach(([key,value])=>params.set(key,value));
+      const response=await fetch(WIKIBOOKS_API+"?"+params.toString());
+      if(!response.ok) throw new Error("Wikibooks category returned "+response.status);
+      const data=await response.json();
+      for(const member of data.query?.categorymembers||[]){
+        if(member.ns===14) pendingCategories.push(member.title);
+        else if(member.ns===0) titles.push(member.title);
+      }
+      continuation=data.continue||null;
+    }while(continuation);
+  }
+  return [...new Set(titles)];
+}
+
+async function searchWikiRecipes(cuisine,ingredients=[]){
+  const category=cuisine==="Any"?"Recipes":WIKI_RECIPE_CATEGORIES[cuisine];
+  if(!category) return [];
+  const terms=[...new Set(ingredients.map(item=>normalizeIngredient(String(item||"").trim().toLowerCase())).filter(Boolean))].slice(0,6);
+  const cacheKey=cuisine+"|"+terms.join("|");
+  if(wikiRecipeSearchCache.has(cacheKey)) return wikiRecipeSearchCache.get(cacheKey);
+  if(terms.length===0){
+    const saved=loadWikiRecipeCache(cuisine);
+    if(saved){
+      wikiRecipeSearchCache.set(cacheKey,saved);
+      return saved;
+    }
+    if(cuisine!=="Any"){
+      try{
+        const titles=await fetchWikiCategoryTitles(category);
+        const pages=await fetchWikiRecipePages(titles);
+        const recipes=pages.map(page=>parseWikiRecipe(page.title,page.extract||"",cuisine,page.categories||[])).filter(Boolean);
+        wikiRecipeSearchCache.set(cacheKey,recipes);
+        saveWikiRecipeCache(cuisine,recipes);
+        return recipes;
+      }catch(error){
+        console.warn("Could not load the complete cuisine recipe list",cuisine,error);
+      }
+    }
+  }
+
+  const queries=terms.length?terms:[""];
+  const resultLists=await mapWithConcurrency(queries,2,async term=>{
+    try{
+      const params=new URLSearchParams({
+        action:"query",
+        list:"search",
+        srsearch:'incategory:"'+category+'"'+(term?" "+term:""),
+        srnamespace:"0",
+        srlimit:terms.length?"20":"40",
+        format:"json",
+        origin:"*"
+      });
+      const response=await fetch(WIKIBOOKS_API+"?"+params.toString());
+      if(!response.ok) throw new Error("Wikibooks returned "+response.status);
+      const data=await response.json();
+      return data.query?.search||[];
+    }catch(error){
+      console.warn("Wikibooks recipe search failed",term,error);
+      return [];
+    }
+  });
+
+  const ranking=new Map();
+  resultLists.forEach(list=>list.forEach((page,index)=>{
+    const current=ranking.get(page.title)||{count:0,rank:0};
+    current.count++;
+    current.rank+=index;
+    ranking.set(page.title,current);
+  }));
+  const titles=[...ranking.entries()]
+    .sort((a,b)=>b[1].count-a[1].count||a[1].rank-b[1].rank)
+    .map(([title])=>title)
+    .slice(0,terms.length?60:40);
+  if(!titles.length) return [];
+
+  const pages=await fetchWikiRecipePages(titles);
+  const recipes=pages.map(page=>parseWikiRecipe(page.title,page.extract||"",cuisine==="Any"?"Any":cuisine,page.categories||[])).filter(Boolean);
+  if(recipes.length){
+    wikiRecipeSearchCache.set(cacheKey,recipes);
+    if(terms.length===0) saveWikiRecipeCache(cuisine,recipes);
+  }
+  return recipes;
+}
+
+function licenseIsReusable(metadata){
+  const license=cleanText(metadata?.LicenseShortName?.value||"").toLowerCase();
+  if(/\b(nc|nd)\b|non.?commercial|no.?derivatives/.test(license)) return false;
+  return /^(public domain|cc0|cc by(?:-sa)?(?:\s|$))/.test(license);
+}
+
+async function commonsPhotoForRecipe(recipe){
+  const url=COMMONS_API+"?action=query&generator=search&gsrsearch="+encodeURIComponent(recipe.name+" "+(recipe.cuisine&&recipe.cuisine!=="International"?recipe.cuisine.toLowerCase()+" ":"")+"food dish")+"&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=640&format=json&origin=*";
+  const response=await fetch(url);
+  if(!response.ok) return recipe;
+  const data=await response.json();
+  const wanted=recipe.name.toLowerCase().split(/\W+/).filter(word=>word.length>2&&!["indian","recipe","dish"].includes(word));
+  const requiredWords=Math.min(2,wanted.length);
+  const ranked=Object.values(data.query?.pages||{}).map(page=>{
+    const info=page.imageinfo?.[0],metadata=info?.extmetadata||{};
+    if(!info||!info.thumburl||!licenseIsReusable(metadata)) return null;
+    const filenameWords=page.title.toLowerCase().replace(/[_-]+/g," ").split(/[^a-z0-9]+/).filter(Boolean);
+    const score=wanted.filter(word=>filenameWords.includes(word)).length;
+    return score>=requiredWords?{page,info,metadata,score}:null;
+  }).filter(Boolean).sort((a,b)=>b.score-a.score);
+  if(!ranked.length){
+    recipe.imageLookupAt=Date.now();
+    return recipe;
+  }
+  const selected=ranked[0],metadata=selected.metadata;
+  recipe.image=selected.info.thumburl||selected.info.url||"";
+  recipe.imagePage="https://commons.wikimedia.org/wiki/"+encodeURIComponent(selected.page.title.replace(/ /g,"_"));
+  recipe.imageCredit=cleanText(metadata.Artist?.value||"Wikimedia Commons contributor");
+  recipe.imageLicenseUrl=metadata.LicenseUrl?.value||"";
+  recipe.imageLookupAt=Date.now();
+  return recipe;
+}
+
+async function attachCommonsPhotos(recipes){
+  const queue=[...recipes],output=[];
+  const workers=Array.from({length:4},async()=>{
+    while(queue.length){
+      const recipe=queue.shift();
+      if(recipe.imageLookupAt&&Date.now()-recipe.imageLookupAt<SOURCE_CACHE_TTL){
+        output.push(recipe);
+        continue;
+      }
+      try{output.push(await commonsPhotoForRecipe(recipe));}
+      catch(error){console.warn("Could not load a licensed food photo",recipe.name,error);output.push(recipe);}
+    }
+  });
+  await Promise.all(workers);
+  const result=recipes.map(recipe=>output.find(item=>item.id===recipe.id)||recipe);
+  return result;
+}
+
+async function mapWithConcurrency(items,limit,worker){
+  const queue=[...items],results=new Array(items.length);
+  let index=0;
+  const workers=Array.from({length:Math.min(limit,queue.length)},async()=>{
+    while(queue.length){
+      const item=queue.shift();
+      const current=index++;
+      results[current]=await worker(item);
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
+
+async function recipesForIngredients(userIngredients,cuisine,diet,meal){
+  const recipes=await searchWikiRecipes(cuisine,userIngredients);
+  const candidates=recipes.map(recipe=>{
+    const matched=matchingIngredients(recipe,userIngredients);
+    const missing=recipe.ingredients.filter(item=>!matched.includes(item.name)).map(item=>item.name);
+    return {recipe,matched,missing};
+  }).filter(item=>
+    (cuisine==="Any"||item.recipe.cuisine===cuisine) &&
+    dietCompatible(item.recipe.diet,diet) &&
+    mealTypeMatches(item.recipe,meal) &&
+    item.matched.length>=Math.min(2,userIngredients.length,item.recipe.ingredients.length)
+  ).sort((a,b)=>{
+    const aCoverage=a.matched.length/Math.max(1,userIngredients.length);
+    const bCoverage=b.matched.length/Math.max(1,userIngredients.length);
+    return bCoverage-aCoverage||b.matched.length-a.matched.length||a.missing.length-b.missing.length;
+  });
+  const withPhotos=await attachCommonsPhotos(candidates.slice(0,12).map(item=>item.recipe));
+  const byId=new Map(withPhotos.map(recipe=>[recipe.id,recipe]));
+  return candidates.slice(0,12).map(item=>byId.get(item.recipe.id)||item.recipe);
+}
+
+let activeCuisineBrowse={name:"",recipes:[],loaded:0,loading:false};
+let cuisineBrowseRequestId=0;
+
+async function recipesForCuisine(cuisine){
+  return searchWikiRecipes(cuisine,[]);
+}
+
+async function loadMoreCuisineRecipes(button){
+  const browse=activeCuisineBrowse;
+  if(browse.requestId!==cuisineBrowseRequestId) return;
+  if(!browse.name||browse.loading||browse.loaded>=browse.recipes.length) return;
+  browse.loading=true;
+  button.disabled=true;
+  button.textContent="Loading more recipes…";
+  try{
+    const nextRecipes=browse.recipes.slice(browse.loaded,browse.loaded+12);
+    const withPhotos=await attachCommonsPhotos(nextRecipes);
+    if(activeCuisineBrowse!==browse||browse.requestId!==cuisineBrowseRequestId) return;
+    saveWikiRecipeCache(browse.name,browse.recipes);
+    document.getElementById("cuisineRecipeGrid").insertAdjacentHTML("beforeend",withPhotos.map(recipe=>plannerRecipeCard(recipe,null,null,null)).join(""));
+    browse.loaded+=withPhotos.length;
+    if(browse.loaded>=browse.recipes.length){ button.remove(); return; }
+    button.disabled=false;
+    button.textContent="Show more recipes";
+  }catch(error){
+    console.error("Could not load more cuisine recipes",error);
+    button.disabled=false;
+    button.textContent="Try loading more";
+  }finally{
+    browse.loading=false;
+  }
+}
+
+function recipeIngredientMatches(userIngredient,recipeIngredient){
+  const user=normalizeIngredient(userIngredient);
+  const recipe=normalizeIngredient(recipeIngredient);
+  if(user===recipe) return true;
+  if(user==="bean" && /\bbean\b/.test(recipe)) return true;
+  const userWords=user.replace(/[-_/]+/g," ");
+  const recipeWords=recipe.replace(/[-_/]+/g," ");
+  if(userWords==="dal" && /\bdal\b/.test(recipeWords)) return true;
+  if(userWords==="rice" && /\brice (?:vinegar|flour|paper|wine)\b/.test(recipeWords)) return false;
+  if(userWords==="rice" && /\brice\b/.test(recipeWords)) return true;
+  if(userWords==="flour" && /\b(?:rice|chickpea|gram|corn|maize|almond|coconut|oat|buckwheat|cassava|potato) flour\b/.test(recipeWords)) return false;
+  if(userWords==="flour" && /\bflour\b/.test(recipeWords)) return true;
+  if(userWords==="onion" && /\b(?:red|white|yellow|spring|green) onion\b/.test(recipeWords)) return true;
+  if(userWords==="butter" && /\b(?:peanut|almond|cashew|sunflower seed|vegan) butter\b/.test(recipeWords)) return false;
+  if(userWords==="milk" && /\b(?:coconut|oat|almond|soy|soya|rice|cashew|hemp|pea|macadamia|hazelnut) milk\b/.test(recipeWords)) return false;
+  if(userWords==="cream" && /\b(?:coconut|oat|soy|soya|almond|cashew|pea) cream\b/.test(recipeWords)) return false;
+  if(userWords==="cheese" && /\b(?:vegan|plant[- ]based|nut|almond|cashew|soy|soya|coconut|rice) cheese\b/.test(recipeWords)) return false;
+  if((userWords==="ginger"||userWords==="garlic") && /\bginger garlic paste\b/.test(recipeWords)) return true;
+  const recipeTokens=recipeWords.split(/[^a-z0-9]+/).filter(Boolean);
+  const userTokens=userWords.split(/[^a-z0-9]+/).filter(Boolean);
+  if(userTokens.length===1 && recipeTokens.includes(userTokens[0])) return true;
+  if(userTokens.length>1 && recipeTokens.some((_,index)=>recipeTokens.slice(index,index+userTokens.length).join(" ")===userTokens.join(" "))) return true;
+  return user.length>=4 && recipe.startsWith(user+" ") ||
+         recipe.length>=4 && user.startsWith(recipe+" ");
+}
+
+function matchingIngredients(recipe,userIngredients){
+  return recipe.ingredients
+    .filter(item=>userIngredients.some(user=>recipeIngredientMatches(user,item.name)))
+    .map(item=>item.name);
+}
+
+function mealTypeMatches(recipe,selected){
+  if(selected==="Any") return true;
+  if(selected==="Lunch"||selected==="Dinner") return recipe.meal==="Main";
+  return recipe.meal===selected;
+}
+
+async function findMeals(){
 
   const results=document.getElementById("results");
-
-  const cuisine=
-    document.getElementById("cuisine").value;
-
-  const diet=
-    document.getElementById("diet").value;
-
-  const meal=
-    document.getElementById("mealType").value;
+  const cuisine=document.getElementById("cuisine").value;
+  const diet=document.getElementById("diet").value;
+  const meal=document.getElementById("mealType").value;
 
   if(ingredients.length===0){
-
     results.innerHTML=`
       <div class="card empty">
         <h3>🥕 Add some ingredients first</h3>
-        <p>Try roti, beans, tomato, cucumber and onion.</p>
-      </div>
-    `;
-
+        <p>Try adding two or more ingredients you have at home.</p>
+      </div>`;
     return;
   }
-
-  const filtered=allRecipes.filter(recipe=>{
-
-    const cuisineMatch=
-      cuisine==="Any" ||
-      recipe.cuisine===cuisine;
-
-    const dietMatch=
-      dietCompatible(recipe.diet,diet);
-
-    const mealMatch=
-      meal==="Any" ||
-      recipe.meal===meal;
-
-    return cuisineMatch && dietMatch && mealMatch;
-
-  });
-
-
-  const ranked=filtered.map(recipe=>{
-
-    const matched=
-      recipe.needs.filter(
-        item=>ingredients.includes(normalizeIngredient(item))
-      );
-
-    const optional=
-      recipe.extra.filter(
-        item=>ingredients.includes(normalizeIngredient(item))
-      );
-
-    const missing=
-      recipe.needs.filter(
-        item=>!ingredients.includes(normalizeIngredient(item))
-      );
-
-    const score=
-      matched.length*6+
-      optional.length*2-
-      missing.length;
-
-    return{
-      recipe,
-      matched,
-      optional,
-      missing,
-      score
-    };
-
-  }).sort((a,b)=>{
-
-    if(b.score!==a.score){
-      return b.score-a.score;
-    }
-
-    return a.missing.length-b.missing.length;
-
-  });
-
-
-  const strong=
-    ranked
-      .filter(x=>x.matched.length>0)
-      .slice(0,12);
-
-
-  const matches=
-    strong.length
-      ? strong
-      : ranked.slice(0,12);
-
-
-  if(matches.length===0){
-
-    results.innerHTML=`
-      <div class="card empty">
-        <h3>🍽️ No matching meals found</h3>
-        <p>
-          Try another meal type or add more ingredients.
-          NutriPlate AI remains optional.
-        </p>
-      </div>
-    `;
-
-    return;
-  }
-
 
   results.innerHTML=`
+    <div class="card empty">
+      <h3>🍳 Finding real recipes…</h3>
+      <p>Checking recipe ingredients, cuisine, and diet.</p>
+    </div>`;
 
-    <div class="card">
+  try{
+    const recipes=await recipesForIngredients(ingredients,cuisine,diet,meal);
+    const ranked=recipes.map(recipe=>{
+      const matched=matchingIngredients(recipe,ingredients);
+      const missing=recipe.ingredients
+        .filter(item=>!matched.includes(item.name))
+        .map(item=>item.name);
+      return{recipe,matched,missing,optional:[]};
+    }).filter(item=>
+      (cuisine==="Any"||item.recipe.cuisine===cuisine) &&
+      dietCompatible(item.recipe.diet,diet) &&
+      mealTypeMatches(item.recipe,meal) &&
+      item.matched.length>=Math.min(2,ingredients.length,item.recipe.ingredients.length)
+    ).sort((a,b)=>
+      b.matched.length-a.matched.length ||
+      a.missing.length-b.missing.length
+    ).slice(0,12);
 
-      <h2>
-        🍽️ ${
-          cuisine==="Any"
-          ? "NutriPlate Meal Matches"
-          : cuisine+" Meal Matches"
-        }
-      </h2>
+    if(!ranked.length){
+      results.innerHTML=`
+        <div class="card empty">
+          <h3>🍽️ No close recipe matches found</h3>
+          <p>
+            The recipe source did not find a dish with enough of your ingredients
+            for the selected cuisine, diet, and meal. Try adding ingredients or
+            changing a filter.
+          </p>
+        </div>`;
+      return;
+    }
 
-      <p class="counter">
-        Found ${matches.length} recommendation${matches.length===1?"":"s"}.
-        Powered by NutriPlate's own engine — AI is not required.
-      </p>
-
-      <div class="grid">
-
-        ${
-          matches.map(x=>
-            plannerRecipeCard(
-              x.recipe,
-              x.matched,
-              x.optional,
-              x.missing
-            )
-          ).join("")
-        }
-
-      </div>
-
-    </div>
-
-  `;
+    results.innerHTML=`
+      <div class="card">
+        <h2>🍽️ ${cuisine==="Any"?"NutriPlate Meal Matches":escapeHTML(cuisine)+" Meal Matches"}</h2>
+        <p class="counter">
+          Showing ${ranked.length} real recipes with at least
+          ${Math.min(2,ingredients.length)} of your ingredients.
+          Each card links to its recipe source and, when available, photo credit and license. Diet labels use listed ingredients; check packaged sauces and stocks.
+        </p>
+        <div class="grid">
+          ${ranked.map(item=>plannerRecipeCard(item.recipe,item.matched,item.optional,item.missing)).join("")}
+        </div>
+      </div>`;
+  }catch(error){
+    console.error(error);
+    results.innerHTML=`
+      <div class="card empty">
+        <h3>⚠️ Recipe search is temporarily unavailable</h3>
+        <p>Please check your internet connection and try again.</p>
+        <p class="recipe-credit">
+          Recipes come from the
+          <a href="https://en.wikibooks.org/wiki/Cookbook:Recipes" target="_blank" rel="noopener noreferrer">Wikibooks Cookbook</a>.
+        </p>
+      </div>`;
+  }
 
 }
 
@@ -2473,101 +2349,47 @@ function findMeals(){
 function plannerRecipeCard(r,matched,optional,missing){
 
   return`
-
-    <div class="recipe">
-
+    <article class="recipe">
+      ${r.image?'<img class="recipe-photo" src="'+escapeHTML(r.image)+'" alt="'+escapeHTML(r.name)+'" loading="lazy">':""}
       <h3>${escapeHTML(r.name)}</h3>
-
       <div class="meta">
         <span>🌎 ${escapeHTML(r.cuisine)}</span>
         <span>🥗 ${escapeHTML(r.diet)}</span>
-        <span>🍽️ ${escapeHTML(r.meal)}</span>
+        <span>🍽️ ${escapeHTML(r.meal==="Main"?"Main meal":r.meal)}</span>
       </div>
-
-      <p>
-        <b>✅ You have:</b>
-        ${matched.length
-          ? matched.map(escapeHTML).join(", ")
-          : "No exact required ingredients"}
+      ${matched===null?"":`<p><b>✅ You have:</b> ${matched.length?matched.map(escapeHTML).join(", "):"No matching ingredients"}</p>`}
+      ${missing&&missing.length?`<p><b>🛒 Also needed:</b> ${missing.map(escapeHTML).join(", ")}</p>`:""}
+      <details class="recipe-details">
+        <summary>Ingredients and cooking steps</summary>
+        <ul>
+          ${r.ingredients.map(item=>`<li>${escapeHTML([item.measure,item.name].filter(Boolean).join(" "))}</li>`).join("")}
+        </ul>
+        <ol>
+          ${r.instructions.map(step=>`<li>${escapeHTML(step)}</li>`).join("")}
+        </ol>
+      </details>
+      <p class="recipe-credit">
+        Recipe: <a href="${escapeHTML(r.sourceUrl||r.originalSource||"https://en.wikibooks.org/wiki/Cookbook:Recipes")}" target="_blank" rel="noopener noreferrer">${escapeHTML(r.attribution||"Wikibooks contributors")}</a>
+        ${r.recipeLicense?'· <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">${escapeHTML(r.recipeLicense)}</a>':""}
+        ${r.imagePage?'· Photo: <a href="'+escapeHTML(r.imagePage)+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(r.imageCredit||"Image details")+'</a>':""}
+        ${r.imageLicenseUrl?'· <a href="'+escapeHTML(r.imageLicenseUrl)+'" target="_blank" rel="noopener noreferrer">Photo license</a>':""}
+        ${r.area&&r.area!=="Indian"?'· '+escapeHTML(r.area):""}
       </p>
-
-      ${
-        missing.length
-        ?`
-          <p>
-            <b>🛒 You may need:</b>
-            ${missing.map(escapeHTML).join(", ")}
-          </p>
-        `
-        :""
-      }
-
-      ${
-        optional.length
-        ?`
-          <p>
-            <b>⭐ Optional you have:</b>
-            ${optional.map(escapeHTML).join(", ")}
-          </p>
-        `
-        :""
-      }
-
-      <p><b>🧺 Ingredients:</b></p>
-
-      <div class="ingredients-list">
-        ${
-          [...r.needs,...r.extra]
-            .map(i=>`
-              <span class="ingredient-pill">
-                ${escapeHTML(i)}
-              </span>
-            `)
-            .join("")
-        }
-      </div>
-
-    </div>
-
-  `;
+    </article>`;
 
 }
 
 
-/* =========================================================
-   CUISINE EXPLORER
-========================================================= */
-
 function renderCuisineCards(){
 
-  const box=
-    document.getElementById("cuisineCards");
-
-  box.innerHTML=
-    Object.entries(cuisineInfo)
-    .map(([name,info])=>`
-
-      <div
-        class="card cuisine-card"
-        onclick="showCuisine('${name}')"
-      >
-
-        <div class="cuisine-icon">
-          ${info.emoji}
-        </div>
-
-        <h3>${name}</h3>
-
-        <p>${info.description}</p>
-
-        <span class="cuisine-count">
-          50+ dishes
-        </span>
-
-      </div>
-
-    `)
-    .join("");
+  const box=document.getElementById("cuisineCards");
+  box.innerHTML=Object.entries(cuisineInfo).map(([name,info])=>`
+    <div class="card cuisine-card" onclick="showCuisine('${name}')">
+      <div class="cuisine-icon">${info.emoji}</div>
+      <h3>${name}</h3>
+      <p>${info.description}</p>
+      <span class="cuisine-count">Browse recipes</span>
+    </div>`).join("");
 
 }
 
@@ -2604,102 +2426,40 @@ function renderCuisineToolbar(){
 }
 
 
-function showCuisine(name,button){
-
-  document
-    .querySelectorAll(".cuisine-toolbar button")
-    .forEach(btn=>btn.classList.remove("active"));
-
-  if(button){
-    button.classList.add("active");
+async function showCuisine(name,button){
+  const requestId=++cuisineBrowseRequestId;
+  document.querySelectorAll(".cuisine-toolbar button").forEach(btn=>btn.classList.remove("active"));
+  if(button) button.classList.add("active");
+  const selected=name==="All"?"Any":name;
+  if(selected==="Any"){
+    navigateTo("cuisines");
+    document.getElementById("cuisineResults").innerHTML='<div class="card empty"><h3>🌍 Choose a cuisine to browse</h3><p>Select a cuisine card or tab to open recipes, photos, ingredients, and cooking steps.</p></div>';
+    return;
   }
-
-  const box=
-    document.getElementById("cuisineResults");
-
-  let list;
-
-  if(name==="All"){
-    list=allRecipes;
-  }else{
-    list=allRecipes.filter(
-      recipe=>recipe.cuisine===name
-    );
+  navigateTo("cuisineDetail");
+  const box=document.getElementById("cuisineDetailContent");
+  box.innerHTML='<div class="card empty"><h3>🌍 Loading '+escapeHTML(selected+" recipes")+'…</h3></div>';
+  try{
+    const recipes=await recipesForCuisine(selected);
+    if(requestId!==cuisineBrowseRequestId) return;
+    if(!recipes.length){
+      box.innerHTML='<div class="card empty"><h3>🍽️ No recipes found for this cuisine yet</h3><p>Choose another cuisine or try again later.</p></div>';
+      return;
+    }
+    const firstBatch=await attachCommonsPhotos(recipes.slice(0,12));
+    if(requestId!==cuisineBrowseRequestId) return;
+    saveWikiRecipeCache(selected,recipes);
+    const browse={name:selected,recipes,loaded:firstBatch.length,loading:false,requestId};
+    activeCuisineBrowse=browse;
+    const countText='Showing '+firstBatch.length+' of '+recipes.length+' recipes. Each card includes ingredients, cooking steps, and source and photo credits when available.';
+    const moreButton=browse.loaded<recipes.length?'<div style="text-align:center;margin-top:18px"><button class="secondary" onclick="loadMoreCuisineRecipes(this)">Show more recipes</button></div>':'';
+    box.innerHTML='<div class="card"><h2>'+(cuisineInfo[selected]?.emoji||"🌍")+' '+escapeHTML(selected)+' Cuisine</h2><p class="counter">'+countText+'</p><div class="grid" id="cuisineRecipeGrid">'+firstBatch.map(recipe=>plannerRecipeCard(recipe,null,null,null)).join("")+'</div>'+moreButton+'</div>';
+  }catch(error){
+    console.error(error);
+    box.innerHTML='<div class="card empty"><h3>⚠️ Recipe collection is temporarily unavailable</h3><p>Please check your internet connection and try again.</p><p class="recipe-credit">Recipes come from the <a href="https://en.wikibooks.org/wiki/Cookbook:Recipes" target="_blank" rel="noopener noreferrer">Wikibooks Cookbook</a>.</p></div>';
   }
-
-  /*
-    World Explorer shows exactly 50+ dishes per cuisine.
-    Only ingredients are required here, as requested.
-  */
-
-  box.innerHTML=`
-
-    <div class="card">
-
-      <h2>
-        ${
-          name==="All"
-          ? "🌍 World Food Collection"
-          : `${cuisineInfo[name].emoji} ${name} Cuisine`
-        }
-      </h2>
-
-      <p class="counter">
-        ${name==="All"
-          ? "Explore dishes from every NutriPlate cuisine."
-          : "50 dishes with their ingredient lists."
-        }
-      </p>
-
-      <div class="grid">
-
-        ${
-          list.map(recipe=>`
-
-            <div class="recipe">
-
-              <h3>${escapeHTML(recipe.name)}</h3>
-
-              <div class="meta">
-                <span>🌎 ${escapeHTML(recipe.cuisine)}</span>
-                <span>🥗 ${escapeHTML(recipe.diet)}</span>
-                <span>🍽️ ${escapeHTML(recipe.meal)}</span>
-              </div>
-
-              <p><b>🧺 Ingredients needed:</b></p>
-
-              <div class="ingredients-list">
-
-                ${
-                  [...recipe.needs,...recipe.extra]
-                    .map(i=>`
-                      <span class="ingredient-pill">
-                        ${escapeHTML(i)}
-                      </span>
-                    `)
-                    .join("")
-                }
-
-              </div>
-
-            </div>
-
-          `).join("")
-        }
-
-      </div>
-
-    </div>
-
-  `;
-
-  if(name!=="All"){
-    document
-      .getElementById("cuisineResults")
-      .scrollIntoView({behavior:"smooth",block:"start"});
-  }
-
 }
+
 
 
 /* =========================================================
@@ -2894,20 +2654,40 @@ function toggleAccordion(id){
    NAVIGATION
 ========================================================= */
 
-function scrollToId(id){
-
+function navigateTo(id,updateHistory=true){
   const element=document.getElementById(id);
-
-  if(element){
-
-    element.scrollIntoView({
-      behavior:"smooth",
-      block:"start"
-    });
-
+  if(!element) return;
+  const page=element.matches("main.container > .section")
+    ? element
+    : element.closest("main.container > .section");
+  if(!page) return;
+  document.querySelectorAll("main.container > .section").forEach(section=>{
+    section.classList.toggle("hidden",section!==page);
+  });
+  if(updateHistory){
+    const route="#"+encodeURIComponent(page.id);
+    if(location.hash!==route) history.pushState({page:page.id},"",route);
   }
-
+  window.scrollTo({top:0,behavior:"auto"});
 }
+
+function scrollToId(id){
+  const element=document.getElementById(id);
+  if(!element) return;
+  const page=element.matches("main.container > .section")
+    ? element
+    : element.closest("main.container > .section");
+  if(page){
+    navigateTo(page.id);
+  }else{
+    element.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+}
+
+window.addEventListener("popstate",()=>{
+  const id=decodeURIComponent(location.hash.slice(1))||"home";
+  navigateTo(id,false);
+});
 
 
 /* =========================================================
@@ -2944,7 +2724,7 @@ en:{
   ageGroup:"Age Group",
   findMeals:"🍳 Find My Meals",
   worldTitle:"🌎 Explore the World of Food",
-  worldSub:"Every cuisine below contains 50 dishes with their ingredient lists.",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 Nutri Facts",
   factsSub:"Explore general nutrition information for different life stages.",
   modesTitle:"🧠 Smart Modes",
@@ -2985,7 +2765,7 @@ hi:{
   ageGroup:"आयु समूह",
   findMeals:"🍳 मेरे भोजन खोजें",
   worldTitle:"🌎 दुनिया के भोजन देखें",
-  worldSub:"हर व्यंजन शैली में 50 भोजन और उनकी सामग्री दी गई है।",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 पोषण तथ्य",
   factsSub:"अलग-अलग आयु समूहों के लिए सामान्य पोषण जानकारी देखें।",
   modesTitle:"🧠 स्मार्ट मोड",
@@ -3026,7 +2806,7 @@ mr:{
   ageGroup:"वयोगट",
   findMeals:"🍳 माझे भोजन शोधा",
   worldTitle:"🌎 जगातील पदार्थ पहा",
-  worldSub:"प्रत्येक पाककृती शैलीमध्ये 50 पदार्थ आणि त्यांची सामग्री आहे.",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 पोषण माहिती",
   factsSub:"वेगवेगळ्या वयोगटांसाठी सामान्य पोषण माहिती पहा.",
   modesTitle:"🧠 स्मार्ट मोड",
@@ -3067,7 +2847,7 @@ ta:{
   ageGroup:"வயது குழு",
   findMeals:"🍳 எனது உணவுகளைத் தேடு",
   worldTitle:"🌎 உலக உணவுகளை ஆராயுங்கள்",
-  worldSub:"ஒவ்வொரு சமையல் வகையிலும் 50 உணவுகளும் அவற்றின் பொருட்களும் உள்ளன.",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 ஊட்டச்சத்து தகவல்",
   factsSub:"வயது குழுக்களுக்கான பொதுவான ஊட்டச்சத்து தகவல்களைப் பாருங்கள்.",
   modesTitle:"🧠 ஸ்மார்ட் முறைகள்",
@@ -3108,7 +2888,7 @@ te:{
   ageGroup:"వయస్సు సమూహం",
   findMeals:"🍳 నా భోజనాలను కనుగొనండి",
   worldTitle:"🌎 ప్రపంచ ఆహారాన్ని అన్వేషించండి",
-  worldSub:"ప్రతి వంటకాల విభాగంలో 50 వంటకాలు మరియు వాటి పదార్థాలు ఉన్నాయి.",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 పోషక సమాచారం",
   factsSub:"వివిధ వయస్సుల కోసం సాధారణ పోషక సమాచారాన్ని చూడండి.",
   modesTitle:"🧠 స్మార్ట్ మోడ్‌లు",
@@ -3149,7 +2929,7 @@ kn:{
   ageGroup:"ವಯಸ್ಸಿನ ಗುಂಪು",
   findMeals:"🍳 ನನ್ನ ಊಟಗಳನ್ನು ಹುಡುಕಿ",
   worldTitle:"🌎 ವಿಶ್ವ ಆಹಾರವನ್ನು ಅನ್ವೇಷಿಸಿ",
-  worldSub:"ಪ್ರತಿ ಅಡುಗೆ ವಿಭಾಗದಲ್ಲಿ 50 ಆಹಾರಗಳು ಮತ್ತು ಅವುಗಳ ಪದಾರ್ಥಗಳಿವೆ.",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 ಪೌಷ್ಟಿಕ ಮಾಹಿತಿ",
   factsSub:"ವಿವಿಧ ವಯಸ್ಸಿನ ಗುಂಪುಗಳಿಗೆ ಸಾಮಾನ್ಯ ಪೌಷ್ಟಿಕ ಮಾಹಿತಿಯನ್ನು ನೋಡಿ.",
   modesTitle:"🧠 ಸ್ಮಾರ್ಟ್ ಮೋಡ್‌ಗಳು",
@@ -3190,7 +2970,7 @@ bn:{
   ageGroup:"বয়সের গ্রুপ",
   findMeals:"🍳 আমার খাবার খুঁজুন",
   worldTitle:"🌎 বিশ্বের খাবার অন্বেষণ করুন",
-  worldSub:"প্রতিটি রান্নার বিভাগে ৫০টি খাবার এবং তাদের উপকরণ রয়েছে।",
+  worldSub:"Browse cuisines and see each recipe’s listed ingredients.",
   factsTitle:"🥦 পুষ্টি তথ্য",
   factsSub:"বিভিন্ন বয়সের জন্য সাধারণ পুষ্টি তথ্য দেখুন।",
   modesTitle:"🧠 স্মার্ট মোড",
@@ -3954,6 +3734,9 @@ function initialize(){
   loadState();
 
   showCuisine("All");
+
+  const initialPage=decodeURIComponent(location.hash.slice(1))||"home";
+  navigateTo(document.getElementById(initialPage)?initialPage:"home",false);
 
 }
 
