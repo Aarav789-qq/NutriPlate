@@ -767,9 +767,8 @@ footer{
 }
 
 @media(max-width:850px){
-  nav{
-    display:none;
-  }
+  .nav{flex-wrap:wrap}
+  nav{display:flex;flex:1 1 100%;order:3}
 }
 
 @media(max-width:650px){
@@ -1006,6 +1005,10 @@ footer{
 
 </section>
 
+<section id="cuisineDetail" class="section hidden">
+  <button class="secondary" onclick="navigateTo('cuisines')">← Back to Cuisines</button>
+  <div id="cuisineDetailContent" class="cuisine-results"></div>
+</section>
 
 <!-- NUTRI FACTS -->
 
@@ -1630,6 +1633,15 @@ function normalizeIngredient(item){
     "spring onions":"spring onion",capsicum:"bell pepper","bell peppers":"bell pepper",
     "shimla mirch":"bell pepper",dahi:"yogurt",curd:"yogurt",yoghurt:"yogurt",
     soya:"soy","soya chunks":"soy chunk","soy chunks":"soy chunk",
+    brinjal:"eggplant",baingan:"eggplant",aubergine:"eggplant","egg plant":"eggplant",
+    bhindi:"okra","lady finger":"okra","lady fingers":"okra",aloo:"potato",palak:"spinach",
+    jeera:"cumin",haldi:"turmeric",mirchi:"chili",mirch:"chili",
+    "chana dal":"split chickpea","chana dhal":"split chickpea","channa dal":"split chickpea","channa dhal":"split chickpea",
+    chilli:"chili","green chilli":"green chili","green chillies":"green chili","green chilies":"green chili",
+    besan:"chickpea flour","gram flour":"chickpea flour",atta:"wheat flour","chapati flour":"wheat flour",maida:"all-purpose flour","plain flour":"all-purpose flour",
+    methi:"fenugreek",saunf:"fennel",ajwain:"carom seed",hing:"asafoetida",amchur:"mango powder",
+    cilantro:"coriander leaf","coriander leaves":"coriander leaf","dhania leaves":"coriander leaf",
+    leaves:"leaf","curry leaves":"curry leaf","bay leaves":"bay leaf",chilies:"chili",chillies:"chili",
     tomatoes:"tomato",potatoes:"potato",onions:"onion",carrots:"carrot",
     apples:"apple",bananas:"banana",mangoes:"mango",mangos:"mango",
     beans:"bean","black beans":"bean","pinto beans":"bean","white beans":"bean",
@@ -1637,10 +1649,11 @@ function normalizeIngredient(item){
     peas:"pea",lentils:"lentil",eggs:"egg"
   };
   let value=String(item||"").trim().toLowerCase().replace(/_/g," ").replace(/\s+/g," ");
-  const modifiers=/^(fresh|dried|ground|minced|chopped|diced|crushed|sliced|grated|shredded|boneless|skinless|medium|large|small|whole|raw|cooked|frozen|canned)\s+/;
+  const modifiers=/^(fresh|dried|ground|minced|chopped|diced|crushed|sliced|grated|shredded|split|boneless|skinless|medium|large|small|whole|raw|cooked|frozen|canned)\s+/;
   while(modifiers.test(value)) value=value.replace(modifiers,"");
   if(aliases[value]) return aliases[value];
-  if(value.length>4 && value.endsWith("s") && !value.endsWith("ss")) value=value.slice(0,-1);
+  if(value.length>4 && value.endsWith("ies")) value=value.slice(0,-3)+"y";
+  else if(value.length>4 && value.endsWith("s") && !value.endsWith("ss")) value=value.slice(0,-1);
   return value;
 }
 
@@ -1855,7 +1868,7 @@ const WIKI_RECIPE_CATEGORIES={
 const wikiRecipeSearchCache=new Map();
 
 function recipeCacheKey(cuisine){
-  return "nutriplate-wiki-catalog-v3-"+encodeURIComponent(cuisine.toLowerCase());
+  return "nutriplate-wiki-catalog-v5-"+encodeURIComponent(cuisine.toLowerCase());
 }
 function loadWikiRecipeCache(cuisine){
   try{
@@ -1881,7 +1894,7 @@ function getMealDiet(ingredients){
     .replace(/\b(?:coconut|oat|almond|soy|soya|rice|cashew|hemp|pea|macadamia|hazelnut)\s+(?:milk|cream|yogurt|yoghurt|cheese)\b/g,"")
     .replace(/\b(?:vegan|plant[- ]based|dairy[- ]free)\s+(?:butter|cheese|cream|milk|mayo|mayonnaise|yogurt|yoghurt)\b/g,"")
     .replace(/\bpeanut butter\b|\bcream of coconut\b/g,"");
-  if(/\b(chicken|beef|pork|lamb|mutton|turkey|duck|goose|fish|salmon|tuna|cod|prawn|shrimp|crab|lobster|clam|mussel|oyster|anchov|sardine|bacon|ham|sausage|chorizo|gelatin|gelatine|lard|suet|meat|worcestershire|rennet)\b/.test(text)) return "Non-Vegetarian";
+  if(/\b(chicken|beef|steak|veal|venison|bison|rabbit|pork|lamb|mutton|turkey|duck|goose|fish|salmon|tuna|cod|prawn|shrimp|crab|lobster|clam|mussel|oyster|anchov|sardine|bacon|ham|sausage|chorizo|gelatin|gelatine|lard|suet|meat|worcestershire|rennet)\b/.test(text)) return "Non-Vegetarian";
   if(/\b(stock|broth|bouillon)\b/.test(text) && !/\b(vegetable|mushroom)\s+(stock|broth)\b/.test(text)) return "Diet not verified";
   if(/\b(egg|eggs|mayonnaise|mayo)\b/.test(text)) return "Egg Vegetarian";
   if(/\b(milk|cream|cheese|butter|ghee|yogurt|yoghurt|paneer|curd|whey|honey|buttermilk|parmesan|mozzarella|cheddar|feta|ricotta)\b/.test(text)) return "Vegetarian";
@@ -1936,10 +1949,21 @@ function parseWikiRecipe(title,extract,cuisineOverride,categories=[]){
   const ingredientLines=wikiSectionLines(extract,"Ingredients").filter(line=>!/^(.+\s+)?ingredients?$/i.test(line));
   const instructionLines=wikiSectionLines(extract,"Procedure").filter(line=>! /^(preparation|cooking|directions|method)$/i.test(line));
   if(ingredientLines.length<3||instructionLines.length<2) return null;
-  const ingredients=ingredientLines.filter(line=>!/^edit\b/i.test(line)&&!/^image$/i.test(line)).map(line=>{
-    const amountPattern="(?:\\d+(?:[.,]\\d+)?(?:(?:\\s*(?:to|[-–—])\\s*\\d+(?:[.,]\\d+)?)|(?:\\s*[¼½¾⅓⅔⅛⅜⅝⅞])|(?:\\s+\\d+\\s*\\/\\s*\\d+))?|\\d+\\s*\\/\\s*\\d+|[¼½¾⅓⅔⅛⅜⅝⅞])";
-    const unitPattern="(?:kg|g|mg|ml|l|cups?|tablespoons?|tbsp|teaspoons?|tsp|ounces?|oz|pounds?|lb|pinches?|cloves?|pieces?)";
-    const measurePattern=new RegExp("^\\s*("+amountPattern+"(?:\\s+"+amountPattern+")?\\s*(?:"+unitPattern+")?)\\s*","i");
+  const procedureLines=new Set(instructionLines.map(line=>line.toLowerCase().replace(/\s+/g," ").trim()));
+  const ingredientRows=ingredientLines.filter(line=>!/^\[?edit\b/i.test(line)&&!/^image$/i.test(line)&&!procedureLines.has(line.toLowerCase().replace(/\s+/g," ").trim())).map(line=>{
+    if(!line.includes("|")) return {line,tableMeasure:""};
+    const cells=line.split("|").map(cell=>cell.trim());
+    const label=(cells[0]||"").replace(/\s*\^?\{?\[?note[^\]]*\]?\}?/ig,"").trim();
+    if(!label||/^(?:ingredient|total|[-–—]+)$/i.test(label)) return null;
+    const tableMeasure=[cells[2],cells[1],cells[3]].find(cell=>cell&&!/^(?:[-–—]+|n\/?a)$/i.test(cell))||"";
+    return {line:label,tableMeasure};
+  }).filter(Boolean);
+  const parsedIngredients=ingredientRows.map(row=>{
+    const line=row.line;
+    const amountAtom="(?:\\d+(?:[.,]\\d+)?(?:\\s*(?:\\d+\\s*\\/\\s*\\d+|[¼½¾⅓⅔⅛⅜⅝⅞]))?|\\d+\\s*\\/\\s*\\d+|[¼½¾⅓⅔⅛⅜⅝⅞])";
+    const amountPattern=amountAtom+"(?:\\s*(?:to|[-–—])\\s*"+amountAtom+")?";
+    const unitPattern="(?:pounds?|lbs?|kilograms?|kgs?|grams?|milligrams?|milliliters?|millilitres?|ml|oz|ounces?|lb|kg|g|mg|tablespoons?|tbsp|teaspoons?|tsp|cups?|liters?|litres?|l|pinch(?:es)?|cloves?|pieces?)(?![a-z])";
+    const measurePattern=new RegExp("^\\s*("+amountPattern+"(?:\\s+"+unitPattern+")?)(?:\\s+|$)","i");
     const measureMatch=line.match(measurePattern);
     let name=line.replace(measurePattern,"");
     name=name.replace(/^(?:of\s+)/i,"")
@@ -1948,8 +1972,10 @@ function parseWikiRecipe(title,extract,cuisineOverride,categories=[]){
       .replace(/,?\s*(?:preferably|to taste|for garnish|for cooking|for serving)\b.*$/i,"")
       .replace(/\s*\([^)]*\)\s*$/,"")
       .trim();
-    return {name,measure:measureMatch?measureMatch[1].trim():""};
+    const tableMeasureMatch=row.tableMeasure.match(measurePattern);
+    return {name,measure:tableMeasureMatch?tableMeasureMatch[1].trim():measureMatch?measureMatch[1].trim():row.tableMeasure};
   });
+  const ingredients=parsedIngredients;
   if(ingredients.length<3) return null;
   const name=title.replace(/^Cookbook:/,"").replace(/_/g," ").replace(/\s+(?:I{1,3}|IV|V)$/,"");
   const category=/(breakfast|dosa|idli|pancake|poha|upma)/i.test(name)?"Breakfast":/(dessert|kheer|halwa|sweet|rasmalai|ladoo|payasam)/i.test(name)?"Dessert":/(snack|samosa|vada|puri|pakora|chaat)/i.test(name)?"Snack":"Main";
@@ -1986,6 +2012,32 @@ async function fetchWikiRecipePages(titles){
   return titles.map(title=>pageByTitle.get(title)).filter(Boolean);
 }
 
+async function fetchWikiCategoryTitles(category){
+  const titles=[];
+  const visitedCategories=new Set();
+  const pendingCategories=["Category:"+category];
+  while(pendingCategories.length){
+    const currentCategory=pendingCategories.pop();
+    if(visitedCategories.has(currentCategory)) continue;
+    visitedCategories.add(currentCategory);
+    const baseParams=new URLSearchParams({action:"query",list:"categorymembers",cmtitle:currentCategory,cmtype:"page|subcat",cmlimit:"max",format:"json",origin:"*"});
+    let continuation=null;
+    do{
+      const params=new URLSearchParams(baseParams);
+      if(continuation) Object.entries(continuation).forEach(([key,value])=>params.set(key,value));
+      const response=await fetch(WIKIBOOKS_API+"?"+params.toString());
+      if(!response.ok) throw new Error("Wikibooks category returned "+response.status);
+      const data=await response.json();
+      for(const member of data.query?.categorymembers||[]){
+        if(member.ns===14) pendingCategories.push(member.title);
+        else if(member.ns===0) titles.push(member.title);
+      }
+      continuation=data.continue||null;
+    }while(continuation);
+  }
+  return [...new Set(titles)];
+}
+
 async function searchWikiRecipes(cuisine,ingredients=[]){
   const category=cuisine==="Any"?"Recipes":WIKI_RECIPE_CATEGORIES[cuisine];
   if(!category) return [];
@@ -1997,6 +2049,18 @@ async function searchWikiRecipes(cuisine,ingredients=[]){
     if(saved){
       wikiRecipeSearchCache.set(cacheKey,saved);
       return saved;
+    }
+    if(cuisine!=="Any"){
+      try{
+        const titles=await fetchWikiCategoryTitles(category);
+        const pages=await fetchWikiRecipePages(titles);
+        const recipes=pages.map(page=>parseWikiRecipe(page.title,page.extract||"",cuisine,page.categories||[])).filter(Boolean);
+        wikiRecipeSearchCache.set(cacheKey,recipes);
+        saveWikiRecipeCache(cuisine,recipes);
+        return recipes;
+      }catch(error){
+        console.warn("Could not load the complete cuisine recipe list",cuisine,error);
+      }
     }
   }
 
@@ -2130,9 +2194,37 @@ async function recipesForIngredients(userIngredients,cuisine,diet,meal){
   return candidates.slice(0,12).map(item=>byId.get(item.recipe.id)||item.recipe);
 }
 
+let activeCuisineBrowse={name:"",recipes:[],loaded:0,loading:false};
+let cuisineBrowseRequestId=0;
+
 async function recipesForCuisine(cuisine){
-  const recipes=await searchWikiRecipes(cuisine,[]);
-  return attachCommonsPhotos(recipes.slice(0,12));
+  return searchWikiRecipes(cuisine,[]);
+}
+
+async function loadMoreCuisineRecipes(button){
+  const browse=activeCuisineBrowse;
+  if(browse.requestId!==cuisineBrowseRequestId) return;
+  if(!browse.name||browse.loading||browse.loaded>=browse.recipes.length) return;
+  browse.loading=true;
+  button.disabled=true;
+  button.textContent="Loading more recipes…";
+  try{
+    const nextRecipes=browse.recipes.slice(browse.loaded,browse.loaded+12);
+    const withPhotos=await attachCommonsPhotos(nextRecipes);
+    if(activeCuisineBrowse!==browse||browse.requestId!==cuisineBrowseRequestId) return;
+    saveWikiRecipeCache(browse.name,browse.recipes);
+    document.getElementById("cuisineRecipeGrid").insertAdjacentHTML("beforeend",withPhotos.map(recipe=>plannerRecipeCard(recipe,null,null,null)).join(""));
+    browse.loaded+=withPhotos.length;
+    if(browse.loaded>=browse.recipes.length){ button.remove(); return; }
+    button.disabled=false;
+    button.textContent="Show more recipes";
+  }catch(error){
+    console.error("Could not load more cuisine recipes",error);
+    button.disabled=false;
+    button.textContent="Try loading more";
+  }finally{
+    browse.loading=false;
+  }
 }
 
 function recipeIngredientMatches(userIngredient,recipeIngredient){
@@ -2145,9 +2237,13 @@ function recipeIngredientMatches(userIngredient,recipeIngredient){
   if(userWords==="dal" && /\bdal\b/.test(recipeWords)) return true;
   if(userWords==="rice" && /\brice (?:vinegar|flour|paper|wine)\b/.test(recipeWords)) return false;
   if(userWords==="rice" && /\brice\b/.test(recipeWords)) return true;
+  if(userWords==="flour" && /\b(?:rice|chickpea|gram|corn|maize|almond|coconut|oat|buckwheat|cassava|potato) flour\b/.test(recipeWords)) return false;
   if(userWords==="flour" && /\bflour\b/.test(recipeWords)) return true;
   if(userWords==="onion" && /\b(?:red|white|yellow|spring|green) onion\b/.test(recipeWords)) return true;
-  if(userWords==="butter" && /\bpeanut butter\b/.test(recipeWords)) return false;
+  if(userWords==="butter" && /\b(?:peanut|almond|cashew|sunflower seed|vegan) butter\b/.test(recipeWords)) return false;
+  if(userWords==="milk" && /\b(?:coconut|oat|almond|soy|soya|rice|cashew|hemp|pea|macadamia|hazelnut) milk\b/.test(recipeWords)) return false;
+  if(userWords==="cream" && /\b(?:coconut|oat|soy|soya|almond|cashew|pea) cream\b/.test(recipeWords)) return false;
+  if(userWords==="cheese" && /\b(?:vegan|plant[- ]based|nut|almond|cashew|soy|soya|coconut|rice) cheese\b/.test(recipeWords)) return false;
   if((userWords==="ginger"||userWords==="garlic") && /\bginger garlic paste\b/.test(recipeWords)) return true;
   const recipeTokens=recipeWords.split(/[^a-z0-9]+/).filter(Boolean);
   const userTokens=userWords.split(/[^a-z0-9]+/).filter(Boolean);
@@ -2331,58 +2427,39 @@ function renderCuisineToolbar(){
 
 
 async function showCuisine(name,button){
-
-  document.querySelectorAll(".cuisine-toolbar button")
-    .forEach(btn=>btn.classList.remove("active"));
+  const requestId=++cuisineBrowseRequestId;
+  document.querySelectorAll(".cuisine-toolbar button").forEach(btn=>btn.classList.remove("active"));
   if(button) button.classList.add("active");
-
-  const box=document.getElementById("cuisineResults");
   const selected=name==="All"?"Any":name;
-
   if(selected==="Any"){
-    box.innerHTML=`
-      <div class="card empty">
-        <h3>🌍 Choose a cuisine to browse</h3>
-        <p>Select a cuisine card or tab to load its available recipes, photos, ingredients, and cooking steps.</p>
-      </div>`;
+    navigateTo("cuisines");
+    document.getElementById("cuisineResults").innerHTML='<div class="card empty"><h3>🌍 Choose a cuisine to browse</h3><p>Select a cuisine card or tab to open recipes, photos, ingredients, and cooking steps.</p></div>';
     return;
   }
-
-  box.innerHTML=`
-    <div class="card empty">
-      <h3>🌍 Loading ${escapeHTML(selected+" recipes")}…</h3>
-    </div>`;
-
+  navigateTo("cuisineDetail");
+  const box=document.getElementById("cuisineDetailContent");
+  box.innerHTML='<div class="card empty"><h3>🌍 Loading '+escapeHTML(selected+" recipes")+'…</h3></div>';
   try{
     const recipes=await recipesForCuisine(selected);
+    if(requestId!==cuisineBrowseRequestId) return;
     if(!recipes.length){
-      box.innerHTML=`
-        <div class="card empty">
-          <h3>🍽️ No recipes found for this cuisine yet</h3>
-          <p>Choose another cuisine or try again later.</p>
-        </div>`;
+      box.innerHTML='<div class="card empty"><h3>🍽️ No recipes found for this cuisine yet</h3><p>Choose another cuisine or try again later.</p></div>';
       return;
     }
-    box.innerHTML=`
-      <div class="card">
-        <h2>${selected==="Any"?"🌍 World Food Collection":(cuisineInfo[selected]?.emoji||"🌍")+" "+escapeHTML(selected)+" Cuisine"}</h2>
-        <p class="counter">Recipes show ingredients and cooking steps with source and photo credits.</p>
-        <div class="grid">${recipes.map(recipe=>plannerRecipeCard(recipe,null,null,null)).join("")}</div>
-      </div>`;
+    const firstBatch=await attachCommonsPhotos(recipes.slice(0,12));
+    if(requestId!==cuisineBrowseRequestId) return;
+    saveWikiRecipeCache(selected,recipes);
+    const browse={name:selected,recipes,loaded:firstBatch.length,loading:false,requestId};
+    activeCuisineBrowse=browse;
+    const countText='Showing '+firstBatch.length+' of '+recipes.length+' recipes. Each card includes ingredients, cooking steps, and source and photo credits when available.';
+    const moreButton=browse.loaded<recipes.length?'<div style="text-align:center;margin-top:18px"><button class="secondary" onclick="loadMoreCuisineRecipes(this)">Show more recipes</button></div>':'';
+    box.innerHTML='<div class="card"><h2>'+(cuisineInfo[selected]?.emoji||"🌍")+' '+escapeHTML(selected)+' Cuisine</h2><p class="counter">'+countText+'</p><div class="grid" id="cuisineRecipeGrid">'+firstBatch.map(recipe=>plannerRecipeCard(recipe,null,null,null)).join("")+'</div>'+moreButton+'</div>';
   }catch(error){
     console.error(error);
-    box.innerHTML=`
-      <div class="card empty">
-        <h3>⚠️ Recipe collection is temporarily unavailable</h3>
-        <p>Please check your internet connection and try again.</p>
-        <p class="recipe-credit">
-          Recipes come from the
-          <a href="https://en.wikibooks.org/wiki/Cookbook:Recipes" target="_blank" rel="noopener noreferrer">Wikibooks Cookbook</a>.
-        </p>
-      </div>`;
+    box.innerHTML='<div class="card empty"><h3>⚠️ Recipe collection is temporarily unavailable</h3><p>Please check your internet connection and try again.</p><p class="recipe-credit">Recipes come from the <a href="https://en.wikibooks.org/wiki/Cookbook:Recipes" target="_blank" rel="noopener noreferrer">Wikibooks Cookbook</a>.</p></div>';
   }
-
 }
+
 
 
 /* =========================================================
